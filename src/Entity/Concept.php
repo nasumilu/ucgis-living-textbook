@@ -350,6 +350,7 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
    */
   private ?string $imagePath = null;
 
+<<<<<<< HEAD
   /**
      * @Assert\Image(
      *     maxSize="2M",
@@ -358,6 +359,8 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
      */
   private $imageFile;
 
+=======
+>>>>>>> a459b8e0 (adding imagepath attribute to concept)
   /** Concept constructor. */
   public function __construct()
   {
