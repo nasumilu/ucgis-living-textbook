@@ -29,7 +29,7 @@ class NamingService
   private ?StudyArea $studyArea = null;
 
   public function __construct(
-      TranslatorInterface $translator, StudyAreaFieldConfigurationRepository $fieldConfigurationRepository)
+    TranslatorInterface $translator, StudyAreaFieldConfigurationRepository $fieldConfigurationRepository)
   {
     $this->translator                   = $translator;
     $this->fieldConfigurationRepository = $fieldConfigurationRepository;
@@ -67,32 +67,32 @@ class NamingService
   {
     /* @noinspection PhpUnhandledExceptionInspection */
     return $this->cache->get(sprintf('studyarea.%d.naming', $studyArea->getId()),
-        function (ItemInterface $item) use ($studyArea) {
-          $conf = $studyArea->getFieldConfiguration() ?: new StudyAreaFieldConfiguration();
+      function (ItemInterface $item) use ($studyArea) {
+        $conf = $studyArea->getFieldConfiguration() ?: new StudyAreaFieldConfiguration();
 
-          $conceptNames = new ResolvedConceptNames(
-              $conf->getConceptDefinitionName() ?: $this->translator->trans('concept.definition'),
-              $conf->getConceptIntroductionName() ?: $this->translator->trans('concept.introduction'),
-              $conf->getConceptSynonymsName() ?: $this->translator->trans('concept.synonyms'),
-              $conf->getConceptPriorKnowledgeName() ?: $this->translator->trans('concept.prior-knowledge'),
-              $conf->getConceptTheoryExplanationName() ?: $this->translator->trans('concept.theory-explanation'),
-              $conf->getConceptHowtoName() ?: $this->translator->trans('concept.how-to'),
-              $conf->getConceptExamplesName() ?: $this->translator->trans('concept.examples'),
-              $conf->getConceptSelfAssessmentName() ?: $this->translator->trans('concept.self-assessment'),
-              $conf->getConceptAdditionalResourcesName() ?: $this->translator->trans('concept.additional-resources'),
-              $conf->getConceptImagePathName() ?: $this->translator->trans('concept.image-path')
-          );
+        $conceptNames = new ResolvedConceptNames(
+          $conf->getConceptDefinitionName() ?: $this->translator->trans('concept.definition'),
+          $conf->getConceptIntroductionName() ?: $this->translator->trans('concept.introduction'),
+          $conf->getConceptSynonymsName() ?: $this->translator->trans('concept.synonyms'),
+          $conf->getConceptPriorKnowledgeName() ?: $this->translator->trans('concept.prior-knowledge'),
+          $conf->getConceptTheoryExplanationName() ?: $this->translator->trans('concept.theory-explanation'),
+          $conf->getConceptHowtoName() ?: $this->translator->trans('concept.how-to'),
+          $conf->getConceptExamplesName() ?: $this->translator->trans('concept.examples'),
+          $conf->getConceptSelfAssessmentName() ?: $this->translator->trans('concept.self-assessment'),
+          $conf->getConceptAdditionalResourcesName() ?: $this->translator->trans('concept.additional-resources'),
+          $conf->getConceptImagePathName() ?: $this->translator->trans('concept.image-path')
+        );
 
-          $learningOutcomeNames = new ResolvedLearningOutcomeNames(
-              $conf->getLearningOutcomeObjName() ?: $this->translator->trans('learning-outcome._name')
-          );
+        $learningOutcomeNames = new ResolvedLearningOutcomeNames(
+          $conf->getLearningOutcomeObjName() ?: $this->translator->trans('learning-outcome._name')
+        );
 
-          $result = new ResolvedNames($conceptNames, $learningOutcomeNames);
-          $result->resolvePlurals(new EnglishInflector());
+        $result = new ResolvedNames($conceptNames, $learningOutcomeNames);
+        $result->resolvePlurals(new EnglishInflector());
 
-          $item->tag(self::CACHE_TAG);
+        $item->tag(self::CACHE_TAG);
 
-          return $result;
-        });
+        return $result;
+      });
   }
 }

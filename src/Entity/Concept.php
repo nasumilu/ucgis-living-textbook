@@ -41,10 +41,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author BobV
  *
  * @ORM\Table()
+ *
  * @ORM\Entity(repositoryClass="App\Repository\ConceptRepository")
+ *
  * @ORM\HasLifecycleCallbacks()
  *
  * @Gedmo\SoftDeleteable(fieldName="deletedAt")
+ *
  * @JMSA\ExclusionPolicy("all")
  *
  * @ConceptRelationValidator()
@@ -57,14 +60,16 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
   use ReviewableTrait;
 
   /**
-   *
    * @ORM\Column(name="name", type="string", length=255, nullable=false)
    *
    * @Assert\NotBlank()
+   *
    * @Assert\Length(min=3, max=255)
    *
    * @JMSA\Expose()
+   *
    * @JMSA\Groups({"Default", "review_change", "name_only"})
+   *
    * @JMSA\Type("string")
    */
   private string $name = '';
@@ -72,51 +77,59 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
   /**
    * Whether this concept should be seen as an instance.
    *
-   *
    * @ORM\Column(name="instance", type="boolean")
+   *
    * @JMSA\Expose()
+   *
    * @JMSA\Groups({"Default", "review_change"})
+   *
    * @JMSA\Type("boolean")
    */
   private bool $instance = false;
 
   /**
-   * @var DataDefinition
-   *
    * @ORM\OneToOne(targetEntity="App\Entity\Data\DataDefinition", cascade={"persist","remove"})
+   * 
    * @ORM\JoinColumn(name="definition_id", referencedColumnName="id", nullable=true)
    *
    * @Assert\Valid()
    *
    * @JMSA\Expose()
+   *
    * @JMSA\Groups({"review_change"})
+   * 
    * @JMSA\Type(DataDefinition::class)
    */
   private ?DataDefinition $definition = null;
 
   /**
-   *
    * @ORM\OneToOne(targetEntity="App\Entity\Data\DataIntroduction", cascade={"persist","remove"})
+   *
    * @ORM\JoinColumn(name="introduction_id", referencedColumnName="id", nullable=false)
    *
    * @Assert\NotNull()
+   *
    * @Assert\Valid()
    *
    * @JMSA\Expose()
+   *
    * @JMSA\Groups({"review_change"})
+   *
    * @JMSA\Type(DataIntroduction::class)
    */
   private DataIntroduction $introduction;
 
   /**
-   *
    * @ORM\Column(name="synonyms", type="string", length=512, nullable=false)
    *
    * @Assert\NotNull()
+   *
    * @Assert\Length(max=512)
    *
    * @JMSA\Expose()
+   *
    * @JMSA\Groups({"review_change"})
+   *
    * @JMSA\Type("string")
    */
   private string $synonyms = '';
@@ -125,18 +138,24 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
    * @var Collection<Concept>
    *
    * @ORM\ManyToMany(targetEntity="App\Entity\Concept", inversedBy="priorKnowledgeOf")
+   *
    * @ORM\JoinTable(name="concepts_prior_knowledge",
    *      joinColumns={@ORM\JoinColumn(name="concept_id", referencedColumnName="id")},
    *      inverseJoinColumns={@ORM\JoinColumn(name="prior_knowledge_id", referencedColumnName="id")}
    *      )
+   *
    * @ORM\OrderBy({"name" = "ASC"})
    *
    * @Assert\NotNull()
+   *
    * @Assert\Valid()
    *
    * @JMSA\Expose()
+   *
    * @JMSA\Groups({"review_change"})
+   *
    * @JMSA\Type("ArrayCollection<App\Entity\Concept>")
+   *
    * @JMSA\MaxDepth(2)
    */
   private Collection $priorKnowledge;
@@ -152,56 +171,67 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
    * @var Collection<LearningOutcome>
    *
    * @ORM\ManyToMany(targetEntity="App\Entity\LearningOutcome", inversedBy="concepts")
+   *
    * @ORM\JoinTable(name="concepts_learning_outcomes",
    *      joinColumns={@ORM\JoinColumn(name="concept_id", referencedColumnName="id")},
    *      inverseJoinColumns={@ORM\JoinColumn(name="learning_outcome_id", referencedColumnName="id")}
    *      )
+   *
    * @ORM\OrderBy({"number" = "ASC"})
    *
    * @Assert\NotNull()
    *
    * @JMSA\Expose()
+   *
    * @JMSA\Groups({"review_change"})
+   *
    * @JMSA\Type("ArrayCollection<App\Entity\LearningOutcome>")
+   *
    * @JMSA\MaxDepth(2)
    */
   private Collection $learningOutcomes;
 
   /**
-   *
    * @ORM\OneToOne(targetEntity="App\Entity\Data\DataTheoryExplanation", cascade={"persist","remove"})
+   *
    * @ORM\JoinColumn(name="theory_explanation_id", referencedColumnName="id", nullable=false)
    *
    * @Assert\Valid()
    *
    * @JMSA\Expose()
+   *
    * @JMSA\Groups({"review_change"})
+   *
    * @JMSA\Type(DataTheoryExplanation::class)
    */
   private DataTheoryExplanation $theoryExplanation;
 
   /**
-   *
    * @ORM\OneToOne(targetEntity="App\Entity\Data\DataHowTo", cascade={"persist", "remove"})
+   *
    * @ORM\JoinColumn(name="how_to_id", referencedColumnName="id", nullable=false)
    *
    * @Assert\Valid()
    *
    * @JMSA\Expose()
+   *
    * @JMSA\Groups({"review_change"})
+   *
    * @JMSA\Type(DataHowTo::class)
    */
   private DataHowTo $howTo;
 
   /**
-   *
    * @ORM\OneToOne(targetEntity="App\Entity\Data\DataExamples", cascade={"persist", "remove"})
+   *
    * @ORM\JoinColumn(name="examples_id", referencedColumnName="id", nullable=false)
    *
    * @Assert\Valid()
    *
    * @JMSA\Expose()
+   *
    * @JMSA\Groups({"review_change"})
+   *
    * @JMSA\Type(DataExamples::class)
    */
   private DataExamples $examples;
@@ -210,17 +240,22 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
    * @var Collection<ExternalResource>
    *
    * @ORM\ManyToMany(targetEntity="App\Entity\ExternalResource", inversedBy="concepts")
+   *
    * @ORM\JoinTable(name="concepts_external_resources",
    *      joinColumns={@ORM\JoinColumn(name="concept_id", referencedColumnName="id")},
    *      inverseJoinColumns={@ORM\JoinColumn(name="external_resource_id", referencedColumnName="id")}
    *      )
+   *
    * @ORM\OrderBy({"title" = "ASC"})
    *
    * @Assert\NotNull()
    *
    * @JMSA\Expose()
+   *
    * @JMSA\Groups({"review_change"})
+   *
    * @JMSA\Type("ArrayCollection<App\Entity\ExternalResource>")
+   *
    * @JMSA\MaxDepth(2)
    */
   private Collection $externalResources;
@@ -229,17 +264,22 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
    * @var Collection<Contributor>
    *
    * @ORM\ManyToMany(targetEntity="App\Entity\Contributor", inversedBy="concepts")
+   *
    * @ORM\JoinTable(name="concepts_contributors",
    *      joinColumns={@ORM\JoinColumn(name="concept_id", referencedColumnName="id")},
    *      inverseJoinColumns={@ORM\JoinColumn(name="contributor_id", referencedColumnName="id")}
    *      )
+   *
    * @ORM\OrderBy({"name" = "ASC"})
    *
    * @Assert\NotNull()
    *
    * @JMSA\Expose()
+   *
    * @JMSA\Groups({"review_change"})
+   *
    * @JMSA\Type("ArrayCollection<App\Entity\Contributor>")
+   *
    * @JMSA\MaxDepth(2)
    */
   private Collection $contributors;
@@ -252,20 +292,24 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
    * @Assert\NotNull()
    *
    * @JMSA\Expose()
+   *
    * @JMSA\Type("ArrayCollection<App\Entity\Tag>")
+   *
    * @JMSA\MaxDepth(2)
    */
   private Collection $tags;
 
   /**
-   *
    * @ORM\OneToOne(targetEntity="App\Entity\Data\DataSelfAssessment", cascade={"persist", "remove"})
+   *
    * @ORM\JoinColumn(name="self_assessment_id", referencedColumnName="id", nullable=false)
    *
    * @Assert\Valid()
    *
    * @JMSA\Expose()
+   *
    * @JMSA\Groups({"review_change"})
+   *
    * @JMSA\Type(DataSelfAssessment::class)
    */
   private $selfAssessment;
@@ -288,15 +332,21 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
    * @var Collection<ConceptRelation>
    *
    * @ORM\OneToMany(targetEntity="ConceptRelation", mappedBy="source", cascade={"persist","remove"})
+   *
    * @ORM\OrderBy({"outgoingPosition" = "ASC"})
    *
    * @Assert\Valid()
+   *
    * @Assert\NotNull()
    *
    * @JMSA\Expose()
+   *
    * @JMSA\Groups({"relations", "review_change"})
+   *
    * @JMSA\SerializedName("relations")
+   *
    * @JMSA\Type("ArrayCollection<App\Entity\ConceptRelation>")
+   *
    * @JMSA\MaxDepth(3)
    */
   private Collection $outgoingRelations;
@@ -305,22 +355,28 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
    * @var Collection<ConceptRelation>
    *
    * @ORM\OneToMany(targetEntity="ConceptRelation", mappedBy="target", cascade={"persist","remove"})
+   *
    * @ORM\OrderBy({"incomingPosition" = "ASC"})
    *
    * @Assert\Valid()
+   *
    * @Assert\NotNull()
    *
    * @JMSA\Expose()
+   *
    * @JMSA\Groups({"review_change"})
+   *
    * @JMSA\Type("ArrayCollection<App\Entity\ConceptRelation>")
+   *
    * @JMSA\MaxDepth(3)
    */
   private Collection $incomingRelations;
 
   /**
-   *
    * @ORM\ManyToOne(targetEntity="StudyArea", inversedBy="concepts")
+   *
    * @ORM\JoinColumn(name="study_area_id", referencedColumnName="id", nullable=false)
+   *
    * @Assert\NotNull()
    */
   private ?StudyArea $studyArea = null;
@@ -407,6 +463,7 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
    * This method wil order the concept relations on flush.
    *
    * @ORM\PreFlush()
+   *
    * @noinspection PhpUnused
    *
    * @throws Exception
@@ -441,7 +498,9 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
 
   /**
    * @JMSA\Expose()
+   *
    * @JMSA\VirtualProperty()
+   *
    * @JMSA\Groups({"relations"})
    *
    * @noinspection PhpUnused
@@ -544,9 +603,9 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
     $this->filterDataOn($results, $this->getAdditionalResources(), 30, 'additional-resources', $search);
 
     return [
-        '_id'     => $this->getId(),
-        '_title'  => $this->getName(),
-        'results' => $results,
+      '_id'     => $this->getId(),
+      '_title'  => $this->getName(),
+      'results' => $results,
     ];
   }
 

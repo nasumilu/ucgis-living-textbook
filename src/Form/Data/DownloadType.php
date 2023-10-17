@@ -22,33 +22,29 @@ class DownloadType extends AbstractType
   public function buildForm(FormBuilderInterface $builder, array $options)
   {    
     $builder
-        ->add('type', ChoiceType::class, [
-            'label'   => 'data.download.type',
-            'choices' => $this->exportService->getChoices(),
-            'attr'    => [
-                'class' => 'download-type',
-            ],
-        ])
-        ->add('preview', DownloadPreviewType::class)
-        ->add('submit', SingleSubmitType::class, [
-            'label' => 'data.download.title',
-            'icon'  => 'fa-download',
-            'attr'  => [
-                'class' => 'btn btn-outline-success',
-            ],
-        ]);
-   
+      ->add('type', ChoiceType::class, [
+        'label'   => 'data.download.type',
+        'choices' => $this->exportService->getChoices(),
+        'attr'    => [
+          'class' => 'download-type',
+        ],
+      ])
+      ->add('preview', DownloadPreviewType::class)
+      ->add('submit', SingleSubmitType::class, [
+        'label' => 'data.download.title',
+        'icon'  => 'fa-download',
+        'attr'  => [
+          'class' => 'btn btn-outline-success',
+        ],
+      ]);
   }
 
   public function configureOptions(OptionsResolver $resolver)
-  {  
-    $resolver
-      ->setRequired('current_study_area')
-      ->setAllowedTypes('current_study_area', StudyArea::class)
-      ->setDefaults([
-        'attr' => [
-            'target' => '_blank',
-        ],
+  {
+    $resolver->setDefaults([
+      'attr' => [
+        'target' => '_blank',
+      ],
     ]);
 
     $resolver->setNormalizer('attr', function (OptionsResolver $optionsResolver, $attr) {
