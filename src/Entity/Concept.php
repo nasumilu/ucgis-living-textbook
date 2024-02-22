@@ -33,6 +33,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use JMS\Serializer\Annotation as JMSA;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Override;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -580,6 +581,7 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
   }
 
   /** Searches in the concept on the given search, returns an array with search result metadata. */
+  #[Override]
   public function searchIn(string $search): array
   {
     // Create result array
@@ -622,6 +624,7 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
    * @throws IncompatibleFieldChangedException
    * @throws ORMException
    */
+  #[Override]
   public function applyChanges(PendingChange $change, EntityManagerInterface $em, bool $ignoreEm = false): void
   {
     $changeObj = $this->testChange($change);
@@ -787,6 +790,7 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
     $conceptRelation->setRelationType($relationTypeRef);
   }
 
+  #[Override]
   public function getReviewTitle(): string
   {
     return $this->getName();
@@ -888,11 +892,13 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
     return $this;
   }
 
+  #[Override]
   public function getStudyArea(): ?StudyArea
   {
     return $this->studyArea;
   }
 
+  #[Override]
   public function setStudyArea(StudyArea $studyArea): Concept
   {
     $this->studyArea = $studyArea;

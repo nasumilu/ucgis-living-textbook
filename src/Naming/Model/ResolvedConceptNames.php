@@ -2,6 +2,7 @@
 
 namespace App\Naming\Model;
 
+use Override;
 use Symfony\Component\String\Inflector\InflectorInterface;
 
 class ResolvedConceptNames implements ResolvedNamesInterface
@@ -33,6 +34,7 @@ class ResolvedConceptNames implements ResolvedNamesInterface
     $this->imagePath           = strtolower($imagePath);
   }
 
+  #[Override]
   public function resolvePlurals(InflectorInterface $inflector)
   {
     // Nothing to do here

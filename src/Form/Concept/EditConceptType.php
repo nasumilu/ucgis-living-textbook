@@ -27,6 +27,7 @@ use App\Repository\ExternalResourceRepository;
 use App\Repository\LearningOutcomeRepository;
 use App\Repository\TagRepository;
 use App\Review\Model\PendingChangeObjectInfo;
+use Override;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -49,6 +50,7 @@ class EditConceptType extends AbstractType
     $this->namingService = $namingService;
   }
 
+  #[Override]
   public function buildForm(FormBuilderInterface $builder, array $options)
   {
     $names      = $this->namingService->get();
@@ -337,6 +339,7 @@ class EditConceptType extends AbstractType
       ]);
   }
 
+  #[Override]
   public function configureOptions(OptionsResolver $resolver)
   {
     $resolver->setRequired('concept');
