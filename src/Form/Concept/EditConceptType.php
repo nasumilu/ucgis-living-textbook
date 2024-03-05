@@ -40,10 +40,8 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EditConceptType extends AbstractType
 {
-  /** @var NamingService */
-  private $namingService;
-  /** @var TranslatorInterface */
-  private $translator;
+  private NamingService $namingService;
+  private TranslatorInterface $translator;
 
   public function __construct(TranslatorInterface $translator, NamingService $namingService)
   {

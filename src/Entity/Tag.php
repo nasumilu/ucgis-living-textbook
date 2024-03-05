@@ -29,24 +29,21 @@ class Tag implements StudyAreaFilteredInterface, IdInterface
   use SoftDeletable;
 
   /**
-   * @var StudyArea|null
    *
    * @ORM\ManyToOne(targetEntity="StudyArea", inversedBy="tags")
    * @ORM\JoinColumn(name="study_area_id", referencedColumnName="id", nullable=false)
-   *
    * @Assert\NotNull()
    */
-  private $studyArea;
+  private ?StudyArea $studyArea = null;
 
   /**
    * @var Collection<Concept>
    *
    * @ORM\ManyToMany(targetEntity="App\Entity\Concept", mappedBy="tags")
    */
-  private $concepts;
+  private Collection $concepts;
 
   /**
-   * @var string
    *
    * @ORM\Column(length=100, nullable=false)
    *
@@ -55,19 +52,17 @@ class Tag implements StudyAreaFilteredInterface, IdInterface
    *
    * @JMSA\Expose()
    */
-  private $name;
+  private string $name = '';
 
   /**
-   * @var string
    *
    * @ORM\Column(length=10, nullable=false)
    *
    * @Assert\NotBlank()
    * @Color()
-   *
    * @JMSA\Expose()
    */
-  private $color;
+  private string $color = '#8FBDAF';
 
   /**
    * @var string
@@ -82,9 +77,6 @@ class Tag implements StudyAreaFilteredInterface, IdInterface
 
   public function __construct()
   {
-    $this->name  = '';
-    $this->color = '#8FBDAF';
-
     $this->concepts = new ArrayCollection();
   }
 

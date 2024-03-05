@@ -57,7 +57,6 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
   use ReviewableTrait;
 
   /**
-   * @var string
    *
    * @ORM\Column(name="name", type="string", length=255, nullable=false)
    *
@@ -68,19 +67,18 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
    * @JMSA\Groups({"Default", "review_change", "name_only"})
    * @JMSA\Type("string")
    */
-  private $name;
+  private string $name = '';
 
   /**
    * Whether this concept should be seen as an instance.
    *
-   * @var bool
    *
    * @ORM\Column(name="instance", type="boolean")
    * @JMSA\Expose()
    * @JMSA\Groups({"Default", "review_change"})
    * @JMSA\Type("boolean")
    */
-  private $instance;
+  private bool $instance = false;
 
   /**
    * @var DataDefinition
@@ -97,7 +95,6 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
   private ?DataDefinition $definition = null;
 
   /**
-   * @var DataIntroduction
    *
    * @ORM\OneToOne(targetEntity="App\Entity\Data\DataIntroduction", cascade={"persist","remove"})
    * @ORM\JoinColumn(name="introduction_id", referencedColumnName="id", nullable=false)
@@ -109,10 +106,9 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
    * @JMSA\Groups({"review_change"})
    * @JMSA\Type(DataIntroduction::class)
    */
-  private $introduction;
+  private DataIntroduction $introduction;
 
   /**
-   * @var string
    *
    * @ORM\Column(name="synonyms", type="string", length=512, nullable=false)
    *
@@ -123,10 +119,10 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
    * @JMSA\Groups({"review_change"})
    * @JMSA\Type("string")
    */
-  private $synonyms;
+  private string $synonyms = '';
 
   /**
-   * @var Concept[]|Collection
+   * @var Collection<Concept>
    *
    * @ORM\ManyToMany(targetEntity="App\Entity\Concept", inversedBy="priorKnowledgeOf")
    * @ORM\JoinTable(name="concepts_prior_knowledge",
@@ -143,17 +139,17 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
    * @JMSA\Type("ArrayCollection<App\Entity\Concept>")
    * @JMSA\MaxDepth(2)
    */
-  private $priorKnowledge;
+  private Collection $priorKnowledge;
 
   /**
-   * @var Concept[]|Collection
+   * @var Collection<Concept>
    *
    * @ORM\ManyToMany(targetEntity="App\Entity\Concept", mappedBy="priorKnowledge")
    */
-  private $priorKnowledgeOf;
+  private Collection $priorKnowledgeOf;
 
   /**
-   * @var LearningOutcome[]|Collection
+   * @var Collection<LearningOutcome>
    *
    * @ORM\ManyToMany(targetEntity="App\Entity\LearningOutcome", inversedBy="concepts")
    * @ORM\JoinTable(name="concepts_learning_outcomes",
@@ -169,10 +165,9 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
    * @JMSA\Type("ArrayCollection<App\Entity\LearningOutcome>")
    * @JMSA\MaxDepth(2)
    */
-  private $learningOutcomes;
+  private Collection $learningOutcomes;
 
   /**
-   * @var DataTheoryExplanation
    *
    * @ORM\OneToOne(targetEntity="App\Entity\Data\DataTheoryExplanation", cascade={"persist","remove"})
    * @ORM\JoinColumn(name="theory_explanation_id", referencedColumnName="id", nullable=false)
@@ -183,10 +178,9 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
    * @JMSA\Groups({"review_change"})
    * @JMSA\Type(DataTheoryExplanation::class)
    */
-  private $theoryExplanation;
+  private DataTheoryExplanation $theoryExplanation;
 
   /**
-   * @var DataHowTo
    *
    * @ORM\OneToOne(targetEntity="App\Entity\Data\DataHowTo", cascade={"persist", "remove"})
    * @ORM\JoinColumn(name="how_to_id", referencedColumnName="id", nullable=false)
@@ -197,10 +191,9 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
    * @JMSA\Groups({"review_change"})
    * @JMSA\Type(DataHowTo::class)
    */
-  private $howTo;
+  private DataHowTo $howTo;
 
   /**
-   * @var DataExamples
    *
    * @ORM\OneToOne(targetEntity="App\Entity\Data\DataExamples", cascade={"persist", "remove"})
    * @ORM\JoinColumn(name="examples_id", referencedColumnName="id", nullable=false)
@@ -211,7 +204,7 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
    * @JMSA\Groups({"review_change"})
    * @JMSA\Type(DataExamples::class)
    */
-  private $examples;
+  private DataExamples $examples;
 
   /**
    * @var Collection<ExternalResource>
@@ -230,7 +223,7 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
    * @JMSA\Type("ArrayCollection<App\Entity\ExternalResource>")
    * @JMSA\MaxDepth(2)
    */
-  private $externalResources;
+  private Collection $externalResources;
 
   /**
    * @var Collection<Contributor>
@@ -249,7 +242,7 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
    * @JMSA\Type("ArrayCollection<App\Entity\Contributor>")
    * @JMSA\MaxDepth(2)
    */
-  private $contributors;
+  private Collection $contributors;
 
   /**
    * @var Collection<Tag>
@@ -262,10 +255,9 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
    * @JMSA\Type("ArrayCollection<App\Entity\Tag>")
    * @JMSA\MaxDepth(2)
    */
-  private $tags;
+  private Collection $tags;
 
   /**
-   * @var DataSelfAssessment
    *
    * @ORM\OneToOne(targetEntity="App\Entity\Data\DataSelfAssessment", cascade={"persist", "remove"})
    * @ORM\JoinColumn(name="self_assessment_id", referencedColumnName="id", nullable=false)
@@ -307,7 +299,7 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
    * @JMSA\Type("ArrayCollection<App\Entity\ConceptRelation>")
    * @JMSA\MaxDepth(3)
    */
-  private $outgoingRelations;
+  private Collection $outgoingRelations;
 
   /**
    * @var Collection<ConceptRelation>
@@ -323,17 +315,15 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
    * @JMSA\Type("ArrayCollection<App\Entity\ConceptRelation>")
    * @JMSA\MaxDepth(3)
    */
-  private $incomingRelations;
+  private Collection $incomingRelations;
 
   /**
-   * @var StudyArea
    *
    * @ORM\ManyToOne(targetEntity="StudyArea", inversedBy="concepts")
    * @ORM\JoinColumn(name="study_area_id", referencedColumnName="id", nullable=false)
-   *
    * @Assert\NotNull()
    */
-  private $studyArea;
+  private ?StudyArea $studyArea = null;
 
   /** @ORM\Column(type="json", nullable=true) */
   private ?array $dotronConfig = null;
