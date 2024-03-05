@@ -6,6 +6,7 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
 use Gedmo\SoftDeleteable\SoftDeleteableListener;
+use Override;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class SoftDeletableSubscriber implements EventSubscriber
@@ -23,6 +24,7 @@ class SoftDeletableSubscriber implements EventSubscriber
    *
    * @return array
    */
+  #[Override]
   public function getSubscribedEvents()
   {
     return [SoftDeleteableListener::PRE_SOFT_DELETE];
@@ -49,7 +51,7 @@ class SoftDeletableSubscriber implements EventSubscriber
     // Make sure the unit of works knows about this
     $uow->propertyChanged($object, self::FIELD_NAME, $oldValue, $user);
     $uow->scheduleExtraUpdate($object, [
-        self::FIELD_NAME => [$oldValue, $user],
+      self::FIELD_NAME => [$oldValue, $user],
     ]);
   }
 }

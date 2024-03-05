@@ -8,25 +8,26 @@ stages:
   - deploy
 
 variables:
-  COMPOSER_REQUIRE_CHECKER_VERSION: 4.0.0
-  COMPOSER_UNUSED_VERSION: 0.7.12
-  DRENSO_PHP_VERSION: 8.1-d1
-  NODE_VERSION: 16
-  PHAN_VERSION: 5.3-d1
-  PHPUNIT_VERSION: 9.5-d3
-  PHP_SEC_CHECK_VERSION: 1.2.0
+  # renovate: datasource=github-releases depName=maglnet/ComposerRequireChecker
+  COMPOSER_REQUIRE_CHECKER_VERSION: 4.8.0
+  # renovate: datasource=github-releases depName=composer-unused/composer-unused
+  COMPOSER_UNUSED_VERSION: 0.8.11
+  DRENSO_PHP_VERSION: 8.3-d1-sury
+  NODE_VERSION: 20
+  PHAN_VERSION: 5.4-d3
+  # renovate: datasource=github-releases depName=fabpot/local-php-security-checker
+  PHP_SEC_CHECK_VERSION: 2.0.6
   SASSLINT_VERSION: 1.12.1-d1
-  SHELLCHECK_VERSION: v0.7.1
+  SHELLCHECK_VERSION: v0.7.2
   TSLINT_VERSION: 5.18.0
   YAMLLINT_DIRECTORIES: config
   YAMLLINT_VERSION: 1.0.0
   YARN_AUDIT_EXCLUDE_LIST: ""
 
 # Prepare
-
 install-dependencies:
   stage: prepare
-  image: "drenso/php:${DRENSO_PHP_VERSION}"
+  image: "registry.drenso.dev/open/docker-images/php:${DRENSO_PHP_VERSION}"
   interruptible: true
   cache:
     key:
@@ -54,12 +55,13 @@ install-dependencies:
     - cp .secrets.json.dist .secrets.json
     - >- # Fix for http-host used in fos-js routing
       if [ "$CI_COMMIT_REF_NAME" = "master" ]; then
-        export HTTP_HOST="${STAGING_HOST}:${STAGING_HOST_PORT}"
+        export HTTP_HOST="${STAGING_HOST}"
       elif [ "$CI_COMMIT_REF_NAME" = "research" ]; then
-        export HTTP_HOST="${RESEARCH_HOST}:${RESEARCH_HOST_PORT}"
+        export HTTP_HOST="${RESEARCH_HOST}"
       else
         export HTTP_HOST="${PRODUCTION_HOST}"
       fi
+    - "sed -i \"s/HTTP_HOST=.*/HTTP_HOST=${HTTP_HOST}/g\" .env" # Set HTTP_HOST in env file, as env only no longer works
     - if [ -z ${COMPOSER_USER+x} ]; then echo "COMPOSER_USER not set, skipping composer auth configuration" ; else composer config http-basic.composer.drenso.dev ${COMPOSER_USER} ${COMPOSER_PASSWORD}; fi
   script:
     - composer validate --no-check-all
@@ -96,10 +98,9 @@ install-js-dependencies:
     - schedules
 
 # Code style fixer
-
 code-style-fixer:
   stage: cs-fix
-  image: "drenso/php:${DRENSO_PHP_VERSION}"
+  image: "registry.drenso.dev/open/docker-images/php:${DRENSO_PHP_VERSION}"
   needs:
     - job: install-dependencies
       artifacts: false
@@ -139,7 +140,6 @@ code-style-fixer:
     - tags
 
 # Lint
-
 php-cve-check:
   stage: lint
   image: alpine:latest
@@ -155,7 +155,7 @@ php-cve-check:
 
 composer-require-checker:
   stage: lint
-  image: "drenso/php:${DRENSO_PHP_VERSION}"
+  image: "registry.drenso.dev/open/docker-images/php:${DRENSO_PHP_VERSION}"
   interruptible: true
   needs:
     - job: install-dependencies
@@ -183,7 +183,7 @@ composer-require-checker:
 
 composer-unused:
   stage: lint
-  image: "drenso/php:${DRENSO_PHP_VERSION}"
+  image: "registry.drenso.dev/open/docker-images/php:${DRENSO_PHP_VERSION}"
   interruptible: true
   needs:
     - job: install-dependencies
@@ -196,10 +196,14 @@ composer-unused:
     paths:
       - vendor/
     policy: pull
+  artifacts:
+    reports:
+      codequality: composer-unused.json
   before_script:
     - curl -JOL https://github.com/composer-unused/composer-unused/releases/download/${COMPOSER_UNUSED_VERSION}/composer-unused.phar
   script:
-    - php composer-unused.phar
+    - php composer-unused.phar --no-progress --output-format=gitlab > composer-unused.json
+    - cat composer-unused.json
   tags:
     - docker
   except:
@@ -226,7 +230,7 @@ shellcheck:
 php-analysis:
   stage: lint
   image:
-    name: "drenso/phan:${PHAN_VERSION}"
+    name: "registry.drenso.dev/open/docker-images/phan:${PHAN_VERSION}"
     entrypoint: [""]
   needs:
     - job: install-dependencies
@@ -243,7 +247,11 @@ php-analysis:
   before_script: # Fix for new lazy ServiceEntityRepository being detected as redefined
     - |-
       if [[ -f vendor/doctrine/doctrine-bundle/Repository/ServiceEntityRepository.php ]]; then
-        sed -i '/LazyServiceEntityRepository/d' vendor/doctrine/doctrine-bundle/Repository/ServiceEntityRepository.php
+        sed -i '/ServiceEntityRepositoryProxy/d' vendor/doctrine/doctrine-bundle/Repository/ServiceEntityRepository.php # Replace with LegacyServiceEntityRepository when moving to ORM3
+      fi
+    - |-
+      if [[ -f vendor/myclabs/php-enum/stubs/Stringable.php ]]; then
+        rm vendor/myclabs/php-enum/stubs/Stringable.php
       fi
   script:
     - phan -k tests/phan/config.php
@@ -273,7 +281,7 @@ js-analysis:
 
 ts-analysis:
   stage: lint
-  image: "drenso/tslint:${TSLINT_VERSION}"
+  image: "registry.drenso.dev/open/docker-images/tslint:${TSLINT_VERSION}"
   needs: []
   interruptible: true
   script:
@@ -287,7 +295,7 @@ ts-analysis:
 
 yaml-analysis:
   stage: lint
-  image: "kickin/yamllint:${YAMLLINT_VERSION}"
+  image: "registry.gitlab.utwente.nl/idb/docker-images/yamllint:${YAMLLINT_VERSION}"
   needs: []
   interruptible: true
   script:
@@ -312,7 +320,7 @@ yarn-audit:
 
 sass-analysis:
   stage: lint
-  image: "drenso/sasslint:${SASSLINT_VERSION}"
+  image: "registry.drenso.dev/open/docker-images/sasslint:${SASSLINT_VERSION}"
   needs: []
   interruptible: true
   script:
@@ -325,7 +333,6 @@ sass-analysis:
     - production
 
 # Build
-
 build-assets:
   stage: build
   image: "node:${NODE_VERSION}"
@@ -362,11 +369,10 @@ build-assets:
     - schedules
 
 # Tests
-
 phpunit:
   stage: tests
   image:
-    name: "drenso/phpunit:${PHPUNIT_VERSION}"
+    name: "registry.drenso.dev/open/docker-images/php:${DRENSO_PHP_VERSION}"
     entrypoint: [""]
   interruptible: true
   needs:
@@ -382,7 +388,7 @@ phpunit:
   before_script:
     - cp phpunit.xml.dist phpunit.xml
   script:
-    - if [[ -f vendor/bin/phpunit ]]; then vendor/bin/phpunit; else phpunit; fi;
+    - vendor/bin/phpunit --log-junit report.xml
   tags:
     - docker
   except:
@@ -392,7 +398,7 @@ phpunit:
 
 action-security-check:
   stage: tests
-  image: "drenso/php:${DRENSO_PHP_VERSION}"
+  image: "registry.drenso.dev/open/docker-images/php:${DRENSO_PHP_VERSION}"
   interruptible: true
   needs:
     - install-dependencies
@@ -414,7 +420,6 @@ action-security-check:
     - production
 
 # Sentry
-
 sentry-release-staging:
   stage: sentry
   image: getsentry/sentry-cli
@@ -443,10 +448,9 @@ sentry-release-production:
     - schedules
 
 # Deploy
-
 deploy-staging:
   stage: deploy
-  image: kickin/ssh:1.2.0
+  image: registry.gitlab.utwente.nl/idb/docker-images/ssh:1.2.0
   resource_group: deploy-staging
   dependencies: []
   variables:
@@ -471,7 +475,7 @@ deploy-staging:
 
 deploy-research:
   stage: deploy
-  image: kickin/ssh:1.2.0
+  image: registry.gitlab.utwente.nl/idb/docker-images/ssh:1.2.0
   resource_group: deploy-staging
   dependencies: []
   variables:
@@ -498,7 +502,7 @@ deploy-research:
 
 deploy-production:
   stage: deploy
-  image: kickin/ssh:1.2.0
+  image: registry.gitlab.utwente.nl/idb/docker-images/ssh:1.2.0
   resource_group: deploy-production
   dependencies: []
   variables:

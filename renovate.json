@@ -6,6 +6,9 @@
         ":disableDevDependencies",
         ":labels(Maintenance,RenovateBot)"
     ],
+    "ignorePresets": [
+        "group:symfony"
+    ],
     "dependencyDashboard": true,
     "dependencyDashboardLabels": ["Maintenance", "RenovateBot"],
     "commitMessagePrefix": "[RenovateBot]",
@@ -35,10 +38,10 @@
         "yarnDedupeFewer"
     ],
     "prConcurrentLimit": 0,
-    "prHourlyLimit": 5,
+    "prHourlyLimit": 10,
     "rangeStrategy": "pin",
     "rebaseWhen": "never",
-    "stabilityDays": 7,
+    "minimumReleaseAge": "7 days",
     "timezone": "Europe/Amsterdam",
     "packageRules": [
         {
@@ -46,20 +49,37 @@
             "rangeStrategy": "replace"
         },
         {
+            "enabled": true,
             "matchPackagePrefixes": ["drenso/", "@drenso/"],
             "rebaseWhen": "conflicted",
-            "stabilityDays": 0
+            "minimumReleaseAge": null
         },
         {
-            "matchPackagePrefixes": ["symfony/", "twig/"],
+            "matchPackagePrefixes": ["twig/"],
             "rebaseWhen": "conflicted",
-            "stabilityDays": 0
+            "minimumReleaseAge": null
+        },
+        {
+            "matchPackagePrefixes": ["symfony/"],
+            "groupName": "Symfony packages",
+            "groupSlug": "symfony",
+            "excludePackagePatterns": "-contracts$",
+            "excludePackageNames": [
+                "symfony/maker-bundle",
+                "symfony/webpack-encore-bundle"
+            ],
+            "minimumReleaseAge": null
         },
         {
             "matchPackagePrefixes": ["@types/"],
+            "enabled": true
+        },
+        {
+            "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+            "matchPackagePrefixes": ["@types/"],
             "rebaseWhen": "auto",
             "automerge": true,
-            "stabilityDays": 0
+            "minimumReleaseAge": null
         },
         {
             "matchPackageNames": ["jms/serializer"],
@@ -83,9 +103,9 @@
             "groupSlug": "sentry"
         },
         {
-            "matchPackagePatterns": ["^twig/\\w+-extra$", "^twig/extra-bundle$"],
-            "groupName": "Twig extra packages",
-            "groupSlug": "twig-extra"
+            "matchPackagePatterns": ["^twig/twig$", "^twig/\\w+-extra$", "^twig/extra-bundle$"],
+            "groupName": "Twig packages",
+            "groupSlug": "twig"
         },
         {
             "matchDepTypes": [
@@ -96,7 +116,18 @@
         {
             "matchPackageNames": ["@utwente/dotron-app"],
             "rebaseWhen": "conflicted",
-            "stabilityDays": 0
+            "minimumReleaseAge": null
+        }
+    ],
+    "customManagers": [
+        {
+            "customType": "regex",
+            "fileMatch": ["^\\.gitlab-ci\\.yml$"],
+            "matchStrings": [
+                "#\\s?renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*?_VERSION: (?<currentValue>.*)\\s"
+            ],
+            "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
+            "extractVersionTemplate": "^v?(?<version>.*)$"
         }
     ]
 }

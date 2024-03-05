@@ -14,15 +14,18 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Drenso\Shared\Helper\StringHelper;
 use Drenso\Shared\Interfaces\IdInterface;
 use Gedmo\Mapping\Annotation as Gedmo;
 use JMS\Serializer\Annotation as JMSA;
+use Override;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class Contributor.
  *
  * @ORM\Entity(repositoryClass="App\Repository\ContributorRepository")
+ *
  * @Gedmo\SoftDeleteable(fieldName="deletedAt")
  */
 class Contributor implements StudyAreaFilteredInterface, ReviewableInterface, IdInterface
@@ -37,79 +40,77 @@ class Contributor implements StudyAreaFilteredInterface, ReviewableInterface, Id
    *
    * @ORM\ManyToMany(targetEntity="App\Entity\Concept", mappedBy="contributors")
    */
-  private $concepts;
+  private Collection $concepts;
 
   /**
-   * @var StudyArea|null
-   *
    * @ORM\ManyToOne(targetEntity="StudyArea", inversedBy="contributors")
+   *
    * @ORM\JoinColumn(name="study_area_id", referencedColumnName="id", nullable=false)
    *
    * @Assert\NotNull()
    */
-  private $studyArea;
+  private ?StudyArea $studyArea = null;
 
   /**
-   * @var string
    * @ORM\Column(name="name", type="string", length=512, nullable=false)
    *
    * @Assert\NotBlank()
+   *
    * @Assert\Length(min=1, max=512)
+   *
    * @JMSA\Groups({"Default", "review_change"})
+   *
    * @JMSA\Type("string")
    */
-  private $name;
+  private string $name = '';
 
   /**
-   * @var string|null
-   *
    * @ORM\Column(name="description", type="text", nullable=true)
    *
    * @Assert\Length(max=1024)
+   *
    * @JMSA\Groups({"Default", "review_change"})
+   *
    * @JMSA\Type("string")
    */
-  private $description;
+  private ?string $description = null;
 
   /**
-   * @var string|null
-   *
    * @ORM\Column(name="url", type="string", length=512, nullable=true)
    *
    * @Assert\Url()
+   *
    * @Assert\Length(max=512)
+   *
    * @JMSA\Groups({"Default", "review_change"})
+   *
    * @JMSA\Type("string")
    */
-  private $url;
+  private ?string $url = null;
 
   /**
-   * @var string|null
-   *
    * @ORM\Column(name="email", type="string", length=255, nullable=true)
    *
    * @Assert\Email()
+   *
    * @Assert\Length(max=255)
+   *
    * @JMSA\Groups({"Default", "review_change"})
+   *
    * @JMSA\Type("string")
    */
-  private $email;
+  private ?string $email = null;
 
   /**
-   * @var bool
-   *
    * @ORM\Column(name="broken", type="boolean", nullable=false)
    *
    * @Assert\NotNull()
    */
-  private $broken;
+  private bool $broken = false;
 
   /** Contributor constructor. */
   public function __construct()
   {
-    $this->name   = '';
-    $this->broken = false;
-
     $this->concepts = new ArrayCollection();
   }
 
@@ -117,6 +118,7 @@ class Contributor implements StudyAreaFilteredInterface, ReviewableInterface, Id
    * @throws IncompatibleChangeException
    * @throws IncompatibleFieldChangedException
    */
+  #[Override]
   public function applyChanges(PendingChange $change, EntityManagerInterface $em, bool $ignoreEm = false): void
   {
     $changeObj = $this->testChange($change);
@@ -132,6 +134,7 @@ class Contributor implements StudyAreaFilteredInterface, ReviewableInterface, Id
     }
   }
 
+  #[Override]
   public function getReviewTitle(): string
   {
     return $this->getName();
@@ -162,7 +165,7 @@ class Contributor implements StudyAreaFilteredInterface, ReviewableInterface, Id
 
   public function setDescription(?string $description): Contributor
   {
-    $this->description = trim($description);
+    $this->description = StringHelper::emptyToNull($description);
 
     return $this;
   }
@@ -174,7 +177,7 @@ class Contributor implements StudyAreaFilteredInterface, ReviewableInterface, Id
 
   public function setUrl(?string $url): Contributor
   {
-    $this->url = trim($url);
+    $this->url = StringHelper::emptyToNull($url);
 
     return $this;
   }
@@ -203,11 +206,13 @@ class Contributor implements StudyAreaFilteredInterface, ReviewableInterface, Id
     return $this;
   }
 
+  #[Override]
   public function getStudyArea(): ?StudyArea
   {
     return $this->studyArea;
   }
 
+  #[Override]
   public function setStudyArea(StudyArea $studyArea): Contributor
   {
     $this->studyArea = $studyArea;

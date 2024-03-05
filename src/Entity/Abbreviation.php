@@ -17,14 +17,18 @@ use Doctrine\ORM\Mapping as ORM;
 use Drenso\Shared\Interfaces\IdInterface;
 use Gedmo\Mapping\Annotation as Gedmo;
 use JMS\Serializer\Annotation as JMSA;
+use Override;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class Abbreviation.
  *
  * @ORM\Table()
+ *
  * @ORM\Entity(repositoryClass="App\Repository\AbbreviationRepository")
+ *
  * @Gedmo\SoftDeleteable(fieldName="deletedAt")
+ *
  * @JMSA\ExclusionPolicy("all")
  */
 class Abbreviation implements SearchableInterface, StudyAreaFilteredInterface, ReviewableInterface, IdInterface
@@ -35,50 +39,46 @@ class Abbreviation implements SearchableInterface, StudyAreaFilteredInterface, R
   use ReviewableTrait;
 
   /**
-   * @var StudyArea|null
-   *
    * @ORM\ManyToOne(targetEntity="StudyArea", inversedBy="abbreviations")
+   *
    * @ORM\JoinColumn(name="study_area_id", referencedColumnName="id", nullable=false)
    *
    * @Assert\NotNull()
    */
-  private $studyArea;
+  private ?StudyArea $studyArea = null;
 
   /**
-   * @var string
-   *
    * @ORM\Column(name="abbreviation", length=25, nullable=false)
    *
    * @Assert\NotBlank()
+   *
    * @Assert\Length(min=1, max=25)
    *
    * @JMSA\Expose()
+   *
    * @JMSA\Groups({"Default", "review_change"})
+   *
    * @JMSA\Type("string")
    */
-  private $abbreviation;
+  private string $abbreviation = '';
 
   /**
-   * @var string
    * @ORM\Column(name="meaning", length=255, nullable=false)
    *
    * @Assert\NotBlank()
+   *
    * @Assert\Length(min=1, max=255)
    *
    * @JMSA\Expose()
+   *
    * @JMSA\Groups({"Default", "review_change"})
+   *
    * @JMSA\Type("string")
    */
-  private $meaning;
-
-  /** Abbreviation constructor. */
-  public function __construct()
-  {
-    $this->abbreviation = '';
-    $this->meaning      = '';
-  }
+  private string $meaning = '';
 
   /** Searches in the abbreviation on the given search, returns an array with search result metadata. */
+  #[Override]
   public function searchIn(string $search): array
   {
     // Create result array
@@ -94,9 +94,9 @@ class Abbreviation implements SearchableInterface, StudyAreaFilteredInterface, R
     }
 
     return [
-        '_data'   => $this,
-        '_title'  => $this->getAbbreviation(),
-        'results' => $results,
+      '_data'   => $this,
+      '_title'  => $this->getAbbreviation(),
+      'results' => $results,
     ];
   }
 
@@ -104,6 +104,7 @@ class Abbreviation implements SearchableInterface, StudyAreaFilteredInterface, R
    * @throws IncompatibleChangeException
    * @throws IncompatibleFieldChangedException
    */
+  #[Override]
   public function applyChanges(PendingChange $change, EntityManagerInterface $em, bool $ignoreEm = false): void
   {
     $changeObj = $this->testChange($change);
@@ -118,16 +119,19 @@ class Abbreviation implements SearchableInterface, StudyAreaFilteredInterface, R
     }
   }
 
+  #[Override]
   public function getReviewTitle(): string
   {
     return $this->getAbbreviation();
   }
 
+  #[Override]
   public function getStudyArea(): ?StudyArea
   {
     return $this->studyArea;
   }
 
+  #[Override]
   public function setStudyArea(StudyArea $studyArea): Abbreviation
   {
     $this->studyArea = $studyArea;

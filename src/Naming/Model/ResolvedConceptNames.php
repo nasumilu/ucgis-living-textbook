@@ -2,34 +2,25 @@
 
 namespace App\Naming\Model;
 
+use Override;
 use Symfony\Component\String\Inflector\InflectorInterface;
 
 class ResolvedConceptNames implements ResolvedNamesInterface
 {
-  /** @var string */
-  private $definition;
-  /** @var string */
-  private $examples;
-  /** @var string */
-  private $howTo;
-  /** @var string */
-  private $introduction;
-  /** @var string */
-  private $priorKnowledge;
-  /** @var string */
-  private $selfAssessment;
-  /** @var string */
-  private $additionalResources;
-  /** @var string */
-  private $synonyms;
-  /** @var string */
-  private $theoryExplanation;
-  /** @var string */
-  private $imagePath;
+  private string $additionalResources;
+  private string $definition;
+  private string $examples;
+  private string $howTo;
+  private string $imagePath;
+  private string $introduction;
+  private string $priorKnowledge;
+  private string $selfAssessment;  
+  private string $synonyms;
+  private string $theoryExplanation;  
 
   public function __construct(
-      string $definition, string $introduction, string $synonyms, string $priorKnowledge, string $theoryExplanation,
-      string $howTo, string $examples, string $selfAssessment, string $additionalResources, string $imagePath)
+    string $definition, string $introduction, string $synonyms, string $priorKnowledge, string $theoryExplanation,
+    string $howTo, string $examples, string $selfAssessment, string $additionalResources, string $imagePath)
   {
     $this->definition          = strtolower($definition);
     $this->introduction        = strtolower($introduction);
@@ -43,6 +34,7 @@ class ResolvedConceptNames implements ResolvedNamesInterface
     $this->imagePath           = strtolower($imagePath);
   }
 
+  #[Override]
   public function resolvePlurals(InflectorInterface $inflector)
   {
     // Nothing to do here

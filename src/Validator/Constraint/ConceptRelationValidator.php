@@ -3,6 +3,7 @@
 namespace App\Validator\Constraint;
 
 use App\Entity\Concept;
+use Override;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -18,6 +19,7 @@ class ConceptRelationValidator extends ConstraintValidator
    * @param mixed      $value      The value that should be validated
    * @param Constraint $constraint The constraint for the validation
    */
+  #[Override]
   public function validate($value, Constraint $constraint)
   {
     // Check constraint
@@ -91,11 +93,11 @@ class ConceptRelationValidator extends ConstraintValidator
 
     // Build violation
     $this->context
-        ->buildViolation($message, [
-            '%c1%' => $source->getName(),
-            '%c2%' => $target->getName(),
-        ])
-        ->atPath($direction ? 'outgoingRelations' : 'incomingRelations')
-        ->addViolation();
+      ->buildViolation($message, [
+        '%c1%' => $source->getName(),
+        '%c2%' => $target->getName(),
+      ])
+      ->atPath($direction ? 'outgoingRelations' : 'incomingRelations')
+      ->addViolation();
   }
 }

@@ -5,6 +5,7 @@ namespace App\Form\Review\ReviewDiff;
 use App\Entity\Contracts\ReviewableInterface;
 use App\Entity\PendingChange;
 use App\Form\Type\PrintedTextType;
+use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -15,6 +16,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AbstractReviewDiffType extends AbstractType
 {
+  #[Override]
   public function buildForm(FormBuilderInterface $builder, array $options)
   {
     if (!$options['review'] && !$options['show_comments']) {
@@ -23,59 +25,60 @@ class AbstractReviewDiffType extends AbstractType
 
     if ($options['review']) {
       $builder
-          ->add('comments', TextareaType::class, [
-              'empty_data' => null,
-              'required'   => false,
-              'attr'       => [
-                  'placeholder' => 'review.comments-placeholder',
-              ],
-          ]);
+        ->add('comments', TextareaType::class, [
+          'empty_data' => null,
+          'required'   => false,
+          'attr'       => [
+            'placeholder' => 'review.comments-placeholder',
+          ],
+        ]);
     } elseif ($options['show_comments']) {
       $builder
-          ->add('comments', PrintedTextType::class, [
-              'text_only' => true,
-          ]);
+        ->add('comments', PrintedTextType::class, [
+          'text_only' => true,
+        ]);
     }
 
     $builder->addModelTransformer(new CallbackTransformer(
-        function () use ($options) {
-          $pendingChange = $options['pending_change'];
-          assert($pendingChange instanceof PendingChange);
+      function () use ($options) {
+        $pendingChange = $options['pending_change'];
+        assert($pendingChange instanceof PendingChange);
 
-          $existingComments = $pendingChange->getReviewComments() ?? [];
-          $data             = null;
+        $existingComments = $pendingChange->getReviewComments() ?? [];
+        $data             = null;
 
-          if (array_key_exists($options['field'], $existingComments)) {
-            $data = $existingComments[$options['field']];
-          }
-
-          return [
-              'comments' => $data,
-          ];
-        },
-        function (array $formData) use ($options) {
-          $pendingChange = $options['pending_change'];
-          $field         = $options['field'];
-          assert($pendingChange instanceof PendingChange);
-
-          $reviewComments = $pendingChange->getReviewComments() ?? [];
-          $formComments   = $formData['comments'];
-          if ($formComments === null) {
-            // Only unset the field if it already existed
-            // But never allow to set null in the comments field
-            if (array_key_exists($field, $reviewComments)) {
-              unset($reviewComments[$field]);
-            }
-          } else {
-            $reviewComments[$field] = $formComments;
-          }
-          $pendingChange->setReviewComments($reviewComments);
-
-          return null;
+        if (array_key_exists($options['field'], $existingComments)) {
+          $data = $existingComments[$options['field']];
         }
+
+        return [
+          'comments' => $data,
+        ];
+      },
+      function (array $formData) use ($options) {
+        $pendingChange = $options['pending_change'];
+        $field         = $options['field'];
+        assert($pendingChange instanceof PendingChange);
+
+        $reviewComments = $pendingChange->getReviewComments() ?? [];
+        $formComments   = $formData['comments'];
+        if ($formComments === null) {
+          // Only unset the field if it already existed
+          // But never allow to set null in the comments field
+          if (array_key_exists($field, $reviewComments)) {
+            unset($reviewComments[$field]);
+          }
+        } else {
+          $reviewComments[$field] = $formComments;
+        }
+        $pendingChange->setReviewComments($reviewComments);
+
+        return null;
+      }
     ));
   }
 
+  #[Override]
   public function buildView(FormView $view, FormInterface $form, array $options)
   {
     $pendingChange = $options['pending_change'];
@@ -91,29 +94,30 @@ class AbstractReviewDiffType extends AbstractType
     $view->vars['field']             = $options['field'];
   }
 
+  #[Override]
   public function configureOptions(OptionsResolver $resolver)
   {
     $resolver
-        ->setDefault('checkbox', false)
-        ->setDefault('show_original', true)
-        ->setDefault('show_updated', true)
-        ->setDefault('show_comments', false)
-        ->setDefault('original_object', null)
-        ->setDefault('diff_only', false)
-        ->setRequired([
-            'pending_change',
-            'field',
-            'review',
-        ])
-        ->setAllowedTypes('checkbox', 'bool')
-        ->setAllowedTypes('show_original', 'bool')
-        ->setAllowedTypes('show_updated', 'bool')
-        ->setAllowedTypes('show_comments', 'bool')
-        ->setAllowedTypes('original_object', [ReviewableInterface::class, 'null'])
-        ->setAllowedTypes('diff_only', 'bool')
-        ->setAllowedTypes('pending_change', PendingChange::class)
-        ->setAllowedTypes('field', 'string')
-        ->setAllowedTypes('review', 'bool');
+      ->setDefault('checkbox', false)
+      ->setDefault('show_original', true)
+      ->setDefault('show_updated', true)
+      ->setDefault('show_comments', false)
+      ->setDefault('original_object', null)
+      ->setDefault('diff_only', false)
+      ->setRequired([
+        'pending_change',
+        'field',
+        'review',
+      ])
+      ->setAllowedTypes('checkbox', 'bool')
+      ->setAllowedTypes('show_original', 'bool')
+      ->setAllowedTypes('show_updated', 'bool')
+      ->setAllowedTypes('show_comments', 'bool')
+      ->setAllowedTypes('original_object', [ReviewableInterface::class, 'null'])
+      ->setAllowedTypes('diff_only', 'bool')
+      ->setAllowedTypes('pending_change', PendingChange::class)
+      ->setAllowedTypes('field', 'string')
+      ->setAllowedTypes('review', 'bool');
   }
 
   protected function getPendingChange(array $options): PendingChange

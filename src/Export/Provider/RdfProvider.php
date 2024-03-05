@@ -16,6 +16,7 @@ use EasyRdf\Graph;
 use EasyRdf\RdfNamespace;
 use EasyRdf\Serialiser\JsonLd;
 use JMS\Serializer\SerializerInterface;
+use Override;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -23,17 +24,13 @@ use Symfony\Component\Routing\RouterInterface;
 
 class RdfProvider implements ProviderInterface
 {
-  /** @var ConceptRepository */
-  private $conceptRepository;
+  private ConceptRepository $conceptRepository;
 
-  /** @var LearningPathRepository */
-  private $learningPathRepository;
+  private LearningPathRepository $learningPathRepository;
 
-  /** @var RouterInterface */
-  private $router;
+  private RouterInterface $router;
 
-  /** @var SerializerInterface */
-  private $serializer;
+  private SerializerInterface $serializer;
 
   public function __construct(ConceptRepository $conceptRepository, LearningPathRepository $learningPathRepository, RouterInterface $router, SerializerInterface $serializer)
   {
@@ -61,11 +58,13 @@ class RdfProvider implements ProviderInterface
     return $this->exportGraph($graph);
   }
 
+  #[Override]
   public function getName(): string
   {
     return 'rdf';
   }
 
+  #[Override]
   public function getPreview(): string
   {
     return <<<'EOT'
@@ -146,6 +145,7 @@ EOT;
   }
 
   /** @throws Exception */
+  #[Override]
   public function export(StudyArea $studyArea): Response
   {
     $response = $this->exportStudyArea($studyArea);

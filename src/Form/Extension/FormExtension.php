@@ -2,6 +2,7 @@
 
 namespace App\Form\Extension;
 
+use Override;
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -20,6 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class FormExtension extends AbstractTypeExtension
 {
+  #[Override]
   public function buildForm(FormBuilderInterface $builder, array $options)
   {
     $builder->setAttribute('hide_label', $options['hide_label']);
@@ -27,6 +29,7 @@ class FormExtension extends AbstractTypeExtension
     $builder->setAttribute('form_header', $options['form_header']);
   }
 
+  #[Override]
   public function buildView(FormView $view, FormInterface $form, array $options)
   {
     $view->vars['hide_label']       = $options['hide_label'];
@@ -34,18 +37,20 @@ class FormExtension extends AbstractTypeExtension
     $view->vars['form_header']      = $options['form_header'];
   }
 
+  #[Override]
   public function configureOptions(OptionsResolver $resolver)
   {
     $resolver->setDefaults([
-        'hide_label'       => false,
-        'full_width_label' => false,
-        'form_header'      => null,
+      'hide_label'       => false,
+      'full_width_label' => false,
+      'form_header'      => null,
     ]);
     $resolver->setAllowedTypes('hide_label', ['bool']);
     $resolver->setAllowedTypes('full_width_label', ['bool']);
     $resolver->setAllowedTypes('form_header', ['null', 'string']);
   }
 
+  #[Override]
   public static function getExtendedTypes(): iterable
   {
     return [FormType::class];

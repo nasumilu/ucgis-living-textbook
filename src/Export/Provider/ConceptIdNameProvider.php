@@ -7,6 +7,7 @@ use App\Entity\StudyArea;
 use App\Excel\SpreadsheetHelper;
 use App\Export\ProviderInterface;
 use App\Repository\ConceptRepository;
+use Override;
 use PhpOffice\PhpSpreadsheet\Cell\CellAddress;
 use PhpOffice\PhpSpreadsheet\Exception;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -14,11 +15,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ConceptIdNameProvider implements ProviderInterface
 {
-  /** @var ConceptRepository */
-  private $conceptRepository;
+  private ConceptRepository $conceptRepository;
 
-  /** @var SpreadsheetHelper */
-  private $spreadsheetHelper;
+  private SpreadsheetHelper $spreadsheetHelper;
 
   public function __construct(ConceptRepository $conceptRepository, SpreadsheetHelper $spreadsheetHelper)
   {
@@ -26,13 +25,13 @@ class ConceptIdNameProvider implements ProviderInterface
     $this->spreadsheetHelper = $spreadsheetHelper;
   }
 
-  /** {@inheritdoc} */
+  #[Override]
   public function getName(): string
   {
     return 'concept-id-name';
   }
 
-  /** {@inheritdoc} */
+  #[Override]
   public function getPreview(): string
   {
     return <<<'EOT'
@@ -51,9 +50,9 @@ EOT;
   {
     /** @var Concept[] $concepts */
     $concepts = $this->conceptRepository
-        ->findForStudyAreaOrderByNameQb($studyArea)
-        ->orderBy('c.id')
-        ->getQuery()->getResult();
+      ->findForStudyAreaOrderByNameQb($studyArea)
+      ->orderBy('c.id')
+      ->getQuery()->getResult();
 
     $row         = 1;
     $spreadSheet = new Spreadsheet();
@@ -67,14 +66,11 @@ EOT;
     return $spreadSheet;
   }
 
-  /**
-   * {@inheritdoc}
-   *
-   * @throws Exception
-   */
+  /** @throws Exception */
+  #[Override]
   public function export(StudyArea $studyArea): Response
   {
     return $this->spreadsheetHelper->createCsvResponse($this->getSpreadSheet($studyArea),
-        sprintf('%s_concept_id_name_export.csv', $studyArea->getName()));
+      sprintf('%s_concept_id_name_export.csv', $studyArea->getName()));
   }
 }

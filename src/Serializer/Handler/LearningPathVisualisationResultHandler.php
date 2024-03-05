@@ -8,22 +8,23 @@ use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
 use JMS\Serializer\Metadata\StaticPropertyMetadata;
 use JMS\Serializer\Visitor\SerializationVisitorInterface;
+use Override;
 use Symfony\Component\Finder\SplFileInfo;
 
 class LearningPathVisualisationResultHandler implements EventSubscriberInterface
 {
-  private const EMPTY = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
+  private const string EMPTY = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
 
-  /** {@inheritDoc} */
+  #[Override]
   public static function getSubscribedEvents()
   {
     return [
-        [
-            'event'  => Events::POST_SERIALIZE,
-            'class'  => LearningPathVisualisationResult::class,
-            'format' => 'json',
-            'method' => 'onPostSerialize',
-        ],
+      [
+        'event'  => Events::POST_SERIALIZE,
+        'class'  => LearningPathVisualisationResult::class,
+        'format' => 'json',
+        'method' => 'onPostSerialize',
+      ],
     ];
   }
 
@@ -41,20 +42,20 @@ class LearningPathVisualisationResultHandler implements EventSubscriberInterface
     }
 
     $visitor->visitProperty(
-        new StaticPropertyMetadata('', 'heatMap', null),
-        self::toBase64($object->heatMapImage));
+      new StaticPropertyMetadata('', 'heatMap', null),
+      self::toBase64($object->heatMapImage));
     $visitor->visitProperty(
-        new StaticPropertyMetadata('', 'pathVisits', null),
-        self::toBase64($object->pathVisitsImage));
+      new StaticPropertyMetadata('', 'pathVisits', null),
+      self::toBase64($object->pathVisitsImage));
     $visitor->visitProperty(
-        new StaticPropertyMetadata('', 'pathUsers', null),
-        self::toBase64($object->pathUsersImage));
+      new StaticPropertyMetadata('', 'pathUsers', null),
+      self::toBase64($object->pathUsersImage));
     $visitor->visitProperty(
-        new StaticPropertyMetadata('', 'flowThrough', null),
-        json_decode($object->flowThroughFile->getContents(), true));
+      new StaticPropertyMetadata('', 'flowThrough', null),
+      json_decode($object->flowThroughFile->getContents(), true));
     $visitor->visitProperty(
-        new StaticPropertyMetadata('', 'metadata', null),
-        json_decode($object->metaDataFile->getContents(), true));
+      new StaticPropertyMetadata('', 'metadata', null),
+      json_decode($object->metaDataFile->getContents(), true));
   }
 
   private static function toBase64(?SplFileInfo $file)

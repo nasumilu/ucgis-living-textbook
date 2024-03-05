@@ -9,23 +9,25 @@ use Drenso\Shared\Interfaces\IdInterface;
 use JMS\Serializer\Annotation\Groups;
 use JMS\Serializer\Annotation\Type;
 use OpenApi\Attributes as OA;
+use Override;
 
 class UpdateConceptRelationApiModel extends ConceptRelationApiModel implements IdInterface
 {
   protected function __construct(
-      protected readonly int $id,
-      protected readonly int $sourceId,
-      protected readonly int $targetId,
-      #[Groups(['Default', 'mutate'])]
-      protected readonly ?int $relationTypeId,
-      #[OA\Property(description: 'Specific Dotron configuration for a concept relation, only returned when Dotron is been enabled', type: 'object', nullable: true)]
-      #[Type('array')]
-      #[Groups(['dotron'])]
-      protected readonly ?array $dotronConfig
+    protected readonly int $id,
+    protected readonly int $sourceId,
+    protected readonly int $targetId,
+    #[Groups(['Default', 'mutate'])]
+    protected readonly ?int $relationTypeId,
+    #[OA\Property(description: 'Specific Dotron configuration for a concept relation, only returned when Dotron is been enabled', type: 'object', nullable: true)]
+    #[Type('array')]
+    #[Groups(['dotron'])]
+    protected readonly ?array $dotronConfig
   ) {
     parent::__construct($id, $sourceId, $targetId);
   }
 
+  #[Override]
   public function getId(): int
   {
     return $this->id;
@@ -36,21 +38,22 @@ class UpdateConceptRelationApiModel extends ConceptRelationApiModel implements I
     return $this->relationTypeId ?? null;
   }
 
+  #[Override]
   public static function fromEntity(ConceptRelation $conceptRelation): self
   {
     return new self(
-        $conceptRelation->getId(),
-        $conceptRelation->getSourceId(),
-        $conceptRelation->getTargetId(),
-        $conceptRelation->getRelationType()->getId(),
-        $conceptRelation->getDotronConfig(),
+      $conceptRelation->getId(),
+      $conceptRelation->getSourceId(),
+      $conceptRelation->getTargetId(),
+      $conceptRelation->getRelationType()->getId(),
+      $conceptRelation->getDotronConfig(),
     );
   }
 
   public function mapToEntity(?ConceptRelation $conceptRelation, ?RelationType $relationType): ConceptRelation
   {
     return ($conceptRelation ?? new ConceptRelation())
-        ->setRelationType($relationType ?? $conceptRelation->getRelationType())
-        ->setDotronConfig($this->dotronConfig ?? $conceptRelation->getDotronConfig() ?? null);
+      ->setRelationType($relationType ?? $conceptRelation->getRelationType())
+      ->setDotronConfig($this->dotronConfig ?? $conceptRelation->getDotronConfig() ?? null);
   }
 }

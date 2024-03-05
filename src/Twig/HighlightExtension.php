@@ -2,6 +2,7 @@
 
 namespace App\Twig;
 
+use Override;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
 
@@ -17,18 +18,16 @@ class HighlightExtension extends AbstractExtension
    *
    * @return array|TwigFilter[]
    */
+  #[Override]
   public function getFilters()
   {
     return [
-        new TwigFilter('highlight', $this->hilightFilter(...), ['is_safe' => ['html']]),
+      new TwigFilter('highlight', $this->hilightFilter(...), ['is_safe' => ['html']]),
     ];
   }
 
   /**
    * Filter implementation.
-   *
-   * @param $text
-   * @param $search
    *
    * @return string
    */

@@ -3,21 +3,21 @@
 namespace App\UrlUtils\Model;
 
 use InvalidArgumentException;
+use Override;
 use Stringable;
 
 class UrlContext implements Stringable
 {
   /** @var string Class name */
-  private $class;
+  private string $class;
 
   /** @var int Class id */
-  private $id;
+  private int $id;
 
   /** @var string Class path */
-  private $path;
+  private string $path;
 
-  /** @var bool */
-  private $inline;
+  private bool $inline;
 
   public function __construct(string $class, int $id = -1, string $path = '')
   {
@@ -35,6 +35,7 @@ class UrlContext implements Stringable
    * Implementation to determine duplicates correctly
    * https://stackoverflow.com/questions/2426557/array-unique-for-objects.
    */
+  #[Override]
   public function __toString(): string
   {
     return $this->class . '.' . $this->path . '.' . ($this->inline ? '1' : '0');
@@ -71,7 +72,7 @@ class UrlContext implements Stringable
   /** Change the camelCase of the property path to snake-case, as that is used in the translations. */
   public function getPathAsTransKey(): string
   {
-    return strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $this->getPath()));
+    return strtolower((string)preg_replace('/(?<!^)[A-Z]/', '-$0', $this->getPath()));
   }
 
   public function isInline(): bool

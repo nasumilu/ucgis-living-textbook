@@ -7,6 +7,7 @@ use App\Database\Traits\IdTrait;
 use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 use Drenso\Shared\Interfaces\IdInterface;
+use Override;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -18,6 +19,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Implements the user interface for easy password hashing and checking.
  *
  * @ORM\Table(indexes={@ORM\Index(columns={"email"})})
+ *
  * @ORM\Entity(repositoryClass="App\Repository\UserProtoRepository")
  *
  * @UniqueEntity({"email"}, errorPath="email")
@@ -30,25 +32,22 @@ class UserProto implements UserInterface, PasswordAuthenticatedUserInterface, Id
   /**
    * The email address that has been invited.
    *
-   * @var string
-   *
    * @ORM\Column(type="string")
    *
    * @Assert\NotBlank()
+   *
    * @Assert\Email()
    */
-  private $email = '';
+  private string $email = '';
 
   /**
    * The invited at timestamp.
-   *
-   * @var DateTime
    *
    * @ORM\Column(type="datetime")
    *
    * @Assert\NotNull()
    */
-  private $invitedAt;
+  private DateTime $invitedAt;
 
   /**
    * Hashed temporary password.
@@ -59,24 +58,27 @@ class UserProto implements UserInterface, PasswordAuthenticatedUserInterface, Id
    *
    * @Assert\NotBlank()
    */
-  private $password = '';
+  private string $password = '';
 
   public function __construct()
   {
     $this->invitedAt = new DateTime();
   }
 
+  #[Override]
   public function getRoles()
   {
     return [];
   }
 
+  #[Override]
   public function getSalt()
   {
     return null;
   }
 
   /** @deprecated */
+  #[Override]
   public function getUsername()
   {
     return $this->getUserIdentifier();
@@ -87,6 +89,7 @@ class UserProto implements UserInterface, PasswordAuthenticatedUserInterface, Id
     return $this->email;
   }
 
+  #[Override]
   public function eraseCredentials()
   {
     // Nothing to do
@@ -123,6 +126,7 @@ class UserProto implements UserInterface, PasswordAuthenticatedUserInterface, Id
     return $this;
   }
 
+  #[Override]
   public function getPassword(): string
   {
     return $this->password;

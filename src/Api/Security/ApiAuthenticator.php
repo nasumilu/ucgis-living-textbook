@@ -7,6 +7,7 @@ use App\Entity\UserApiToken;
 use App\Repository\UserApiTokenRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Override;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,21 +27,23 @@ class ApiAuthenticator extends AbstractAuthenticator
   final public const API_TOKEN_HEADER = 'X-LTB-AUTH';
 
   public function __construct(
-      private readonly UserApiTokenRepository $userApiTokenRepository,
-      private readonly UserPasswordHasherInterface $passwordHasher,
-      private readonly EntityManagerInterface $entityManager)
+    private readonly UserApiTokenRepository $userApiTokenRepository,
+    private readonly UserPasswordHasherInterface $passwordHasher,
+    private readonly EntityManagerInterface $entityManager)
   {
   }
 
+  #[Override]
   public function supports(Request $request): bool
   {
     return $request->headers->has(self::API_TOKEN_HEADER);
   }
 
+  #[Override]
   public function authenticate(Request $request): Passport
   {
     // Split token into user id and token
-    $token = $request->headers->get(self::API_TOKEN_HEADER);
+    $token = (string)$request->headers->get(self::API_TOKEN_HEADER);
 
     $tokenData = explode('_', $token);
 
@@ -49,26 +52,28 @@ class ApiAuthenticator extends AbstractAuthenticator
     }
 
     return new Passport(
-        new UserBadge(
-            $tokenData[0],
-            fn ($userIdentifier): ?UserApiToken => $this->userApiTokenRepository->findOneBy(['tokenId' => $userIdentifier])
-        ),
-        new CustomCredentials(
-            fn (string $password, UserApiToken $apiToken): bool => (!$apiToken->getValidUntil() || $apiToken->getValidUntil() > new DateTimeImmutable())
-            && $this->passwordHasher->isPasswordValid($apiToken, $password),
-            $tokenData[1]
-        ),
-        [
-            new PasswordUpgradeBadge($tokenData[1], $this->userApiTokenRepository),
-        ]
+      new UserBadge(
+        $tokenData[0],
+        fn ($userIdentifier): ?UserApiToken => $this->userApiTokenRepository->findOneBy(['tokenId' => $userIdentifier])
+      ),
+      new CustomCredentials(
+        fn (string $password, UserApiToken $apiToken): bool => (!$apiToken->getValidUntil() || $apiToken->getValidUntil() > new DateTimeImmutable())
+        && $this->passwordHasher->isPasswordValid($apiToken, $password),
+        $tokenData[1]
+      ),
+      [
+        new PasswordUpgradeBadge($tokenData[1], $this->userApiTokenRepository),
+      ]
     );
   }
 
+  #[Override]
   public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
   {
     return $this->createUnauthorizedResponse('Invalid API credentials');
   }
 
+  #[Override]
   public function onAuthenticationSuccess(Request $request, TokenInterface $token, $firewallName): ?Response
   {
     return null;
@@ -79,6 +84,7 @@ class ApiAuthenticator extends AbstractAuthenticator
     return new ApiErrorResponse('Unauthorized', Response::HTTP_UNAUTHORIZED, $description);
   }
 
+  #[Override]
   public function createToken(Passport $passport, $firewallName): TokenInterface
   {
     $apiToken = $passport->getUser();

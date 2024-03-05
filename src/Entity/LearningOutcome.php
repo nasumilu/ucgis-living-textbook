@@ -20,6 +20,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Drenso\Shared\Interfaces\IdInterface;
 use Gedmo\Mapping\Annotation as Gedmo;
 use JMS\Serializer\Annotation as Serializer;
+use Override;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -29,8 +30,11 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author BobV
  *
  * @ORM\Table()
+ *
  * @ORM\Entity(repositoryClass="App\Repository\LearningOutcomeRepository")
+ *
  * @Gedmo\SoftDeleteable(fieldName="deletedAt")
+ *
  * @UniqueEntity(fields={"studyArea","number"},errorPath="number",message="learning-outcome.number-already-used")
  */
 class LearningOutcome implements SearchableInterface, StudyAreaFilteredInterface, ReviewableInterface, IdInterface
@@ -45,66 +49,64 @@ class LearningOutcome implements SearchableInterface, StudyAreaFilteredInterface
    *
    * @ORM\ManyToMany(targetEntity="App\Entity\Concept", mappedBy="learningOutcomes")
    */
-  private $concepts;
+  private Collection $concepts;
 
   /**
-   * @var StudyArea|null
-   *
    * @ORM\ManyToOne(targetEntity="StudyArea", inversedBy="learningOutcomes")
+   *
    * @ORM\JoinColumn(name="study_area_id", referencedColumnName="id", nullable=false)
    *
    * @Assert\NotNull()
    */
-  private $studyArea;
+  private ?StudyArea $studyArea = null;
 
   /**
    * Learning outcome number.
    *
-   * @var int
-   *
    * @ORM\Column(name="number", type="integer", nullable=false)
    *
    * @Assert\NotBlank()
+   *
    * @Assert\Range(min="1", max="9999")
+   *
    * @Serializer\Groups({"Default", "review_change"})
+   *
    * @Serializer\Type("int")
    */
-  private $number;
+  private int $number = 1;
 
   /**
    * Learning outcome name.
    *
-   * @var string
-   *
    * @ORM\Column(name="name", type="string", length=255, nullable=false)
    *
    * @Assert\NotBlank()
+   *
    * @Assert\Length(max="255")
+   *
    * @Serializer\Groups({"Default", "review_change"})
+   *
    * @Serializer\Type("string")
    */
-  private $name;
+  private string $name = '';
 
   /**
    * Learning outcome text.
    *
-   * @var string
-   *
    * @ORM\Column(name="text", type="text", nullable=false)
    *
    * @Assert\NotBlank()
+   *
    * @WordCount(min=1, max=10000)
+   *
    * @Serializer\Groups({"Default", "review_change"})
+   *
    * @Serializer\Type("string")
    */
-  private $text;
+  private string $text = '';
 
   public function __construct()
   {
-    $this->number = 1;
-    $this->name   = '';
-    $this->text   = '';
-
     $this->concepts = new ArrayCollection();
   }
 
@@ -114,6 +116,7 @@ class LearningOutcome implements SearchableInterface, StudyAreaFilteredInterface
   }
 
   /** Searches in the external resource on the given search, returns an array with search result metadata. */
+  #[Override]
   public function searchIn(string $search): array
   {
     // Create result array
@@ -128,9 +131,9 @@ class LearningOutcome implements SearchableInterface, StudyAreaFilteredInterface
     }
 
     return [
-        '_id'     => $this->getId(),
-        '_title'  => $this->getName(),
-        'results' => $results,
+      '_id'     => $this->getId(),
+      '_title'  => $this->getName(),
+      'results' => $results,
     ];
   }
 
@@ -138,6 +141,7 @@ class LearningOutcome implements SearchableInterface, StudyAreaFilteredInterface
    * @throws IncompatibleChangeException
    * @throws IncompatibleFieldChangedException
    */
+  #[Override]
   public function applyChanges(PendingChange $change, EntityManagerInterface $em, bool $ignoreEm = false): void
   {
     $changeObj = $this->testChange($change);
@@ -153,6 +157,7 @@ class LearningOutcome implements SearchableInterface, StudyAreaFilteredInterface
     }
   }
 
+  #[Override]
   public function getReviewTitle(): string
   {
     return $this->getName();
@@ -200,11 +205,13 @@ class LearningOutcome implements SearchableInterface, StudyAreaFilteredInterface
     return $this->concepts;
   }
 
+  #[Override]
   public function getStudyArea(): ?StudyArea
   {
     return $this->studyArea;
   }
 
+  #[Override]
   public function setStudyArea(StudyArea $studyArea): LearningOutcome
   {
     $this->studyArea = $studyArea;

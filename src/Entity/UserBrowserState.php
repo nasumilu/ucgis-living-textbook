@@ -9,6 +9,7 @@ use App\Entity\Contracts\StudyAreaFilteredInterface;
 use Doctrine\ORM\Mapping as ORM;
 use Drenso\Shared\Interfaces\IdInterface;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Override;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -16,6 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * Holds information about the current browser state for the user, per study area.
  *
  * @ORM\Table(uniqueConstraints={@ORM\UniqueConstraint(columns={"user_id", "study_area_id"})})
+ *
  * @ORM\Entity(repositoryClass="App\Repository\UserBrowserStateRepository")
  *
  * @Gedmo\SoftDeleteable(fieldName="deletedAt")
@@ -27,33 +29,29 @@ class UserBrowserState implements StudyAreaFilteredInterface, IdInterface
   use SoftDeletable;
 
   /**
-   * @var User|null
-   *
    * @ORM\ManyToOne(targetEntity="App\Entity\User")
+   *
    * @ORM\JoinColumn(nullable=false)
    *
    * @Assert\NotNull()
    */
-  private $user;
+  private ?User $user = null;
 
   /**
-   * @var StudyArea|null
-   *
    * @ORM\ManyToOne(targetEntity="StudyArea")
+   *
    * @ORM\JoinColumn(nullable=false)
    *
    * @Assert\NotNull()
    */
-  private $studyArea;
+  private ?StudyArea $studyArea = null;
 
   /**
    * The current filter state.
    *
-   * @var array
-   *
    * @ORM\Column(type="json", nullable=true)
    */
-  private $filterState;
+  private ?array $filterState = null;
 
   public function getUser(): ?User
   {
@@ -67,6 +65,7 @@ class UserBrowserState implements StudyAreaFilteredInterface, IdInterface
     return $this;
   }
 
+  #[Override]
   public function getStudyArea(): ?StudyArea
   {
     return $this->studyArea;

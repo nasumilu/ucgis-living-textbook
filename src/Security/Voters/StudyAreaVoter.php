@@ -6,6 +6,7 @@ use App\Entity\StudyArea;
 use App\Entity\User;
 use App\Request\Wrapper\RequestStudyArea;
 use LogicException;
+use Override;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -21,17 +22,16 @@ class StudyAreaVoter extends Voter
   final public const PRINTER              = 'STUDYAREA_PRINT';
   final public const ANALYTICS            = 'STUDYAREA_ANALYTICS';
   final public const SUPPORTED_ATTRIBUTES = [
-      self::OWNER,
-      self::SHOW,
-      self::EDIT,
-      self::REVIEW,
-      self::ANNOTATE,
-      self::PRINTER,
-      self::ANALYTICS,
+    self::OWNER,
+    self::SHOW,
+    self::EDIT,
+    self::REVIEW,
+    self::ANNOTATE,
+    self::PRINTER,
+    self::ANALYTICS,
   ];
 
-  /** @var AccessDecisionManagerInterface */
-  private $decisionManager;
+  private AccessDecisionManagerInterface $decisionManager;
 
   /** StudyAreaVoter constructor. */
   public function __construct(AccessDecisionManagerInterface $decisionManager)
@@ -47,6 +47,7 @@ class StudyAreaVoter extends Voter
    *
    * @return bool True if the attribute and subject are supported, false otherwise
    */
+  #[Override]
   protected function supports($attribute, $subject)
   {
     if (!in_array($attribute, self::SUPPORTED_ATTRIBUTES)) {
@@ -65,10 +66,10 @@ class StudyAreaVoter extends Voter
    * It is safe to assume that $attribute and $subject already passed the "supports()" method check.
    *
    * @param string $attribute
-   * @param mixed  $subject
    *
    * @return bool
    */
+  #[Override]
   protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
   {
     $user = $token->getUser();

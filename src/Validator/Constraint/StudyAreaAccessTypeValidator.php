@@ -4,6 +4,7 @@ namespace App\Validator\Constraint;
 
 use App\Entity\StudyArea;
 use Doctrine\ORM\EntityManagerInterface;
+use Override;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Validator\Constraint;
@@ -16,8 +17,8 @@ use Symfony\Component\Validator\Constraints\ChoiceValidator;
 class StudyAreaAccessTypeValidator extends ChoiceValidator
 {
   public function __construct(
-      private readonly Security $security,
-      private readonly EntityManagerInterface $em)
+    private readonly Security $security,
+    private readonly EntityManagerInterface $em)
   {
   }
 
@@ -27,6 +28,7 @@ class StudyAreaAccessTypeValidator extends ChoiceValidator
    * @param mixed      $value      The value that should be validated
    * @param Constraint $constraint The constraint for the validation
    */
+  #[Override]
   public function validate($value, Constraint $constraint)
   {
     // Check constraint
@@ -52,7 +54,7 @@ class StudyAreaAccessTypeValidator extends ChoiceValidator
 
     // Forward the call to the Symfony Choice constraint validator, with the allowed values
     parent::validate($value, new Choice([
-        'choices' => $object->getAvailableAccessTypes($this->security, $this->em),
+      'choices' => $object->getAvailableAccessTypes($this->security, $this->em),
     ]));
   }
 }

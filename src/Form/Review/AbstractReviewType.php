@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Entity\UserGroup;
 use App\Repository\UserGroupRepository;
 use Doctrine\ORM\NonUniqueResultException;
+use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -17,10 +18,8 @@ use Symfony\Component\Validator\Constraints\NotNull;
 
 class AbstractReviewType extends AbstractType
 {
-  /** @var Security */
-  private $security;
-  /** @var UserGroupRepository */
-  private $userGroupRepository;
+  private Security $security;
+  private UserGroupRepository $userGroupRepository;
 
   /** AbstractReviewType constructor. */
   public function __construct(UserGroupRepository $userGroupRepository, Security $security)
@@ -32,11 +31,11 @@ class AbstractReviewType extends AbstractType
   protected function addNotes(FormBuilderInterface $builder): AbstractReviewType
   {
     $builder
-        ->add('notes', TextareaType::class, [
-            'required' => false,
-            'label'    => 'review.notes',
-            'help'     => 'review.notes-help',
-        ]);
+      ->add('notes', TextareaType::class, [
+        'required' => false,
+        'label'    => 'review.notes',
+        'help'     => 'review.notes-help',
+      ]);
 
     return $this;
   }
@@ -50,33 +49,34 @@ class AbstractReviewType extends AbstractType
     assert($studyArea instanceof StudyArea);
     $userGroup      = $this->userGroupRepository->getForType($studyArea, UserGroup::GROUP_REVIEWER);
     $groupReviewers = array_filter($userGroup ? $userGroup->getUsers()->toArray() : [],
-        fn (User $user) => $user->getId() != $self->getId());
+      fn (User $user) => $user->getId() != $self->getId());
 
     $possibleUsers = array_merge(
-        [$studyArea->getOwner()], // Owner is always available for review
-        $groupReviewers
+      [$studyArea->getOwner()], // Owner is always available for review
+      $groupReviewers
     );
 
     $builder
-        ->add('requestedReviewBy', ChoiceType::class, [
-            'required'     => true,
-            'label'        => 'review.reviewer',
-            'select2'      => true,
-            'choice_label' => 'selectionName',
-            'choices'      => $possibleUsers,
-            'help'         => 'review.reviewer-help',
-            'constraints'  => [
-                new NotNull(),
-            ],
-        ]);
+      ->add('requestedReviewBy', ChoiceType::class, [
+        'required'     => true,
+        'label'        => 'review.reviewer',
+        'select2'      => true,
+        'choice_label' => 'selectionName',
+        'choices'      => $possibleUsers,
+        'help'         => 'review.reviewer-help',
+        'constraints'  => [
+          new NotNull(),
+        ],
+      ]);
 
     return $this;
   }
 
+  #[Override]
   public function configureOptions(OptionsResolver $resolver)
   {
     $resolver
-        ->setRequired('study_area')
-        ->setAllowedTypes('study_area', [StudyArea::class]);
+      ->setRequired('study_area')
+      ->setAllowedTypes('study_area', [StudyArea::class]);
   }
 }

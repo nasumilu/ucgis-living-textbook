@@ -9,23 +9,20 @@ use App\Export\ProviderInterface;
 use App\Repository\ConceptRelationRepository;
 use App\Repository\ConceptRepository;
 use App\Repository\RelationTypeRepository;
+use Override;
 use PhpOffice\PhpSpreadsheet\Cell\CellAddress;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Symfony\Component\HttpFoundation\Response;
 
 class RelationProvider implements ProviderInterface
 {
-  /** @var ConceptRepository */
-  private $conceptRepository;
-  /** @var ConceptRelationRepository */
-  private $conceptRelationRepository;
-  /** @var RelationTypeRepository */
-  private $relationTypeRepository;
-  /** @var SpreadsheetHelper */
-  private $spreadsheetHelper;
+  private ConceptRepository $conceptRepository;
+  private ConceptRelationRepository $conceptRelationRepository;
+  private RelationTypeRepository $relationTypeRepository;
+  private SpreadsheetHelper $spreadsheetHelper;
 
   public function __construct(ConceptRepository $conceptRepository, ConceptRelationRepository $conceptRelationRepository,
-                              RelationTypeRepository $relationTypeRepository, SpreadsheetHelper $spreadsheetHelper)
+    RelationTypeRepository $relationTypeRepository, SpreadsheetHelper $spreadsheetHelper)
   {
     $this->conceptRepository         = $conceptRepository;
     $this->conceptRelationRepository = $conceptRelationRepository;
@@ -33,13 +30,13 @@ class RelationProvider implements ProviderInterface
     $this->spreadsheetHelper         = $spreadsheetHelper;
   }
 
-  /** {@inheritdoc} */
+  #[Override]
   public function getName(): string
   {
     return 'relation';
   }
 
-  /** {@inheritdoc} */
+  #[Override]
   public function getPreview(): string
   {
     return <<<'EOT'
@@ -89,10 +86,10 @@ EOT;
     return $spreadSheet;
   }
 
-  /** {@inheritdoc} */
+  #[Override]
   public function export(StudyArea $studyArea): Response
   {
     return $this->spreadsheetHelper->createCsvResponse($this->getSpreadsheet($studyArea),
-        sprintf('%s_concept_relation_export.csv', $studyArea->getName()));
+      sprintf('%s_concept_relation_export.csv', $studyArea->getName()));
   }
 }

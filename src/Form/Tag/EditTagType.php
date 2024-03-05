@@ -5,6 +5,7 @@ namespace App\Form\Tag;
 use App\Entity\StudyArea;
 use App\Entity\Tag;
 use App\Form\Type\SaveType;
+use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -14,32 +15,34 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class EditTagType extends AbstractType
 {
+  #[Override]
   public function buildForm(FormBuilderInterface $builder, array $options)
   {
     $builder
-        ->add('name', TextType::class, [
-            'label' => 'tag.name',
-        ])
-        ->add('description', TextareaType::class, [
-          'label'    => 'tag.description',
-          'required' => false,
-        ])
-        ->add('color', ColorType::class, [
-            'label' => 'tag.color',
-        ])
-        ->add('submit', SaveType::class, [
-            'enable_cancel'        => true,
-            'enable_save_and_list' => false,
-            'cancel_label'         => 'form.discard',
-            'cancel_route'         => 'app_tag_list',
-        ]);
+      ->add('name', TextType::class, [
+        'label' => 'tag.name',
+      ])
+      ->add('description', TextareaType::class, [
+        'label'    => 'tag.description',
+        'required' => false,
+      ])
+      ->add('color', ColorType::class, [
+        'label' => 'tag.color',
+      ])
+      ->add('submit', SaveType::class, [
+        'enable_cancel'        => true,
+        'enable_save_and_list' => false,
+        'cancel_label'         => 'form.discard',
+        'cancel_route'         => 'app_tag_list',
+      ]);
   }
 
+  #[Override]
   public function configureOptions(OptionsResolver $resolver)
   {
     $resolver
-        ->setRequired('studyArea')
-        ->setAllowedTypes('studyArea', StudyArea::class)
-        ->setDefault('data_class', Tag::class);
+      ->setRequired('studyArea')
+      ->setAllowedTypes('studyArea', StudyArea::class)
+      ->setDefault('data_class', Tag::class);
   }
 }

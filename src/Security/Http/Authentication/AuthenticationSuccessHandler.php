@@ -4,6 +4,7 @@ namespace App\Security\Http\Authentication;
 
 use App\Router\LtbRouter;
 use Exception;
+use Override;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -17,8 +18,7 @@ use Symfony\Component\Security\Http\HttpUtils;
  */
 class AuthenticationSuccessHandler extends DefaultAuthenticationSuccessHandler
 {
-  /** @var LtbRouter */
-  private $router;
+  private LtbRouter $router;
 
   public function __construct(LtbRouter $router, HttpUtils $httpUtils, array $options = [])
   {
@@ -34,6 +34,7 @@ class AuthenticationSuccessHandler extends DefaultAuthenticationSuccessHandler
    *
    * @return Response never null
    */
+  #[Override]
   public function onAuthenticationSuccess(Request $request, TokenInterface $token)
   {
     // Original target url, as determined by Symfony

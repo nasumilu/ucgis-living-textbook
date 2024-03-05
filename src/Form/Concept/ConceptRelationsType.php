@@ -3,6 +3,7 @@
 namespace App\Form\Concept;
 
 use App\Entity\Concept;
+use Override;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormInterface;
@@ -12,20 +13,21 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class ConceptRelationsType extends AbstractType
 {
+  #[Override]
   public function configureOptions(OptionsResolver $resolver)
   {
     $resolver->setRequired('concept');
     $resolver->setDefaults([
-        'incoming'       => false,
-        'allow_add'      => true,
-        'allow_delete'   => true,
-        'prototype'      => true,
-        'error_bubbling' => false,
-        'entry_type'     => ConceptRelationType::class,
-        'entry_options'  => [
-            'hide_label' => true,
-            'incoming'   => false,
-        ],
+      'incoming'       => false,
+      'allow_add'      => true,
+      'allow_delete'   => true,
+      'prototype'      => true,
+      'error_bubbling' => false,
+      'entry_type'     => ConceptRelationType::class,
+      'entry_options'  => [
+        'hide_label' => true,
+        'incoming'   => false,
+      ],
     ]);
 
     $resolver->setAllowedTypes('concept', [Concept::class]);
@@ -40,11 +42,13 @@ class ConceptRelationsType extends AbstractType
   }
 
   /** @suppress PhanTypeMismatchProperty */
+  #[Override]
   public function buildView(FormView $view, FormInterface $form, array $options)
   {
     $view->vars['allow_move'] = false;
   }
 
+  #[Override]
   public function getParent()
   {
     return CollectionType::class;

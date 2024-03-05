@@ -7,33 +7,35 @@ use App\Entity\ConceptRelation;
 use JMS\Serializer\Annotation\Groups;
 use JMS\Serializer\Annotation\Type;
 use OpenApi\Attributes as OA;
+use Override;
 
 class DetailedConceptRelationApiModel extends ConceptRelationApiModel
 {
   protected function __construct(
-      int $id,
-      int $sourceId,
-      int $targetId,
-      protected readonly string $name,
-      #[OA\Property(nullable: true)]
-      protected readonly ?string $description,
-      #[OA\Property(description: 'Specific Dotron configuration for a concept relation, only returned when Dotron is been enabled', type: 'object', nullable: true)]
-      #[Type('array')]
-      #[Groups(['dotron'])]
-      protected readonly ?array $dotronConfig
+    int $id,
+    int $sourceId,
+    int $targetId,
+    protected readonly string $name,
+    #[OA\Property(nullable: true)]
+    protected readonly ?string $description,
+    #[OA\Property(description: 'Specific Dotron configuration for a concept relation, only returned when Dotron is been enabled', type: 'object', nullable: true)]
+    #[Type('array')]
+    #[Groups(['dotron'])]
+    protected readonly ?array $dotronConfig
   ) {
     parent::__construct($id, $sourceId, $targetId);
   }
 
+  #[Override]
   public static function fromEntity(ConceptRelation $conceptRelation): self
   {
     return new self(
-        $conceptRelation->getId(),
-        $conceptRelation->getSourceId(),
-        $conceptRelation->getTargetId(),
-        $conceptRelation->getRelationName(),
-        $conceptRelation->getRelationType()?->getDescription(),
-        $conceptRelation->getDotronConfig(),
+      $conceptRelation->getId(),
+      $conceptRelation->getSourceId(),
+      $conceptRelation->getTargetId(),
+      $conceptRelation->getRelationName(),
+      $conceptRelation->getRelationType()?->getDescription(),
+      $conceptRelation->getDotronConfig(),
     );
   }
 }

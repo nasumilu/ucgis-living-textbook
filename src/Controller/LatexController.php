@@ -6,10 +6,10 @@ use Bobv\LatexBundle\Generator\LatexGeneratorInterface;
 use Bobv\LatexBundle\Latex\Base\Standalone;
 use Bobv\LatexBundle\Latex\Element\CustomCommand;
 use DateTime;
+use Drenso\PdfToImage\Pdf;
 use Exception;
 use Psr\Cache\InvalidArgumentException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Spatie\PdfToImage\Pdf;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Filesystem\Filesystem;
@@ -31,6 +31,7 @@ class LatexController extends AbstractController
 {
   /**
    * @Route("/render", methods={"GET"}, options={"expose"=true,"no_login_wrap"=true})
+   *
    * @IsGranted("PUBLIC_ACCESS")
    *
    * @throws InvalidArgumentException
@@ -66,25 +67,24 @@ class LatexController extends AbstractController
       try {
         // Create latex object
         $document = (new Standalone(md5($content)))
-            ->addPackages(['mathtools', 'amssymb', 'esint'])
-            ->addElement(new CustomCommand('\\begin{displaymath}'))
-            ->addElement(new CustomCommand($content))
-            ->addElement(new CustomCommand('\\end{displaymath}'));
+          ->addPackages(['mathtools', 'amssymb', 'esint'])
+          ->addElement(new CustomCommand('\\begin{displaymath}'))
+          ->addElement(new CustomCommand($content))
+          ->addElement(new CustomCommand('\\end{displaymath}'));
 
         // Generate pdf output
         $pdfLocation = $generator->generate($document);
 
         // Determine output location
-        $imageLocation = str_replace('.pdf', '.jpg', $pdfLocation);
+        $imageLocation = str_replace('.pdf', '.png', $pdfLocation);
 
         // Convert to image
         $pdf = new Pdf($pdfLocation);
-        $pdf->setOutputFormat('jpg');
         $pdf->saveImage($imageLocation);
       } catch (Exception) {
         $imageLocation = sprintf('%s/%s',
-            $this->getParameter('kernel.project_dir'),
-            'public/img/latex/error.jpg');
+          $this->getParameter('kernel.project_dir'),
+          'public/img/latex/error.jpg');
 
         // Do not really store it in the cache
         $item->expiresAfter(0);
