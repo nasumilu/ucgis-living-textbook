@@ -8,7 +8,7 @@ services:
       dockerfile: docker/ltb/Dockerfile
     restart: always
     volumes:
-      - 'ltb-uploads:/usr/src/app/public/uploads'
+      - 'ltb-uploads:/usr/src/app/uploads'
       - 'ltb-public:/usr/src/app/public_mirror'
       - './.secrets.json:/usr/src/app/.secrets.json:ro'
     environment:
@@ -25,7 +25,7 @@ services:
       - ltb-network
 
   nginx:
-    image: nginx:1.25.4-alpine
+    image: nginx:1.27.2-alpine
     restart: always
     volumes:
       - 'ltb-public:/usr/src/app/public:ro'
@@ -40,7 +40,7 @@ services:
       - ltb-network
 
   db:
-    image: mariadb:10.11.7
+    image: mariadb:10.11.9
     command: [ '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci' ]
     restart: always
     environment:

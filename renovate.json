@@ -71,6 +71,12 @@
             "minimumReleaseAge": null
         },
         {
+            "matchPackagePatterns": ["^symfony/[\\w+-]+-contracts$"],
+            "groupName": "Symfony contracts",
+            "groupSlug": "symfony-contracts",
+            "minimumReleaseAge": null
+        },
+        {
             "matchPackagePrefixes": ["@types/"],
             "enabled": true
         },
@@ -80,6 +86,11 @@
             "rebaseWhen": "auto",
             "automerge": true,
             "minimumReleaseAge": null
+        },
+        {
+            "matchUpdateTypes": ["minor", "patch"],
+            "matchPackageNames": ["@types/node"],
+            "enabled": false
         },
         {
             "matchPackageNames": ["jms/serializer"],

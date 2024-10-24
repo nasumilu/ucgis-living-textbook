@@ -12,34 +12,28 @@ use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessH
 use Symfony\Component\Security\Http\HttpUtils;
 
 /**
- * Class AuthenticationSuccessHandler.
- *
- * Verifies the original target url, and insert the map if required
+ * Verifies the original target url, and insert the map if required.
  */
 class AuthenticationSuccessHandler extends DefaultAuthenticationSuccessHandler
 {
-  private LtbRouter $router;
-
-  public function __construct(LtbRouter $router, HttpUtils $httpUtils, array $options = [])
+  public function __construct(
+    private readonly LtbRouter $router,
+    HttpUtils $httpUtils,
+    array $options = [])
   {
     parent::__construct($httpUtils, $options);
-
-    $this->router = $router;
   }
 
   /**
    * This is called when an interactive authentication attempt succeeds. This
    * is called by authentication listeners inheriting from
    * AbstractAuthenticationListener.
-   *
-   * @return Response never null
    */
   #[Override]
-  public function onAuthenticationSuccess(Request $request, TokenInterface $token)
+  public function onAuthenticationSuccess(Request $request, TokenInterface $token): Response
   {
     // Original target url, as determined by Symfony
-    $targetUrl = $this->determineTargetUrl($request);
-    /** @phan-suppress-next-line PhanTypePossiblyInvalidDimOffset */
+    $targetUrl  = $this->determineTargetUrl($request);
     $targetPath = parse_url($targetUrl)['path'];
 
     // Determine whether to wrap this url or not

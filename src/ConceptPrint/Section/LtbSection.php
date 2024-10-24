@@ -17,37 +17,20 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 abstract class LtbSection extends Section
 {
-  /** @var Pandoc */
-  protected $pandoc;
+  protected readonly Pandoc $pandoc; // Set in constructor
+  protected readonly Filesystem $fileSystem; // Set in constructor
+  protected readonly Parser $parser; // Set in constructor
+  protected readonly string $baseUrl; // Set in constructor
 
-  /** @var Filesystem */
-  protected $fileSystem;
-
-  /** @var Parser */
-  protected $parser;
-
-  /** @var LtbRouter */
-  protected $router;
-
-  /** @var string */
-  protected $projectDir;
-
-  /** @var string */
-  protected $baseUrl;
-
-  /**
-   * LtbSection constructor.
-   *
-   * @throws LatexException
-   */
-  public function __construct(string $name, LtbRouter $router, string $projectDir)
+  /** @throws LatexException */
+  public function __construct(
+    string $name,
+    protected readonly LtbRouter $router,
+    protected readonly string $projectDir)
   {
     $this->pandoc     = new Pandoc($_ENV['PANDOC_PATH']);
     $this->fileSystem = new Filesystem();
     $this->parser     = new Parser();
-
-    $this->router     = $router;
-    $this->projectDir = $projectDir;
 
     // Generate base url
     $this->baseUrl = $router->generate('base_url', [], UrlGeneratorInterface::ABSOLUTE_URL);
@@ -179,7 +162,7 @@ abstract class LtbSection extends Section
           // Retrieve relevant information
           $image             = $imgElement->getAttribute('src');
           $normalImages[$id] = [
-            'replace' => preg_replace('/(\/uploads\/studyarea\/)/ui', sprintf('%s%spublic$1', $this->projectDir, DIRECTORY_SEPARATOR), $image),
+            'replace' => preg_replace('/(\/uploads\/studyarea\/)/ui', sprintf('%s$1', $this->projectDir), $image),
             'caption' => $caption,
           ];
         }
@@ -205,7 +188,6 @@ abstract class LtbSection extends Section
 
     // Restore errors
     libxml_clear_errors();
-    /* @phan-suppress-next-line PhanDeprecatedFunctionInternal */
     libxml_disable_entity_loader(false);
 
     $latex = $this->pandoc->convert($html, 'html', 'latex');
