@@ -62,6 +62,7 @@ RUN printf "zend.assertions = -1\n" >> `php -i | grep php.ini | awk '{print $6'}
 # Max File upload and form post size.
 RUN printf "post_max_size = 10M\n" >> `php -i | grep php.ini | awk '{print $6'}`/php.ini
 RUN printf "upload_max_filesize = 10M\n" >> `php -i | grep php.ini | awk '{print $6'}`/php.ini
+RUN printf "memory_limit = 1024M\n" >> `php -i | grep php.ini | awk '{print $6'}`/php.ini
 
 # Install PHP extensions
 RUN docker-php-ext-install zip
