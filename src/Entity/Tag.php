@@ -37,18 +37,9 @@ class Tag implements StudyAreaFilteredInterface, IdInterface
   #[ORM\ManyToMany(targetEntity: Concept::class, mappedBy: 'tags')]
   private Collection $concepts;
 
-  /**
-   *
-   * @ORM\Column(length=100, nullable=false)
-   *
-   * @Assert\NotBlank()
-   * @Assert\Length(max=100)
-   *
-   * @JMSA\Expose()
-   */
   #[Assert\NotBlank]
-  #[Assert\Length(max: 25)]
-  #[ORM\Column(length: 25, nullable: false)]
+  #[Assert\Length(max: 100)]
+  #[ORM\Column(length: 100, nullable: false)]
   #[JMSA\Expose]
   private string $name = '';
 

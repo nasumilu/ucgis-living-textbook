@@ -130,10 +130,6 @@
             href="{{ path('app_tag_list') }}">{% endif %}
           {{ 'dashboard.tag-count'|trans({'%count%': tagCount}) }}
           {% if tagCount > 0 %}</a>{% endif %}
-        {% if is_granted('STUDYAREA_OWNER', _twigStudyArea) and tagCount > 0 %}<a
-            href="{{ path('app_tag_list') }}">{% endif %}
-          {{ 'dashboard.tag-count'|trans({'%count%': tagCount}) }}
-          {% if is_granted('STUDYAREA_OWNER', _twigStudyArea) and tagCount > 0 %}</a>{% endif %}
       </li>
     {% endif %}
     {% if not studyArea.openAccess or relationCount > 0 %}

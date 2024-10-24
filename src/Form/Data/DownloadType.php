@@ -18,8 +18,6 @@ class DownloadType extends AbstractType
   }
 
   #[Override]
-  public function buildForm(FormBuilderInterface $builder, array $options)
-  {    
   public function buildForm(FormBuilderInterface $builder, array $options): void
   {
     $builder

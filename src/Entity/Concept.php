@@ -66,26 +66,13 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
   #[JMSA\Type('boolean')]
   private bool $instance = false;
 
-  /**
-   * @ORM\OneToOne(targetEntity="App\Entity\Data\DataDefinition", cascade={"persist","remove"})
-   * 
-   * @ORM\JoinColumn(name="definition_id", referencedColumnName="id", nullable=true)
-   *
-   * @Assert\Valid()
-   *
-   * @JMSA\Expose()
-   *
-   * @JMSA\Groups({"review_change"})
-   * 
-   * @JMSA\Type(DataDefinition::class)
-   */
-  private ?DataDefinition $definition = null;
-  #[Assert\NotNull]
-  #[ORM\Column(name: 'definition', type: Types::TEXT, nullable: false)]
+  #[Assert\Valid]
+  #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+  #[ORM\JoinColumn(name: 'definition_id', referencedColumnName: 'id', nullable: true)]
   #[JMSA\Expose]
   #[JMSA\Groups(['review_change'])]
-  #[JMSA\Type('string')]
-  private string $definition = '';
+  #[JMSA\Type(DataDefinition::class)]
+  private ?DataDefinition $definition = null;
 
   #[Assert\NotNull]
   #[Assert\Valid]
@@ -185,34 +172,14 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
   #[JMSA\MaxDepth(2)]
   private Collection $tags;
 
-  /**
-   * @ORM\OneToOne(targetEntity="App\Entity\Data\DataSelfAssessment", cascade={"persist", "remove"})
-   *
-   * @ORM\JoinColumn(name="self_assessment_id", referencedColumnName="id", nullable=false)
-   *
-   * @Assert\Valid()
-   *
-   * @JMSA\Expose()
-   *
-   * @JMSA\Groups({"review_change"})
-   *
-   * @JMSA\Type(DataSelfAssessment::class)
-   */
-  private $selfAssessment;
-
-  /**
-   * @var DataAdditionalResources
-   *
-   * @ORM\OneToOne(targetEntity="App\Entity\Data\DataAdditionalResources", cascade={"persist", "remove"})
-   * @ORM\JoinColumn(name="additional_resources_id", referencedColumnName="id", nullable=true)
-   *
-   * @Assert\Valid()
-   *
-   * @JMSA\Expose()
-   * @JMSA\Groups({"review_change"})
-   * @JMSA\Type(DataAdditionalResources::class)
-   */
+  #[Assert\Valid]
+  #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+  #[ORM\JoinColumn(name: 'additional_resources_id', referencedColumnName: 'id', nullable: true)]
+  #[JMSA\Expose]
+  #[JMSA\Groups(['review_change'])]
+  #[JMSA\Type(DataAdditionalResources::class)]
   private ?DataAdditionalResources $additionalResources = null;
+
   #[Assert\Valid]
   #[ORM\OneToOne(cascade: ['persist', 'remove'])]
   #[ORM\JoinColumn(name: 'self_assessment_id', referencedColumnName: 'id', nullable: false)]
@@ -253,23 +220,13 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
   private ?array $dotronConfig = null;
 
 
-  /**
-   * @var string
-   *
-   * @ORM\Column(name="image_path", type="string", nullable=true)
-   *
-   * @Assert\Length(max=512)
-   * @JMSA\Type("string")
-   * @JMSA\Expose()
-   */
+  #[ORM\Column(name: 'image_path', type: 'string', nullable: true)]
+  #[Assert\Length(max: 512)]
+  #[JMSA\Type('string')]
+  #[JMSA\Expose]
   private ?string $imagePath = null;
 
-  /**
-     * @Assert\Image(
-     *     maxSize="2M",
-     *     mimeTypes={"image/jpg", "image/jpeg", "image/png", "image/gif"}
-     * )
-     */
+  #[Assert\Image(maxSize: '2M', mimeTypes: ['image/jpg', 'image/jpeg', 'image/png', 'image/gif'])]
   private $imageFile;
 
   /** Concept constructor. */
@@ -406,6 +363,7 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
     // Check direct data
     $check($this->getExamples());
     $check($this->getHowTo());
+    $check($this->getDefinition());
     $check($this->getIntroduction());
     $check($this->getSelfAssessment());
     $check($this->getAdditionalResources());

@@ -557,14 +557,6 @@ class DataController extends AbstractController
     ]);
   }
 
-  /**
-   * @Route("/download")
-   *
-   * @Template()
-   *
-   * @IsGranted("STUDYAREA_EDIT", subject="requestStudyArea")
-   */
-  public function download(Request $request, RequestStudyArea $requestStudyArea, ExportService $exportService, TranslatorInterface $translator): array|Response
   #[Route('/download')]
   #[IsGranted(StudyAreaVoter::EDIT, subject: 'requestStudyArea')]
   public function download(Request $request, RequestStudyArea $requestStudyArea, ExportService $exportService): Response
