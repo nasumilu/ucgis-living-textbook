@@ -73,7 +73,21 @@ RUN docker-php-ext-install intl
 RUN docker-php-ext-install sockets
 RUN docker-php-ext-install xsl
 RUN pecl install apcu && docker-php-ext-enable apcu
-RUN pecl install imagick && docker-php-ext-enable imagick
+
+# Comment out the next cmd as a workaround of an imagick installation issue
+# RUN pecl install imagick && docker-php-ext-enable imagick
+# Imagick is installed from the archive because regular installation fails
+# See: https://github.com/Imagick/imagick/issues/643#issuecomment-1834361716
+ARG IMAGICK_VERSION=3.7.0
+RUN curl -L -o /tmp/imagick.tar.gz https://github.com/Imagick/imagick/archive/refs/tags/${IMAGICK_VERSION}.tar.gz \
+    && tar --strip-components=1 -xf /tmp/imagick.tar.gz \
+    && phpize \
+    && ./configure \
+    && make \
+    && make install \
+    && echo "extension=imagick.so" > /usr/local/etc/php/conf.d/ext-imagick.ini \
+    && rm -rf /tmp/*
+# <<< End of Imagick installation
 
 # Fix ulem package
 RUN mkdir /usr/share/texmf/tex/latex/ulem \
