@@ -153,22 +153,13 @@ class StudyArea implements Stringable, IdInterface
   #[ORM\Column(nullable: true)]
   private ?array $dotronConfig = null;
 
-  /**
-   * Setting this to true makes it possible to export studyarea to given URL endpoint
-   *
-   * @ORM\Column(type="boolean",name="url_export_enabled")
-   */
+  #[ORM\Column(type: 'boolean', name:'url_export_enabled', nullable: true)]
   private bool $urlExportEnabled = false;
 
-  /**
-   * @var string
-   *
-   * @ORM\Column(name="export_url", type="string", nullable=true)
-   *
-   * @Assert\Length(max=256)
-   * @JMSA\Type("string")
-   * @JMSA\Expose()
-   */
+  #[ORM\Column(type: 'string', name:'export_url', nullable: true)]
+  #[Assert\Length(max: 256)]
+  #[JMSA\Type('string')]
+  #[JMSA\Expose]
   private ?string $exportUrl = null;
 
   /**
