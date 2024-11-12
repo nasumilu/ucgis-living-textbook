@@ -1,4 +1,4 @@
-FROM php:8.3.3-fpm-bookworm as ltb_base
+FROM php:8.3.12-fpm-bookworm as ltb_base
 MAINTAINER Drienerlo Engineering Solutions <hallo@drenso.nl>
 
 # Update all dependencies, and install required ones
@@ -62,6 +62,7 @@ RUN printf "zend.assertions = -1\n" >> `php -i | grep php.ini | awk '{print $6'}
 # Max File upload and form post size.
 RUN printf "post_max_size = 10M\n" >> `php -i | grep php.ini | awk '{print $6'}`/php.ini
 RUN printf "upload_max_filesize = 10M\n" >> `php -i | grep php.ini | awk '{print $6'}`/php.ini
+RUN printf "memory_limit = 1024M\n" >> `php -i | grep php.ini | awk '{print $6'}`/php.ini
 
 # Install PHP extensions
 RUN docker-php-ext-install zip
@@ -72,7 +73,21 @@ RUN docker-php-ext-install intl
 RUN docker-php-ext-install sockets
 RUN docker-php-ext-install xsl
 RUN pecl install apcu && docker-php-ext-enable apcu
-RUN pecl install imagick && docker-php-ext-enable imagick
+
+# Comment out the next cmd as a workaround of an imagick installation issue
+# RUN pecl install imagick && docker-php-ext-enable imagick
+# Imagick is installed from the archive because regular installation fails
+# See: https://github.com/Imagick/imagick/issues/643#issuecomment-1834361716
+ARG IMAGICK_VERSION=3.7.0
+RUN curl -L -o /tmp/imagick.tar.gz https://github.com/Imagick/imagick/archive/refs/tags/${IMAGICK_VERSION}.tar.gz \
+    && tar --strip-components=1 -xf /tmp/imagick.tar.gz \
+    && phpize \
+    && ./configure \
+    && make \
+    && make install \
+    && echo "extension=imagick.so" > /usr/local/etc/php/conf.d/ext-imagick.ini \
+    && rm -rf /tmp/*
+# <<< End of Imagick installation
 
 # Fix ulem package
 RUN mkdir /usr/share/texmf/tex/latex/ulem \
@@ -132,7 +147,7 @@ RUN cp .secrets.json.dist .secrets.json \
     && rm .secrets.json
 
 ######################## Production assets builder ########################
-FROM node:20.11.1-slim as ltb_prod_assets_build
+FROM node:20.18.0-slim as ltb_prod_assets_build
 
 # Set the work dir
 WORKDIR /usr/src/app
@@ -158,10 +173,11 @@ COPY --from=ltb_prod_assets_build /usr/src/app/public/email ./public/email
 
 # Set some permissions
 RUN mkdir -p var \
-    && mkdir -p public\uploads \
+    && mkdir -p uploads \
     && chmod o+r -R public \
     && find public -type d -exec chmod o+x {} \+ \
     && chown -R www-data . \
+    && chmod o+x uploads \
     && chmod u+rwx var
 
 # Mark as production environment

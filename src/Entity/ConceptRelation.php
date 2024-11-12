@@ -5,116 +5,74 @@ namespace App\Entity;
 use App\Database\Traits\Blameable;
 use App\Database\Traits\IdTrait;
 use App\Database\Traits\SoftDeletable;
+use App\Repository\ConceptRelationRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Drenso\Shared\Interfaces\IdInterface;
 use Gedmo\Mapping\Annotation as Gedmo;
 use JMS\Serializer\Annotation as JMSA;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * Class ConceptRelation.
- *
- * @author BobV
- *
- * @ORM\Table()
- *
- * @ORM\Entity(repositoryClass="App\Repository\ConceptRelationRepository")
- *
- * @Gedmo\SoftDeleteable(fieldName="deletedAt")
- *
- * @JMSA\ExclusionPolicy("all")
- */
+#[ORM\Entity(repositoryClass: ConceptRelationRepository::class)]
+#[ORM\Table]
+#[JMSA\ExclusionPolicy('all')]
+#[Gedmo\SoftDeleteable(fieldName: 'deletedAt')]
 class ConceptRelation implements IdInterface
 {
   use IdTrait;
   use Blameable;
   use SoftDeletable;
 
-  /**
-   * @ORM\ManyToOne(targetEntity="Concept", inversedBy="outgoingRelations")
-   *
-   * @ORM\JoinColumn(name="source_id", referencedColumnName="id", nullable=false)
-   *
-   * @Assert\NotNull()
-   *
-   * @JMSA\Expose()
-   *
-   * @JMSA\Groups({"review_change"})
-   *
-   * @JMSA\Type(Concept::class)
-   *
-   * @JMSA\MaxDepth(2)
-   */
+  #[Assert\NotNull]
+  #[ORM\ManyToOne(inversedBy: 'outgoingRelations')]
+  #[ORM\JoinColumn(name: 'source_id', referencedColumnName: 'id', nullable: false)]
+  #[JMSA\Expose]
+  #[JMSA\Groups(['review_change'])]
+  #[JMSA\Type(Concept::class)]
+  #[JMSA\MaxDepth(2)]
   private ?Concept $source = null;
 
-  /**
-   * @ORM\ManyToOne(targetEntity="Concept", inversedBy="incomingRelations")
-   *
-   * @ORM\JoinColumn(name="target_id", referencedColumnName="id", nullable=false)
-   *
-   * @Assert\NotNull()
-   *
-   * @JMSA\Expose()
-   *
-   * @JMSA\Groups({"review_change"})
-   *
-   * @JMSA\Type(Concept::class)
-   *
-   * @JMSA\MaxDepth(2)
-   */
+  #[Assert\NotNull]
+  #[ORM\ManyToOne(inversedBy: 'incomingRelations')]
+  #[ORM\JoinColumn(name: 'target_id', referencedColumnName: 'id', nullable: false)]
+  #[JMSA\Expose]
+  #[JMSA\Groups(['review_change'])]
+  #[JMSA\Type(Concept::class)]
+  #[JMSA\MaxDepth(2)]
   private ?Concept $target = null;
 
-  /**
-   * @ORM\ManyToOne(targetEntity="RelationType")
-   *
-   * @ORM\JoinColumn(name="relation_type", referencedColumnName="id", nullable=false)
-   *
-   * @Assert\NotNull()
-   *
-   * @JMSA\Expose()
-   *
-   * @JMSA\Groups({"review_change"})
-   *
-   * @JMSA\Type(RelationType::class)
-   *
-   * @JMSA\MaxDepth(2)
-   */
+  #[Assert\NotNull]
+  #[ORM\ManyToOne]
+  #[ORM\JoinColumn(name: 'relation_type', referencedColumnName: 'id', nullable: false)]
+  #[JMSA\Expose]
+  #[JMSA\Groups(['review_change'])]
+  #[JMSA\Type(RelationType::class)]
+  #[JMSA\MaxDepth(2)]
   private ?RelationType $relationType = null;
 
   /**
    * The position field will be filled automatically by a callback in the concept,
    * in order to force the desired positioning.
-   *
-   * @ORM\Column(name="outgoing_position", type="integer", nullable=false)
-   *
-   * @Assert\NotNull()
-   *
-   * @Assert\GreaterThanOrEqual(value="0")
    */
+  #[Assert\NotNull]
+  #[Assert\GreaterThanOrEqual(value: '0')]
+  #[ORM\Column(name: 'outgoing_position', nullable: false)]
   private int $outgoingPosition = 0;
 
   /**
    * The position field will be filled automatically by a callback in the concept,
    * in order to force the desired positioning.
-   *
-   * @ORM\Column(name="incoming_position", type="integer", nullable=false)
-   *
-   * @Assert\NotNull()
-   *
-   * @Assert\GreaterThanOrEqual(value="0")
    */
+  #[Assert\NotNull]
+  #[Assert\GreaterThanOrEqual(value: '0')]
+  #[ORM\Column(name: 'incoming_position', nullable: false)]
   private int $incomingPosition = 0;
 
-  /** @ORM\Column(type="json", nullable=true) */
+  #[ORM\Column(nullable: true)]
   private ?array $dotronConfig = null;
 
-  /**
-   * @JMSA\VirtualProperty()
-   *
-   * @JMSA\SerializedName("target")
-   *
-   * @JMSA\Expose()
-   */
+  #[JMSA\VirtualProperty]
+  #[JMSA\SerializedName('target')]
+  #[JMSA\Expose]
   public function getTargetId(): ?int
   {
     return $this->getTarget()?->getId();
@@ -125,11 +83,8 @@ class ConceptRelation implements IdInterface
     return $this->getSource()?->getId();
   }
 
-  /**
-   * @JMSA\VirtualProperty()
-   *
-   * @JMSA\Expose()
-   */
+  #[JMSA\VirtualProperty]
+  #[JMSA\Expose]
   public function getRelationName(): string
   {
     return $this->relationType ? $this->relationType->getName() : '';

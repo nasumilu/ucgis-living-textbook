@@ -10,6 +10,7 @@ use App\Repository\ConceptRepository;
 use App\Repository\StudyAreaRepository;
 use Override;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\ChoiceList\Loader\CallbackChoiceLoader;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -17,7 +18,6 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -25,28 +25,22 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class DuplicateType extends AbstractType
 {
-  final public const CHOICE              = 'type';
-  final public const CHOICE_EXISTING     = 'existing';
-  final public const CHOICE_NEW          = 'new';
-  final public const EXISTING_STUDY_AREA = 'existing_study_area';
-  final public const NEW_STUDY_AREA      = 'new_study_area';
-  final public const CONCEPTS            = 'concepts';
-  final public const SELECT_ALL          = 'select_all';
-  private Security $security;
-  private StudyAreaRepository $studyAreaRepository;
-
-  private TranslatorInterface $translator;
-
+  final public const string CHOICE              = 'type';
+  final public const string CHOICE_EXISTING     = 'existing';
+  final public const string CHOICE_NEW          = 'new';
+  final public const string EXISTING_STUDY_AREA = 'existing_study_area';
+  final public const string NEW_STUDY_AREA      = 'new_study_area';
+  final public const string CONCEPTS            = 'concepts';
+  final public const string SELECT_ALL          = 'select_all';
   public function __construct(
-    TranslatorInterface $translator, StudyAreaRepository $studyAreaRepository, Security $security)
+    private readonly TranslatorInterface $translator,
+    private readonly StudyAreaRepository $studyAreaRepository,
+    private readonly Security $security)
   {
-    $this->translator          = $translator;
-    $this->studyAreaRepository = $studyAreaRepository;
-    $this->security            = $security;
   }
 
   #[Override]
-  public function buildForm(FormBuilderInterface $builder, array $options)
+  public function buildForm(FormBuilderInterface $builder, array $options): void
   {
     $defaultGroupName = $this->translator->trans('study-area.groups.default-name');
 
@@ -121,7 +115,7 @@ class DuplicateType extends AbstractType
   }
 
   #[Override]
-  public function configureOptions(OptionsResolver $resolver)
+  public function configureOptions(OptionsResolver $resolver): void
   {
     $resolver
       ->setDefaults([
@@ -138,7 +132,7 @@ class DuplicateType extends AbstractType
   }
 
   /** Check if there is at least 1 concept selected to duplicate. */
-  public function checkConcepts($data, ExecutionContextInterface $context)
+  public function checkConcepts($data, ExecutionContextInterface $context): void
   {
     if ($data['select_all'] === false && (is_countable($data['concepts']) ? count($data['concepts']) : 0) === 0) {
       $context->buildViolation('data.concepts-no-selection')
@@ -148,7 +142,7 @@ class DuplicateType extends AbstractType
   }
 
   /** Check if the new study area is valid. */
-  public function checkNewStudyArea($data, ExecutionContextInterface $context)
+  public function checkNewStudyArea($data, ExecutionContextInterface $context): void
   {
     if ($context->getGroup() === self::CHOICE_NEW) {
       $context

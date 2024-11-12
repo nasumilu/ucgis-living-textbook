@@ -32,7 +32,7 @@ final class Version20240130190038 extends AbstractMigration
         $this->addSql('ALTER TABLE concept DROP FOREIGN KEY FK_E74A6050D11EA911');
         $this->addSql('DROP TABLE data_definition');
         $this->addSql('DROP INDEX UNIQ_E74A6050D11EA911 ON concept');
-        $this->addSql('ALTER TABLE concept ADD definition LONGTEXT DEFAULT NULL, DROP definition_id');
+        $this->addSql('DROP definition_id');
     }
 
     public function isTransactional(): bool

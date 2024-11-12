@@ -9,7 +9,6 @@ use DateTime;
 use Drenso\PdfToImage\Pdf;
 use Exception;
 use Psr\Cache\InvalidArgumentException;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Component\Filesystem\Filesystem;
@@ -17,30 +16,24 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
+use Symfony\Component\RateLimiter\Exception\RateLimitExceededException;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Cache\ItemInterface;
 
-/**
- * Class LatexController.
- *
- * @author BobV
- *
- * @Route("/latex")
- */
+#[Route('/latex')]
 class LatexController extends AbstractController
 {
-  /**
-   * @Route("/render", methods={"GET"}, options={"expose"=true,"no_login_wrap"=true})
-   *
-   * @IsGranted("PUBLIC_ACCESS")
-   *
-   * @throws InvalidArgumentException
-   *
-   * @return Response
-   *
-   * @suppress PhanTypeInvalidThrowsIsInterface
-   */
-  public function renderLatex(Request $request, LatexGeneratorInterface $generator)
+  /** @throws InvalidArgumentException */
+  #[Route('/render', options: ['expose' => true, 'no_login_wrap' => true], methods: [Request::METHOD_GET])]
+  #[IsGranted(AuthenticatedVoter::PUBLIC_ACCESS)]
+  public function renderLatex(
+    Request $request,
+    LatexGeneratorInterface $generator,
+    RateLimiterFactory $latexGeneratorLimiter): Response
   {
     // Retrieve and check content
     $content = $request->query->get('content', null);
@@ -63,8 +56,22 @@ class LatexController extends AbstractController
       }
     }
 
-    $imageLocation = $cache->get($cacheKey, function (ItemInterface $item) use ($content, $generator, &$cached) {
+    $imageLocation = $cache->get($cacheKey, function (ItemInterface $item) use (
+      $content,
+      $generator,
+      &$cached,
+      $request,
+      $latexGeneratorLimiter,
+    ) {
       try {
+        if (!$this->isGranted('ROLE_USER')) {
+          // Enforce generation limit
+          $latexGeneratorLimiter
+            ->create($request->getClientIp())
+            ->consume()
+            ->ensureAccepted();
+        }
+
         // Create latex object
         $document = (new Standalone(md5($content)))
           ->addPackages(['mathtools', 'amssymb', 'esint'])
@@ -81,6 +88,15 @@ class LatexController extends AbstractController
         // Convert to image
         $pdf = new Pdf($pdfLocation);
         $pdf->saveImage($imageLocation);
+      } catch (RateLimitExceededException $e) {
+        $limit = $e->getRateLimit();
+
+        $retryAfter = $limit->getRetryAfter()->getTimestamp() - time();
+        throw new TooManyRequestsHttpException($retryAfter, headers: [
+          'X-RateLimit-Remaining'   => $limit->getRemainingTokens(),
+          'X-RateLimit-Retry-After' => $retryAfter,
+          'X-RateLimit-Limit'       => $limit->getLimit(),
+        ]);
       } catch (Exception) {
         $imageLocation = sprintf('%s/%s',
           $this->getParameter('kernel.project_dir'),
@@ -99,7 +115,6 @@ class LatexController extends AbstractController
     $response = $this->file($imageLocation, null, ResponseHeaderBag::DISPOSITION_INLINE);
     if ($cached) {
       // Disable symfony's automatic cache control header
-      /* @phan-suppress-next-line PhanAccessClassConstantInternal */
       $response->headers->set(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER, 'true');
 
       // Setup cache headers

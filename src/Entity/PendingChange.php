@@ -5,22 +5,19 @@ namespace App\Entity;
 use App\Database\Traits\Blameable;
 use App\Database\Traits\IdTrait;
 use App\Entity\Contracts\ReviewableInterface;
+use App\Repository\PendingChangeRepository;
 use App\Review\Exception\IncompatibleChangeMergeException;
 use App\Review\Exception\OverlappingFieldsChangedException;
 use App\Review\ReviewService;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Drenso\Shared\Interfaces\IdInterface;
 use RuntimeException;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-/**
- * Class PendingChange.
- *
- * @ORM\Table()
- *
- * @ORM\Entity(repositoryClass="App\Repository\PendingChangeRepository")
- */
+#[ORM\Entity(repositoryClass: PendingChangeRepository::class)]
+#[ORM\Table]
 class PendingChange implements IdInterface
 {
   use IdTrait;
@@ -30,100 +27,66 @@ class PendingChange implements IdInterface
    * Change types
    * Number are added to force time dependant ordering.
    */
-  final public const CHANGE_TYPE_ADD    = '10_add';
-  final public const CHANGE_TYPE_EDIT   = '20_edit';
-  final public const CHANGE_TYPE_REMOVE = '30_remove';
-  final public const CHANGE_TYPES       = [
+  final public const string CHANGE_TYPE_ADD    = '10_add';
+  final public const string CHANGE_TYPE_EDIT   = '20_edit';
+  final public const string CHANGE_TYPE_REMOVE = '30_remove';
+  final public const array CHANGE_TYPES        = [
     self::CHANGE_TYPE_ADD,
     self::CHANGE_TYPE_EDIT,
     self::CHANGE_TYPE_REMOVE,
   ];
 
-  /**
-   * @ORM\ManyToOne(targetEntity="StudyArea")
-   *
-   * @ORM\JoinColumn(name="study_area_id", referencedColumnName="id", nullable=false)
-   *
-   * @Assert\NotNull()
-   */
+  #[Assert\NotNull]
+  #[ORM\ManyToOne]
+  #[ORM\JoinColumn(name: 'study_area_id', referencedColumnName: 'id', nullable: false)]
   private ?StudyArea $studyArea = null;
 
-  /**
-   * The change type of the pending change.
-   *
-   * @ORM\Column(type="string", length=10)
-   *
-   * @Assert\NotNull()
-   *
-   * @Assert\Choice(choices=PendingChange::CHANGE_TYPES)
-   */
+  /** The change type of the pending change. */
+  #[Assert\NotNull]
+  #[Assert\Choice(choices: PendingChange::CHANGE_TYPES)]
+  #[ORM\Column(length: 10)]
   private ?string $changeType = null;
 
-  /**
-   * The object type of the pending change.
-   *
-   * @ORM\Column(type="string", length=255)
-   *
-   * @Assert\NotBlank(allowNull=false)
-   */
+  /** The object type of the pending change. */
+  #[Assert\NotBlank(allowNull: false)]
+  #[ORM\Column(length: 255)]
   private ?string $objectType = null;
 
-  /**
-   * The object id of the pending change.
-   *
-   * @ORM\Column(type="integer", nullable=true)
-   */
+  /** The object id of the pending change. */
+  #[ORM\Column(nullable: true)]
   private ?int $objectId = null;
 
   /**
    * JSON encoded object.
    *
    * @var string|null
-   *
-   * @ORM\Column(type="text")
-   *
-   * @Assert\NotBlank(allowNull=false)
    */
+  #[Assert\NotBlank(allowNull: false)]
+  #[ORM\Column(type: Types::TEXT)]
   private $payload;
 
   /**
    * Changed fields in the object.
    *
    * @var array|null
-   *
-   * @ORM\Column(type="json")
-   *
-   * @Assert\NotNull()
    */
+  #[Assert\NotNull]
+  #[ORM\Column(type: Types::JSON)]
   private $changedFields;
 
-  /**
-   * The owner of the pending change (aka, the user who created it).
-   *
-   * @ORM\ManyToOne(targetEntity="App\Entity\User")
-   *
-   * @ORM\JoinColumn(nullable=false)
-   *
-   * @Assert\NotNull()
-   */
+  /** The owner of the pending change (aka, the user who created it). */
+  #[Assert\NotNull]
+  #[ORM\ManyToOne]
+  #[ORM\JoinColumn(nullable: false)]
   private ?User $owner = null;
 
-  /**
-   * The review this pending change belongs to, if any.
-   *
-   * @ORM\ManyToOne(targetEntity="App\Entity\Review", inversedBy="pendingChanges")
-   *
-   * @ORM\JoinColumn(nullable=true)
-   */
+  /** The review this pending change belongs to, if any. */
+  #[ORM\ManyToOne(inversedBy: 'pendingChanges')]
+  #[ORM\JoinColumn(nullable: true)]
   private ?Review $review = null;
 
-  /**
-   * If any, review comments on particular changes (per field) are stores here.
-   *
-   * @ORM\Column(type="json", nullable=true)
-   *
-   * @Assert\Type("array")
-   */
+  /** If any, review comments on particular changes (per field) are stores here. */
+  #[ORM\Column(nullable: true)]
   private ?array $reviewComments = null;
 
   /** Cached deserialized object. */
@@ -169,7 +132,6 @@ class PendingChange implements IdInterface
     $origData  = json_decode($this->payload ?? '[]', true);
     $mergeData = json_decode($merge->payload ?? '[]', true);
     foreach ($merge->getChangedFields() as $changedField) {
-      /* @phan-suppress-next-line PhanTypeArraySuspiciousNullable */
       $origData[$changedField] = $mergeData[$changedField];
       $this->changedFields[]   = $changedField;
     }
@@ -324,11 +286,8 @@ class PendingChange implements IdInterface
     return $this;
   }
 
-  /**
-   * Validates the object id field, which must be empty for new objects, but filled for existing objects.
-   *
-   * @Assert\Callback()
-   */
+  /** Validates the object id field, which must be empty for new objects, but filled for existing objects. */
+  #[Assert\Callback]
   public function validateObjectId(ExecutionContextInterface $context, $payload)
   {
     $violation = null;

@@ -3,8 +3,8 @@
 namespace App\Controller;
 
 use App\Request\Wrapper\RequestStudyArea;
+use App\Security\Voters\StudyAreaVoter;
 use DateTime;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -12,29 +12,24 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\EventListener\AbstractSessionListener;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/**
- * Class UploadsController.
- *
- * @author BobV
- *
- * @Route("/uploads")
- */
+#[Route('/uploads')]
 class UploadsController extends AbstractController
 {
-  /**
-   * @Route("/studyarea/{_studyArea}/{path}", requirements={"_studyArea"="\d+", "path"=".+"},
-   *                                          options={"no_login_wrap"=true})
-   *
-   * @IsGranted("STUDYAREA_SHOW", subject="requestStudyArea")
-   *
-   * @return Response
-   */
-  public function load(Request $request, RequestStudyArea $requestStudyArea, string $path)
+  #[Route('/studyarea/{_studyArea<\d+>}/{path<.+>}', options: ['no_login_wrap' => true])]
+  #[IsGranted(AuthenticatedVoter::PUBLIC_ACCESS)]
+  public function load(Request $request, RequestStudyArea $requestStudyArea, string $path): Response
   {
+    // Manual check to not trigger login forward
+    if (!$this->isGranted(StudyAreaVoter::SHOW, $requestStudyArea)) {
+      return new Response(status: Response::HTTP_FORBIDDEN);
+    }
+
     // Create path from request
-    $requestedFile = sprintf('%s/public/uploads/studyarea/%s/%s',
+    $requestedFile = sprintf('%s/uploads/studyarea/%s/%s',
       $this->getParameter('kernel.project_dir'),
       $requestStudyArea->getStudyArea()->getId(),
       $path);
@@ -42,17 +37,12 @@ class UploadsController extends AbstractController
     return $this->getFile($request, $requestedFile);
   }
 
-  /**
-   * @Route("/global/{path}", options={"no_login_wrap"=true})
-   *
-   * @IsGranted("PUBLIC_ACCESS")
-   *
-   * @return Response
-   */
-  public function loadGlobal(Request $request, string $path)
+  #[Route('/global/{path}', options: ['no_login_wrap' => true])]
+  #[IsGranted(AuthenticatedVoter::PUBLIC_ACCESS)]
+  public function loadGlobal(Request $request, string $path): Response
   {
     // Create path from request
-    $requestedFile = sprintf('%s/public/uploads/global/%s',
+    $requestedFile = sprintf('%s/uploads/global/%s',
       $this->getParameter('kernel.project_dir'),
       $path);
 
@@ -70,13 +60,12 @@ class UploadsController extends AbstractController
     // Create base response
     $download = $request->query->has('download');
     $response = $this->file($requestedFile, null, $download
-        ? ResponseHeaderBag::DISPOSITION_ATTACHMENT
-        : ResponseHeaderBag::DISPOSITION_INLINE);
+      ? ResponseHeaderBag::DISPOSITION_ATTACHMENT
+      : ResponseHeaderBag::DISPOSITION_INLINE);
 
     // Only cache when not downloading
     if (!$download) {
       // Disable symfony's automatic cache control header
-      /* @phan-suppress-next-line PhanAccessClassConstantInternal */
       $response->headers->set(AbstractSessionListener::NO_AUTO_CACHE_CONTROL_HEADER, 'true');
 
       // Setup cache headers

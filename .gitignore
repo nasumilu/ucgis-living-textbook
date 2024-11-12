@@ -18,7 +18,7 @@ assets/js/_fos_routes.json
 /public/elfinder-assets
 
 # Uploaded assets
-/public/uploads
+/uploads
 
 ###> symfony/framework-bundle ###
 /.env.local
@@ -57,3 +57,7 @@ docker/nginx/server.cert
 
 # Ignore .DS_Store file
 .DS_Store
+###> vincentlanglet/twig-cs-fixer ###
+/.twig-cs-fixer.cache
+twigcs.xml
+###< vincentlanglet/twig-cs-fixer ###
