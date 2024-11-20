@@ -86,7 +86,7 @@ the [environment description](environment.md) to learn more.
 
 ### Development start-up
 
-1. Make a copy of `docker-compose.dev.yml` called `docker-compose.yml`
+1. Make a copy of `compose.dev.yml` called `docker-compose.yml`
 2. Make sure the environment is configured accordingly
 3. Start the containers by running the command `docker-compose up` in the project root folder and wait until it is up
    and running (you will see `NOTICE: ready to handle connections`)
@@ -124,7 +124,7 @@ the [environment description](environment.md) to learn more.
 
 ### Production how-to
 
-1. Make a copy of `docker-compose.prod.yml` called `docker-compose.yml`
+1. Make a copy of `compose.prod.yml` called `docker-compose.yml`
 2. Make sure the environment is configured accordingly
 3. Start with `docker-compose up -d`
 4. Visit the ltb in your browser by going to the host configured in `ltb_prod.env`.
