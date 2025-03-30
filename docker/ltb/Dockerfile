@@ -35,6 +35,9 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists
 
+# Addressing a latex renderer error: Semaphore extension (sysvsem) is required.
+RUN docker-php-ext-install sysvmsg sysvsem sysvshm
+
 # todo: Python sources
 ## Install python 3.8
 #ARG PYTHON_VERSION=3.8.13
