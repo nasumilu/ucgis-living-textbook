@@ -13,7 +13,6 @@ use App\Entity\Traits\ReviewableTrait;
 use App\Repository\LearningOutcomeRepository;
 use App\Review\Exception\IncompatibleChangeException;
 use App\Review\Exception\IncompatibleFieldChangedException;
-use App\Validator\Constraint\Data\WordCount;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -63,11 +62,9 @@ class LearningOutcome implements SearchableInterface, StudyAreaFilteredInterface
   private string $name = '';
 
   /** Learning outcome text. */
-  #[Assert\NotBlank]
   #[ORM\Column(name: 'text', type: Types::TEXT, nullable: false)]
   #[Serializer\Groups(['Default', 'review_change'])]
   #[Serializer\Type('string')]
-  #[WordCount(min: 1, max: 10000)]
   private string $text = '';
 
   public function __construct()
