@@ -1,18 +1,18 @@
 submit: Submit
 
 abbreviation:
-  _name: 'Abbreviation'
-  abbreviation: 'Abbreviation'
-  add-title: 'Add new abbreviation'
-  edit-title: 'Edit abbreviation "%item%"'
-  list-title: 'Abbreviation list'
+  _name: 'Definition'
+  abbreviation: 'Definition'
+  add-title: 'Add new definition'
+  edit-title: 'Edit definition "%item%"'
+  list-title: 'Definition list'
   meaning: 'Meaning'
   no-url: 'No url'
-  saved: 'Abbreviation "%item%" has been saved successfully.'
-  remove: 'Remove abbreviation "%item%"'
-  remove-text: 'Are you sure you want to remove the abbreviation "%item%"?'
-  removed: 'Abbreviation "%item%" has been removed successfully.'
-  updated: 'Abbreviation "%item%" has been successfully updated.'
+  saved: 'Definition "%item%" has been saved successfully.'
+  remove: 'Remove definition "%item%"'
+  remove-text: 'Are you sure you want to remove the definition "%item%"?'
+  removed: 'Definition "%item%" has been removed successfully.'
+  updated: 'Definition "%item%" has been successfully updated.'
 
 analytics:
   date-end: 'End date'
