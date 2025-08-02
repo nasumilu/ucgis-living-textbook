@@ -50,6 +50,7 @@ class EditLearningOutcomeType extends AbstractType
       ])
       ->add('text', CkEditorType::class, [
         'label'      => 'learning-outcome.text',
+        'required'   => false,
         'empty_data' => '',
         'studyArea'  => $options['studyArea'],
         'disabled'   => in_array('text', $disabledFields),
