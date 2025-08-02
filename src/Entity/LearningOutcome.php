@@ -67,7 +67,7 @@ class LearningOutcome implements SearchableInterface, StudyAreaFilteredInterface
   private string $name = '';
 
   /** Learning outcome text. */
-  #[ORM\Column(name: 'text', type: Types::TEXT, nullable: false)]
+  #[ORM\Column(name: 'text', type: Types::TEXT, nullable: true)]
   #[Serializer\Groups(['Default', 'review_change'])]
   #[Serializer\Type('string')]
   private string $text = '';
