@@ -38,16 +38,15 @@ class Abbreviation implements SearchableInterface, StudyAreaFilteredInterface, R
   private ?StudyArea $studyArea = null;
 
   #[Assert\NotBlank]
-  #[Assert\Length(min: 1, max: 25)]
-  #[ORM\Column(name: 'abbreviation', length: 25, nullable: false)]
+  #[Assert\Length(min: 1, max: 255)]
+  #[ORM\Column(name: 'abbreviation', length: 255, nullable: false)]
   #[JMSA\Expose]
   #[JMSA\Groups(['Default', 'review_change'])]
   #[JMSA\Type('string')]
   private string $abbreviation = '';
 
   #[Assert\NotBlank]
-  #[Assert\Length(min: 1, max: 255)]
-  #[ORM\Column(name: 'meaning', length: 255, nullable: false)]
+  #[ORM\Column(name: 'meaning', type: 'text', nullable: false)]
   #[JMSA\Expose]
   #[JMSA\Groups(['Default', 'review_change'])]
   #[JMSA\Type('string')]
