@@ -70,7 +70,7 @@ class LearningOutcome implements SearchableInterface, StudyAreaFilteredInterface
   #[ORM\Column(name: 'text', type: Types::TEXT, nullable: true)]
   #[Serializer\Groups(['Default', 'review_change'])]
   #[Serializer\Type('string')]
-  private string $text = '';
+  private ?string $text = null;
 
   public function __construct()
   {
@@ -154,12 +154,12 @@ class LearningOutcome implements SearchableInterface, StudyAreaFilteredInterface
     return $this;
   }
 
-  public function getText(): string
+  public function getText(): ?string
   {
     return $this->text;
   }
 
-  public function setText(string $text): self
+  public function setText(?string $text): self
   {
     $this->text = trim($text);
 
