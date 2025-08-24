@@ -2,7 +2,6 @@
 
 namespace App\Form\Data;
 
-use App\Entity\StudyArea;
 use App\Export\ExportService;
 use App\Form\Type\SingleSubmitType;
 use Override;
@@ -17,48 +16,33 @@ class DownloadType extends AbstractType
   {
   }
 
-  #[Override]
-  public function buildForm(FormBuilderInterface $builder, array $options): void
+  public function buildForm(FormBuilderInterface $builder, array $options)
   {
     $builder
-      ->add('type', ChoiceType::class, [
-        'label'   => 'data.download.type',
-        'choices' => $this->exportService->getChoices(),
-        'attr'    => [
-          'class' => 'download-type',
-        ],
-      ])
-      ->add('preview', DownloadPreviewType::class)
-      ->add('submit', SingleSubmitType::class, [
-        'label' => 'data.download.title',
-        'icon'  => 'fa-download',
-        'attr'  => [
-          'class' => 'btn btn-outline-success',
-        ],
-      ]);
+        ->add('type', ChoiceType::class, [
+            'label'   => 'data.download.type',
+            'choices' => $this->exportService->getChoices(),
+            'attr'    => [
+                'class' => 'download-type',
+            ],
+        ])
+        ->add('preview', DownloadPreviewType::class)
+        ->add('submit', SingleSubmitType::class, [
+            'label' => 'data.download.title',
+            'icon'  => 'fa-download',
+            'attr'  => [
+                'class' => 'btn btn-outline-success',
+            ],
+        ]);
   }
 
   #[Override]
-  public function configureOptions(OptionsResolver $resolver): void
+  public function configureOptions(OptionsResolver $resolver)
   {
-    $resolver
-      ->setRequired('current_study_area')
-      ->setAllowedTypes('current_study_area', StudyArea::class)
-      ->setDefaults([
+    $resolver->setDefaults([
         'attr' => [
-          'target' => '_blank',
+            'target' => '_blank',
         ],
-      ]);
-
-    $resolver->setNormalizer('attr', function (OptionsResolver $optionsResolver, $attr) {
-      /** @var StudyArea $studyArea */
-      $studyArea = $optionsResolver->offsetGet('current_study_area');
-      if ($studyArea->isUrlExportEnabled() && $studyArea->getExportUrl() !== null) {
-        $attr['target'] = '_self';
-      } else {
-        $attr['target'] = '_blank';
-      }
-      return $attr;
-    });
+    ]);
   }
 }

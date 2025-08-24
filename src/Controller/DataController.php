@@ -40,7 +40,6 @@ use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use PhpOffice\PhpSpreadsheet\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -49,6 +48,18 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+
+use function array_key_exists;
+use function assert;
+use function file_get_contents;
+use function is_array;
+use function is_numeric;
+use function is_string;
+use function json_encode;
+use function mb_convert_encoding;
+use function set_time_limit;
+use function sprintf;
+use function strlen;
 
 #[Route('/{_studyArea<\d+>}/data')]
 class DataController extends AbstractController
@@ -119,7 +130,11 @@ class DataController extends AbstractController
         set_time_limit(600); // 10 minutes
 
         try {
-          $contents = mb_convert_encoding(file_get_contents($json->getPathname()), 'UTF-8', 'UTF-8');
+          $jsonFile = file_get_contents($json->getPathname());
+          if ($jsonFile === false) {
+            throw new DataImportException('Could not open file');
+          }
+          $contents = mb_convert_encoding($jsonFile, 'UTF-8', 'UTF-8');
 
           // Extra json check as we now allow text/html uploads
           if (!$this->couldBeJson($contents)) {
@@ -288,7 +303,7 @@ class DataController extends AbstractController
 
         if (array_key_exists('learningOutcomes', $jsonData)) {
           if (!is_array($jsonData['learningOutcomes'])) {
-            throw new DataImportException(sprintf('When set, the "learningOutcomes" property must be an array!'));
+            throw new DataImportException('When set, the "learningOutcomes" property must be an array!');
           }
 
           $learningOutcomeNumber = $learningOutcomeRepository->findUnusedNumberInStudyArea($studyArea);
@@ -329,7 +344,7 @@ class DataController extends AbstractController
 
         if (array_key_exists('externalResources', $jsonData)) {
           if (!is_array($jsonData['externalResources'])) {
-            throw new DataImportException(sprintf('When set, the "externalResources" property must be an array!'));
+            throw new DataImportException('When set, the "externalResources" property must be an array!');
           }
 
           foreach ($jsonData['externalResources'] as $jsonExternalResource) {
@@ -377,7 +392,7 @@ class DataController extends AbstractController
         // Tags
         if (array_key_exists('tags', $jsonData)) {
           if (!is_array($jsonData['tags'])) {
-            throw new DataImportException(sprintf('When set, the "tags" property must be an array!'));
+            throw new DataImportException('When set, the "tags" property must be an array!');
           }
 
           foreach ($jsonData['tags'] as $jsonTag) {
@@ -538,7 +553,7 @@ class DataController extends AbstractController
           if (array_key_exists('imagePath', $jsonAliases)) {
             $studyAreaConfiguration->setConceptImagePathName($jsonAliases['imagePath']);
           }
-          
+
           $studyArea->setFieldConfiguration($studyAreaConfiguration);
         }
 
@@ -559,47 +574,14 @@ class DataController extends AbstractController
 
   #[Route('/download')]
   #[IsGranted(StudyAreaVoter::EDIT, subject: 'requestStudyArea')]
-  public function download(Request $request, RequestStudyArea $requestStudyArea, TranslatorInterface $translator, ExportService $exportService): Response
+  public function download(Request $request, RequestStudyArea $requestStudyArea, ExportService $exportService): Response
   {
+    $form = $this->createForm(DownloadType::class);
+    $form->handleRequest($request);
+
     $studyArea = $requestStudyArea->getStudyArea();
-    $form = $this->createForm(DownloadType::class, null, [
-      'current_study_area' => $studyArea,
-    ]);
-    $form->handleRequest($request);   
-    
-    if ($form->isSubmitted()) {     
-      $exportResponse =$exportService->export($studyArea, $form->getData()['type']);
-
-      if ($studyArea->isUrlExportEnabled() && $studyArea->getExportUrl() !== null 
-        && $exportResponse->getStatusCode() == Response::HTTP_OK) {
-        $client = HttpClient::create();
-
-        $response = $client->request('PUT', 
-          sprintf('%s/%s.json', $studyArea->getExportUrl(), $studyArea->getName(), $studyArea->getId()), 
-          [
-            'headers' => [
-                'Content-Type' => 'application/json',
-          ],
-          'body' => $exportResponse->getContent() ? $exportResponse->getContent() : ''
-        ]);
-
-        $statusCode = $response->getStatusCode();
-        if ($statusCode == Response::HTTP_OK) {
-          $this->addFlash(
-            'success', sprintf('%s: "%s"', 
-            $translator->trans('data.export-to-url-success'), 
-            $studyArea->getExportUrl())
-          );
-          $this->redirectToRoute('app_data_download');
-        } else {
-          $this->addFlash('error', sprintf('%s: "%s".', 
-            $translator->trans('data.export-to-url-error'), 
-            $studyArea->getExportUrl())
-          );          
-        }
-      } else {
-        return $exportResponse;
-      }      
+    if ($form->isSubmitted() && $form->isValid()) {
+      return $exportService->export($studyArea, $form->getData()['type']);
     }
 
     return $this->render('data/download.html.twig', [
