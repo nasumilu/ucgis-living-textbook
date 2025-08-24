@@ -237,8 +237,6 @@ data:
     In order to select an existing area, you need to have write right, and review mode must be disabled.
     You can either select a topic/instance subset, or tick "Select all" to duplicate all topics/instances.
     Note that other elements will always be duplicated fully (e.g. contributors, references).'
-  export-to-url-error: 'You get this message because your enabled export to URL in your study area. The system could not export the current study area to'
-  export-to-url-success: 'Because you enabled export to URL, this study area was exported successfully to'  
   json-file: 'JSON data file'
   json-incorrect: 'JSON data incorrect! %message%'
   json-uploaded: 'JSON data successfully imported!'
