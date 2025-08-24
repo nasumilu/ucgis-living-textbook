@@ -30,6 +30,10 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+use function bin2hex;
+use function random_bytes;
+use function sha1;
+
 class AuthenticationController extends AbstractController
 {
   private const string RESET_PASSWORD_USER  = '_ltb_rpu';
@@ -123,12 +127,12 @@ class AuthenticationController extends AbstractController
 
           $user
             ->setResetCode($passwordHasher->hash($resetCode, null))
-            ->setResetCodeValid((new DateTime())->modify('+10 minutes'));
+            ->setResetCodeValid(new DateTime()->modify('+10 minutes'));
 
           // Save and send mail
           $em->flush();
           $mailer->send(
-            (new TemplatedEmail())
+            new TemplatedEmail()
               ->to($user->getAddress())
               ->subject($translator->trans('auth.password-reset.subject', [], 'communication'))
               ->htmlTemplate('communication/auth/password_reset.html.twig')
@@ -185,7 +189,7 @@ class AuthenticationController extends AbstractController
     // Set information in the session
     $session = $request->getSession();
     $session->set(self::RESET_PASSWORD_USER, $user->getId());
-    $session->set(self::RESET_PASSWORD_VALID, (new DateTime())->modify('+10 minutes'));
+    $session->set(self::RESET_PASSWORD_VALID, new DateTime()->modify('+10 minutes'));
 
     // Forward to the create password page
     return $this->redirectToRoute('app_authentication_createpassword');
@@ -227,7 +231,7 @@ class AuthenticationController extends AbstractController
     }
 
     // Reset session validity, to allow errors
-    $session->set(self::RESET_PASSWORD_VALID, (new DateTime())->modify('+10 minutes'));
+    $session->set(self::RESET_PASSWORD_VALID, new DateTime()->modify('+10 minutes'));
 
     // Create the password form
     $form = $this->createFormBuilder()
@@ -253,7 +257,7 @@ class AuthenticationController extends AbstractController
       // Notify user
       $this->addFlash('success', $translator->trans('auth.password-changed'));
       $mailer->send(
-        (new TemplatedEmail())
+        new TemplatedEmail()
           ->to($user->getAddress())
           ->subject($translator->trans('auth.password-reset-success.subject', [], 'communication'))
           ->htmlTemplate('communication/auth/password_reset_success.html.twig')
@@ -303,7 +307,7 @@ class AuthenticationController extends AbstractController
     }
 
     // Create new User object
-    $user = (new User())
+    $user = new User()
       ->setUsername($email);
 
     // Create the form

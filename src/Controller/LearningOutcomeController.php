@@ -20,6 +20,10 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+use function count;
+use function sprintf;
+use function ucfirst;
+
 #[Route('/{_studyArea<\d+>}/learningoutcome')]
 class LearningOutcomeController extends AbstractController
 {
@@ -33,7 +37,7 @@ class LearningOutcomeController extends AbstractController
     $studyArea = $requestStudyArea->getStudyArea();
 
     // Create new object
-    $learningOutcome = (new LearningOutcome())->setStudyArea($studyArea);
+    $learningOutcome = new LearningOutcome()->setStudyArea($studyArea);
     $snapshot        = $reviewService->getSnapshot($learningOutcome);
 
     $form = $this->createForm(EditLearningOutcomeType::class, $learningOutcome, [

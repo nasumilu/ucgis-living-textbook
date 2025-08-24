@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+use function assert;
+
 #[Route('/{_studyArea<\d+>}/browser/state')]
 class BrowserStateController extends AbstractController
 {
@@ -51,7 +53,7 @@ class BrowserStateController extends AbstractController
     assert($user instanceof User);
 
     if (!$state = $repository->findForUser($user, $requestStudyArea->getStudyArea())) {
-      $state = (new UserBrowserState())
+      $state = new UserBrowserState()
         ->setUser($user)
         ->setStudyArea($requestStudyArea->getStudyArea());
     }

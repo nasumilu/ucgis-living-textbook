@@ -18,9 +18,14 @@ use App\Router\LtbRouter;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Override;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
+use function array_map;
+use function sprintf;
+
+#[Autoconfigure(lazy: true)]
 class LinkedSimpleNodeProvider implements ProviderInterface
 {
   private ConceptRepository $conceptRepository;
@@ -54,7 +59,7 @@ class LinkedSimpleNodeProvider implements ProviderInterface
   }
 
   #[Override]
-  public function getName(): string
+  public static function getName(): string
   {
     return 'linked-simple-node';
   }
@@ -130,7 +135,7 @@ class LinkedSimpleNodeProvider implements ProviderInterface
     "priorKnowledge": [
       {
           "node": "<node-id>",
-          "isPriorKnowledgeOf": [<node-ids>],          
+          "isPriorKnowledgeOf": [<node-ids>],
       }
     ],
     "aliases" : [

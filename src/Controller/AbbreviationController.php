@@ -20,6 +20,9 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+use function array_filter;
+use function is_numeric;
+
 #[Route('/{_studyArea<\d+>}/abbreviation')]
 class AbbreviationController extends AbstractController
 {
@@ -32,7 +35,7 @@ class AbbreviationController extends AbstractController
     $studyArea = $requestStudyArea->getStudyArea();
 
     // Create new object
-    $abbreviation = (new Abbreviation())->setStudyArea($studyArea);
+    $abbreviation = new Abbreviation()->setStudyArea($studyArea);
     $snapshot     = $reviewService->getSnapshot($abbreviation);
 
     $form = $this->createForm(EditAbbreviationType::class, $abbreviation, ['studyArea' => $studyArea]);
