@@ -28,22 +28,27 @@ use function sprintf;
 #[Autoconfigure(lazy: true)]
 class LinkedSimpleNodeProvider implements ProviderInterface
 {
-  private ConceptRepository $conceptRepository;
-  private ConceptRelationRepository $conceptRelationRepository;
-  private ContributorRepository $contributorRepository;
+  private ConceptRepository          $conceptRepository;
+  private ConceptRelationRepository  $conceptRelationRepository;
+  private ContributorRepository      $contributorRepository;
   private ExternalResourceRepository $externalResourceRepository;
-  private LearningOutcomeRepository $learningOutcomeRepository;
-  private NamingService $namingService;
-  private RelationTypeRepository $relationTypeRepository;
-  private TagRepository $tagRepository;
-  private LtbRouter $router;
-  private SerializerInterface $serializer;
+  private LearningOutcomeRepository  $learningOutcomeRepository;
+  private NamingService              $namingService;
+  private RelationTypeRepository     $relationTypeRepository;
+  private TagRepository              $tagRepository;
+  private LtbRouter                  $router;
+  private SerializerInterface        $serializer;
 
   public function __construct(
-    ConceptRepository $conceptRepository, ConceptRelationRepository $conceptRelationRepository,
-    ContributorRepository $contributorRepository, ExternalResourceRepository $externalResourceRepository,
-    LearningOutcomeRepository $learningOutcomeRepository, RelationTypeRepository $relationTypeRepository,
-    TagRepository $tagRepository, SerializerInterface $serializer, NamingService $namingService,
+    ConceptRepository $conceptRepository,
+    ConceptRelationRepository $conceptRelationRepository,
+    ContributorRepository $contributorRepository,
+    ExternalResourceRepository $externalResourceRepository,
+    LearningOutcomeRepository $learningOutcomeRepository,
+    RelationTypeRepository $relationTypeRepository,
+    TagRepository $tagRepository,
+    SerializerInterface $serializer,
+    NamingService $namingService,
     LtbRouter $router)
   {
     $this->conceptRepository          = $conceptRepository;
@@ -73,15 +78,16 @@ class LinkedSimpleNodeProvider implements ProviderInterface
     return sprintf(<<<'EOT'
 {
     "id": "<studyarea-id>",
-    "dateCreated": "<studyarea-date-created>",
-    "lastUpdated": "<studyarea-date-last-updated>",
-    "datePublished": "<studyarea-publishing-date>",
+    "name": "<studyarea-name>",
+    "description": "<studyarea-description>",
+    "date_created": "<studyarea-date-created>",
+    "last_updated": "<studyarea-last-updated>",
     "nodes": [
         {
             "instance": "<concept-instance>",
             "label": "<concept-name>",
             "link": "<concept-url>",
-            "numberOfLinks": <number-of-relations>,            
+            "numberOfLinks": <number-of-relations>,
             "definition": "<concept-definition>",
             "explanation": "<concept-theory-explanation>",
             "introduction": "<concept-introduction>",
@@ -151,7 +157,7 @@ class LinkedSimpleNodeProvider implements ProviderInterface
       "imagePath": "%10$s",
     ]
 }
-EOT,        
+EOT,
       $fieldNames->definition(),
       $fieldNames->theoryExplanation(),
       $fieldNames->introduction(),
@@ -253,31 +259,32 @@ EOT,
 
     // Create JSON data
 
-    $names                 = $this->namingService->get();
-    $fieldNames            = $names->concept();
-    
+    $names      = $this->namingService->get();
+    $fieldNames = $names->concept();
+
     // Return as JSON
     $serializationContext = SerializationContext::create();
     $serializationContext->setSerializeNull(true);
     $json = $this->serializer->serialize(
       [
-        'id'                => $studyArea->getId(),
-        'dateCreated'       => $studyArea->getCreatedAt(),
-        'lastUpdated'       => $studyArea->getLastUpdated(),
-        'datePublished'     => date('Y-m-d H:i:s'),
-        'nodes' => array_map(fn (Concept $concept) => [                  
-          'instance'       => $concept->isInstance(),
-          'label'          => $concept->getName(),
-          'link'           => $this->router->generateBrowserUrl('app_concept_show', ['concept' => $concept->getId()]),
-          'numberOfLinks'  => $concept->getNumberOfLinks(),
-          'definition'     => $concept->getDefinition()->getText(),
-          'explanation'    => $concept->getTheoryExplanation()->getText(),
-          'introduction'   => $concept->getIntroduction()->getText(),
-          'examples'       => $concept->getExamples()->getText(),
-          'howTo'          => $concept->getHowTo()->getText(),
-          'selfAssessment' => $concept->getSelfAssessment()->getText(),
-          'additionalResources'     => $concept->getAdditionalResources() ? $concept->getAdditionalResources()->getText(): '',
-          'imagePath'               => $concept->getImagePath(),
+        'id'           => $studyArea->getId(),
+        'name'         => $studyArea->getName(),
+        'description'  => $studyArea->getDescription(),
+        'date_created' => $studyArea->getCreatedAt(),
+        'last_updated' => $studyArea->getLastUpdated(),
+        'nodes'        => array_map(fn (Concept $concept) => [
+          'instance'            => $concept->isInstance(),
+          'label'               => $concept->getName(),
+          'link'                => $this->router->generateBrowserUrl('app_concept_show', ['concept' => $concept->getId()]),
+          'numberOfLinks'       => $concept->getNumberOfLinks(),
+          'definition'          => $concept->getDefinition()->getText(),
+          'explanation'         => $concept->getTheoryExplanation()->getText(),
+          'introduction'        => $concept->getIntroduction()->getText(),
+          'examples'            => $concept->getExamples()->getText(),
+          'howTo'               => $concept->getHowTo()->getText(),
+          'selfAssessment'      => $concept->getSelfAssessment()->getText(),
+          'additionalResources' => $concept->getAdditionalResources() ? $concept->getAdditionalResources()->getText() : '',
+          'imagePath'           => $concept->getImagePath(),
         ], $concepts),
         'links'             => $mappedLinks,
         'contributors'      => $mappedContributors,
