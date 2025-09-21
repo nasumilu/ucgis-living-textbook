@@ -32,6 +32,15 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Routing\Exception\ExceptionInterface;
 use Symfony\Component\Routing\RouterInterface;
 
+use function array_key_exists;
+use function count;
+use function ini_set;
+use function preg_match_all;
+use function preg_quote;
+use function set_time_limit;
+use function sprintf;
+use function str_replace;
+
 class StudyAreaDuplicator
 {
   private TagRepository $tagRepository;
@@ -182,7 +191,7 @@ class StudyAreaDuplicator
   {
     $learningOutcomes = $this->learningOutcomeRepo->findForStudyArea($this->studyAreaToDuplicate);
     foreach ($learningOutcomes as $learningOutcome) {
-      $newLearningOutcome = (new LearningOutcome())
+      $newLearningOutcome = new LearningOutcome()
         ->setStudyArea($this->newStudyArea)
         ->setNumber($learningOutcome->getNumber())
         ->setName($learningOutcome->getName())
@@ -198,7 +207,7 @@ class StudyAreaDuplicator
   {
     $learningPaths = $this->learningPathRepo->findForStudyArea($this->studyAreaToDuplicate);
     foreach ($learningPaths as $learningPath) {
-      $newLearningPath = (new LearningPath())
+      $newLearningPath = new LearningPath()
         ->setStudyArea($this->newStudyArea)
         ->setName($learningPath->getName())
         ->setIntroduction($learningPath->getIntroduction())
@@ -219,7 +228,7 @@ class StudyAreaDuplicator
           continue;
         }
 
-        $newElement = (new LearningPathElement())
+        $newElement = new LearningPathElement()
           ->setNext($previousElement)
           ->setConcept($this->newConcepts[$element->getConcept()->getId()])
           ->setDescription($setNextNull ? null : $element->getDescription());
@@ -241,7 +250,7 @@ class StudyAreaDuplicator
   {
     $externalResources = $this->externalResourceRepo->findForStudyArea($this->studyAreaToDuplicate);
     foreach ($externalResources as $externalResource) {
-      $newExternalResource = (new ExternalResource())
+      $newExternalResource = new ExternalResource()
         ->setStudyArea($this->newStudyArea)
         ->setTitle($externalResource->getTitle())
         ->setDescription($externalResource->getDescription())
@@ -258,7 +267,7 @@ class StudyAreaDuplicator
   {
     $contributors = $this->contributorRepo->findForStudyArea($this->studyAreaToDuplicate);
     foreach ($contributors as $contributor) {
-      $newContributor = (new Contributor())
+      $newContributor = new Contributor()
         ->setStudyArea($this->newStudyArea)
         ->setName($contributor->getName())
         ->setDescription($contributor->getDescription())
@@ -275,7 +284,7 @@ class StudyAreaDuplicator
   {
     $abbreviations = $this->abbreviationRepo->findForStudyArea($this->studyAreaToDuplicate);
     foreach ($abbreviations as $abbreviation) {
-      $newAbbreviation = (new Abbreviation())
+      $newAbbreviation = new Abbreviation()
         ->setStudyArea($this->newStudyArea)
         ->setAbbreviation($abbreviation->getAbbreviation())
         ->setMeaning($abbreviation->getMeaning());
@@ -289,7 +298,7 @@ class StudyAreaDuplicator
   {
     $tags = $this->tagRepository->findForStudyArea($this->studyAreaToDuplicate);
     foreach ($tags as $tag) {
-      $newTag = (new Tag())
+      $newTag = new Tag()
         ->setStudyArea($this->newStudyArea)
         ->setName($tag->getName())
         ->setColor($tag->getColor());
@@ -365,7 +374,7 @@ class StudyAreaDuplicator
       // Duplicate relation type, if not done yet
       $relationType = $conceptRelation->getRelationType();
       if (!array_key_exists($relationType->getId(), $newRelationTypes)) {
-        $newRelationType = (new RelationType())
+        $newRelationType = new RelationType()
           ->setStudyArea($this->newStudyArea)
           ->setName($relationType->getName());
 
@@ -380,7 +389,7 @@ class StudyAreaDuplicator
       }
 
       // Duplicate relation
-      $newConceptRelation = (new ConceptRelation())
+      $newConceptRelation = new ConceptRelation()
         ->setSource($this->newConcepts[$conceptRelation->getSource()->getId()])
         ->setTarget($this->newConcepts[$conceptRelation->getTarget()->getId()])
         ->setRelationType($newRelationTypes[$relationType->getId()])
@@ -525,7 +534,7 @@ class StudyAreaDuplicator
       }
 
       // Check if this url is actually from the area to duplicate
-      if (intval($matchedRouteData['_studyArea']) !== $this->studyAreaToDuplicate->getId()) {
+      if ((int)$matchedRouteData['_studyArea'] !== $this->studyAreaToDuplicate->getId()) {
         continue;
       }
 
@@ -538,24 +547,24 @@ class StudyAreaDuplicator
       // Update route parameters for specific routes
       if ($routeName === 'app_concept_show') {
         // Check whether the new concept is available
-        if (array_key_exists(intval($matchedRouteData['concept']), $this->newConcepts)) {
-          $matchedRouteData['concept'] = $this->newConcepts[intval($matchedRouteData['concept'])]->getId();
+        if (array_key_exists((int)$matchedRouteData['concept'], $this->newConcepts)) {
+          $matchedRouteData['concept'] = $this->newConcepts[(int)$matchedRouteData['concept']]->getId();
         } else {
           // Revert to old study area id to not break link completely
           $revertStudyArea = true;
         }
       } elseif ($routeName === 'app_learningoutcome_show') {
         // Check whether the new learning outcome is available
-        if (array_key_exists(intval($matchedRouteData['learningOutcome']), $this->newLearningOutcomes)) {
-          $matchedRouteData['learningOutcome'] = $this->newLearningOutcomes[intval($matchedRouteData['learningOutcome'])]->getId();
+        if (array_key_exists((int)$matchedRouteData['learningOutcome'], $this->newLearningOutcomes)) {
+          $matchedRouteData['learningOutcome'] = $this->newLearningOutcomes[(int)$matchedRouteData['learningOutcome']]->getId();
         } else {
           // Revert to old study area id to not break link completely
           $revertStudyArea = true;
         }
       } elseif ($routeName === 'app_learningpath_show') {
         // Check whether the new learning path is available
-        if (array_key_exists(intval($matchedRouteData['learningPath']), $this->newLearningPaths)) {
-          $matchedRouteData['learningPath'] = $this->newLearningPaths[intval($matchedRouteData['learningPath'])]->getId();
+        if (array_key_exists((int)$matchedRouteData['learningPath'], $this->newLearningPaths)) {
+          $matchedRouteData['learningPath'] = $this->newLearningPaths[(int)$matchedRouteData['learningPath']]->getId();
         } else {
           // Revert to old study area id to not break link completely
           $revertStudyArea = true;
@@ -602,8 +611,8 @@ class StudyAreaDuplicator
       // Regex search successful
       foreach ($matches[1] as $key => $match) {
         // Find new id
-        if (array_key_exists(intval($match), $source)) {
-          $replace = str_replace($match, $source[intval($match)]->getId(), (string)$matches[0][$key]);
+        if (array_key_exists((int)$match, $source)) {
+          $replace = str_replace($match, $source[(int)$match]->getId(), (string)$matches[0][$key]);
           $text    = str_replace($matches[0][$key], $replace, $text);
         }
       }

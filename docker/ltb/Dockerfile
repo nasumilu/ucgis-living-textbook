@@ -1,4 +1,4 @@
-FROM php:8.3.13-fpm-bookworm as ltb_base
+FROM php:8.4.12-fpm-bookworm as ltb_base
 MAINTAINER Drienerlo Engineering Solutions <hallo@drenso.nl>
 
 # Update all dependencies, and install required ones
@@ -19,7 +19,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     ## Imagick
       imagemagick libmagickwand-dev libmagickcore-dev \
     # Latex
-      texlive-base texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-fonts-extra texlive-fonts-extra-links poppler-utils \
+      texlive-base texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-fonts-extra poppler-utils \
     # Pandoc
       pandoc \
     # Python build dependencies \
@@ -34,9 +34,6 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     # Cleanup apt
     && apt-get clean \
     && rm -rf /var/lib/apt/lists
-
-# Addressing a latex renderer error: Semaphore extension (sysvsem) is required.
-RUN docker-php-ext-install sysvmsg sysvsem sysvshm
 
 # todo: Python sources
 ## Install python 3.8
@@ -75,6 +72,7 @@ RUN docker-php-ext-install gd
 RUN docker-php-ext-install intl
 RUN docker-php-ext-install sockets
 RUN docker-php-ext-install xsl
+RUN docker-php-ext-install sysvsem
 RUN pecl install apcu && docker-php-ext-enable apcu
 
 # Comment out the next cmd as a workaround of an imagick installation issue
@@ -150,7 +148,7 @@ RUN cp .secrets.json.dist .secrets.json \
     && rm .secrets.json
 
 ######################## Production assets builder ########################
-FROM node:20.18.0-slim as ltb_prod_assets_build
+FROM node:20.19.5-slim as ltb_prod_assets_build
 
 # Set the work dir
 WORKDIR /usr/src/app

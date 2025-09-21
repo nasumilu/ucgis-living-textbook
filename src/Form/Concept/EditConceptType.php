@@ -39,6 +39,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+use function in_array;
+use function ucfirst;
+
 class EditConceptType extends AbstractType
 {
   public function __construct(

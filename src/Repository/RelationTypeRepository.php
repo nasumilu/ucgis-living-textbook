@@ -9,6 +9,9 @@ use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<RelationType>
+ */
 class RelationTypeRepository extends ServiceEntityRepository
 {
   public function __construct(ManagerRegistry $registry)
@@ -46,7 +49,7 @@ class RelationTypeRepository extends ServiceEntityRepository
         ->setMaxResults(1)
         ->getQuery()->getSingleResult();
     } catch (NoResultException) {
-      $foundRelation = (new RelationType())
+      $foundRelation = new RelationType()
         ->setStudyArea($studyArea)
         ->setName($name);
       $this->getEntityManager()->persist($foundRelation);

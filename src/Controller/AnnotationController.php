@@ -22,6 +22,9 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
+use function assert;
+use function count;
+
 #[Route('/{_studyArea<\d+>}/annotation')]
 class AnnotationController extends AbstractController
 {
@@ -64,7 +67,7 @@ class AnnotationController extends AbstractController
     }
 
     // Create new annotation
-    $annotation = (new Annotation())
+    $annotation = new Annotation()
       ->setUser($this->getUser())
       ->setConcept($concept)
       ->setText($request->request->get('text', null))
@@ -119,7 +122,7 @@ class AnnotationController extends AbstractController
     // everybody visibility is implied by method security
 
     // Create the comment
-    $comment = (new AnnotationComment())
+    $comment = new AnnotationComment()
       ->setUser($user)
       ->setAnnotation($annotation)
       ->setText($request->request->get('text', null));

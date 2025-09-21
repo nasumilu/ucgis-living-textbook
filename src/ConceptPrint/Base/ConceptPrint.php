@@ -14,6 +14,10 @@ use Exception;
 use InvalidArgumentException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+use function sprintf;
+use function strlen;
+use function substr;
+
 class ConceptPrint extends LatexBase
 {
   private Parser $parser;
@@ -125,7 +129,7 @@ class ConceptPrint extends LatexBase
   {
     // Only add the introduction when one is defined
     if ($studyArea->getPrintIntroduction()) {
-      $this->addElement((new SubSection($translator->trans('study-area.print-introduction-header')))
+      $this->addElement(new SubSection($translator->trans('study-area.print-introduction-header'))
         ->addElement(new Text($studyArea->getPrintIntroduction())));
       $this->addElement(new CustomCommand('\\newpage'));
     }
