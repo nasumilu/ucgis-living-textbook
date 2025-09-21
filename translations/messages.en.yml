@@ -1,18 +1,18 @@
 submit: Submit
 
 abbreviation:
-  _name: 'Abbreviation'
-  abbreviation: 'Abbreviation'
-  add-title: 'Add new abbreviation'
-  edit-title: 'Edit abbreviation "%item%"'
-  list-title: 'Abbreviation list'
+  _name: 'Definition'
+  abbreviation: 'Definition'
+  add-title: 'Add new definition'
+  edit-title: 'Edit definition "%item%"'
+  list-title: 'Definition list'
   meaning: 'Meaning'
   no-url: 'No url'
-  saved: 'Abbreviation "%item%" has been saved successfully.'
-  remove: 'Remove abbreviation "%item%"'
-  remove-text: 'Are you sure you want to remove the abbreviation "%item%"?'
-  removed: 'Abbreviation "%item%" has been removed successfully.'
-  updated: 'Abbreviation "%item%" has been successfully updated.'
+  saved: 'Definition "%item%" has been saved successfully.'
+  remove: 'Remove definition "%item%"'
+  remove-text: 'Are you sure you want to remove the definition "%item%"?'
+  removed: 'Definition "%item%" has been removed successfully.'
+  updated: 'Definition "%item%" has been successfully updated.'
 
 analytics:
   date-end: 'End date'
@@ -275,7 +275,7 @@ datatable:
     sSortDescending: ": activate to sort this column descending"
 
 dashboard:
-  abbreviation-count: '{0} No abbreviations|{1} One abbreviation|]1,Inf[ %count% abbreviations'
+  abbreviation-count: '{0} No definitions|{1} One abbreviation|]1,Inf[ %count% definition'
   concept-count: '{0} No topics|{1} One topic|]1,Inf[ %count% topics'
   contributor-count: '{0} No contributors|{1} One contributor|]1,Inf[ %count% contributors'
   external-resource-count: '{0} No references|{1} One reference|]1,Inf[ %count% references'
@@ -490,7 +490,7 @@ login:
   username: 'Username'
 
 menu:
-  abbreviations: 'Abbreviations'
+  abbreviations: 'Definitions'
   admin: 'Administrators'
   analytics-dashboard: 'Analytics dashboard'
   api-tokens: 'API tokens'
@@ -502,6 +502,7 @@ menu:
   duplicate: 'Duplicate'
   edit: 'Edit'
   excel-status: 'Progress export'
+  export-to-url: 'Export to URL'
   external-resources: "References"
   concept: 'Topics'
   case-study: 'Case studies'
@@ -644,7 +645,7 @@ search:
   placeholder: 'Search for...'
   preview: 'Preview'
   result:
-    abbreviations: "Abbreviations"
+    abbreviations: "Definitions"
     all-annotations: "All annotations"
     concepts: "Topics"
     external-resources: "References"
