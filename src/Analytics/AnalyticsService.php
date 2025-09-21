@@ -39,6 +39,22 @@ use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\SemaphoreStore;
 use Symfony\Component\Process\Process;
 
+use function array_map;
+use function array_reverse;
+use function array_unshift;
+use function array_values;
+use function gc_collect_cycles;
+use function ini_set;
+use function iterator_to_array;
+use function json_encode;
+use function md5;
+use function random_int;
+use function serialize;
+use function set_time_limit;
+use function sprintf;
+use function trim;
+use function unserialize;
+
 class AnalyticsService
 {
   private const string ENV_DIR = '.venv';
@@ -84,7 +100,7 @@ class AnalyticsService
     $progressBar->display();
 
     // Create the virtual environment directory
-    (new Process([$this->pythonPath, '-m', 'venv', self::ENV_DIR], $this->analyticsDir))
+    new Process([$this->pythonPath, '-m', 'venv', self::ENV_DIR], $this->analyticsDir)
       ->mustRun();
 
     $progressBar->clear();
@@ -143,7 +159,7 @@ class AnalyticsService
       ->build($learningPath, $request->periodStart, $request->periodEnd, $settings, $request->forceRebuild);
 
     // Return the data
-    $finder = fn () => (new Finder())
+    $finder = fn () => new Finder()
       ->files()
       ->in($outputDirectory)
       ->depth(0);
@@ -261,7 +277,7 @@ class AnalyticsService
       $this->pageLoadRepository->purgeForStudyArea($studyArea);
 
       // Load new data into db
-      $sheet = (new Csv())->load($settings['outputFileName'])->getActiveSheet();
+      $sheet = new Csv()->load($settings['outputFileName'])->getActiveSheet();
       foreach ($sheet->getRowIterator(2) as $i => $row) {
         if ($i % 1000 === 0) {
           $this->entityManager->flush();
@@ -272,7 +288,7 @@ class AnalyticsService
         }
 
         $this->entityManager->persist(
-          (new PageLoad())
+          new PageLoad()
             ->setStudyArea($studyArea)
             ->setUserId($sheet->getCell(CellAddress::fromColumnAndRow(3, $row->getRowIndex()))->getFormattedValue())
             ->setTimestamp(DateTime::createFromFormat('Y-m-d H:i:s',
@@ -465,7 +481,7 @@ class AnalyticsService
     }
 
     // Find all directories older than one day
-    $finder = (new Finder())
+    $finder = new Finder()
       ->directories()
       ->in($this->baseOutputDir)
       ->depth('== 0')

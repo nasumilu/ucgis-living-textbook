@@ -24,6 +24,13 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+use function assert;
+use function basename;
+use function mb_strtolower;
+use function preg_match;
+use function sprintf;
+use function str_replace;
+
 #[Route('/{_studyArea<\d+>}/print')]
 class PrintController extends AbstractController
 {
@@ -42,7 +49,7 @@ class PrintController extends AbstractController
     $projectDir = $this->getParameter('kernel.project_dir');
 
     // Create LaTeX document
-    $document = (new ConceptPrint($this->filename($concept->getName())))
+    $document = new ConceptPrint($this->filename($concept->getName()))
       ->useLicenseImage($projectDir)
       ->setBaseUrl($this->generateUrl('base_url', [], UrlGeneratorInterface::ABSOLUTE_URL))
       ->setHeader($concept->getStudyArea(), $translator)
@@ -72,7 +79,7 @@ class PrintController extends AbstractController
     $projectDir = $this->getParameter('kernel.project_dir');
 
     // Create LaTeX document
-    $document = (new ConceptPrint($this->filename($learningPath->getName())))
+    $document = new ConceptPrint($this->filename($learningPath->getName()))
       ->useLicenseImage($projectDir)
       ->setBaseUrl($this->generateUrl('base_url', [], UrlGeneratorInterface::ABSOLUTE_URL))
       ->setHeader($learningPath->getStudyArea(), $translator)

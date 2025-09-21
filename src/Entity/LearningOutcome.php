@@ -25,16 +25,21 @@ use Override;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
+use function assert;
+use function sprintf;
+use function stripos;
+use function trim;
+
 #[UniqueEntity(fields: ['studyArea', 'number'], message: 'learning-outcome.number-already-used', errorPath: 'number')]
 #[ORM\Entity(repositoryClass: LearningOutcomeRepository::class)]
 #[ORM\Table]
 #[Gedmo\SoftDeleteable(fieldName: 'deletedAt')]
 class LearningOutcome implements SearchableInterface, StudyAreaFilteredInterface, ReviewableInterface, IdInterface
 {
-  use IdTrait;
   use Blameable;
-  use SoftDeletable;
+  use IdTrait;
   use ReviewableTrait;
+  use SoftDeletable;
 
   /** @var Collection<Concept> */
   #[ORM\ManyToMany(targetEntity: Concept::class, mappedBy: 'learningOutcomes')]
@@ -130,7 +135,7 @@ class LearningOutcome implements SearchableInterface, StudyAreaFilteredInterface
     return $this->number;
   }
 
-  public function setNumber(int $number): LearningOutcome
+  public function setNumber(int $number): self
   {
     $this->number = $number;
 
@@ -142,7 +147,7 @@ class LearningOutcome implements SearchableInterface, StudyAreaFilteredInterface
     return $this->name;
   }
 
-  public function setName(string $name): LearningOutcome
+  public function setName(string $name): self
   {
     $this->name = trim($name);
 
@@ -154,7 +159,7 @@ class LearningOutcome implements SearchableInterface, StudyAreaFilteredInterface
     return $this->text;
   }
 
-  public function setText(?string $text): LearningOutcome
+  public function setText(?string $text): self
   {
     $this->text = trim($text);
 
@@ -174,7 +179,7 @@ class LearningOutcome implements SearchableInterface, StudyAreaFilteredInterface
   }
 
   #[Override]
-  public function setStudyArea(StudyArea $studyArea): LearningOutcome
+  public function setStudyArea(StudyArea $studyArea): self
   {
     $this->studyArea = $studyArea;
 
