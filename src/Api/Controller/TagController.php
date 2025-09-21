@@ -9,13 +9,15 @@ use App\EntityHandler\TagHandler;
 use App\Repository\TagRepository;
 use App\Request\Wrapper\RequestStudyArea;
 use App\Security\Voters\StudyAreaVoter;
-use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+
+use function array_map;
 
 #[OA\Tag('Tag')]
 #[Route('/tag')]
@@ -51,7 +53,9 @@ class TagController extends AbstractApiController
   }
 
   /** Add a new study area tag. */
-  #[OA\RequestBody(description: 'The new tag', required: true, content: [new Model(type: TagApiModel::class, groups: ['mutate'])])]
+  #[OA\RequestBody(description: 'The new tag', required: true, content: [
+    new OA\JsonContent(ref: new Model(type: TagApiModel::class, groups: ['mutate'])),
+  ])]
   #[OA\Response(response: 200, description: 'The new tag', content: [new Model(type: TagApiModel::class)])]
   #[OA\Response(response: 400, description: 'Validation failed', content: [new Model(type: ValidationFailedData::class)])]
   #[Route(methods: [Request::METHOD_POST])]
@@ -70,7 +74,9 @@ class TagController extends AbstractApiController
   }
 
   /** Update an existing study area tag. */
-  #[OA\RequestBody(description: 'The tag properties to update', required: true, content: [new Model(type: TagApiModel::class, groups: ['mutate'])])]
+  #[OA\RequestBody(description: 'The tag properties to update', required: true, content: [
+    new OA\JsonContent(ref: new Model(type: TagApiModel::class, groups: ['mutate'])),
+  ])]
   #[OA\Response(response: 200, description: 'The updated tag', content: [new Model(type: TagApiModel::class)])]
   #[OA\Response(response: 400, description: 'Validation failed', content: [new Model(type: ValidationFailedData::class)])]
   #[Route('/{tag<\d+>}', methods: [Request::METHOD_PATCH])]

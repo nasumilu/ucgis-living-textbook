@@ -9,9 +9,11 @@ use App\Entity\Tag;
 use Drenso\Shared\Interfaces\IdInterface;
 use JMS\Serializer\Annotation\Groups;
 use JMS\Serializer\Annotation\Type;
-use Nelmio\ApiDocBundle\Annotation\Model;
+use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
 use Override;
+
+use function array_map;
 
 class ConceptApiModel implements IdInterface
 {
@@ -45,6 +47,7 @@ class ConceptApiModel implements IdInterface
   /** @return int[]|null */
   public function getTags(): ?array
   {
+    /* @phpstan-ignore nullCoalesce.initializedProperty (Needs fallback for old values) */
     return $this->tags ?? null;
   }
 

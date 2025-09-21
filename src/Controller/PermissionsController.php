@@ -25,6 +25,16 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+use function array_diff;
+use function array_filter;
+use function array_map;
+use function array_merge;
+use function assert;
+use function count;
+use function mb_strtolower;
+use function trim;
+use function urldecode;
+
 #[Route('/{_studyArea<\d+>}/permissions')]
 class PermissionsController extends AbstractController
 {
@@ -148,7 +158,7 @@ class PermissionsController extends AbstractController
 
         // Retrieve or create the user group
         $userGroup = $userGroupRepository->getForType($studyArea, $groupType)
-            ?? (new UserGroup())->setStudyArea($studyArea)->setGroupType($groupType);
+            ?? new UserGroup()->setStudyArea($studyArea)->setGroupType($groupType);
 
         // Add the users
         foreach ($foundUsers as $foundUser) {
@@ -187,7 +197,7 @@ class PermissionsController extends AbstractController
     }
 
     $userGroup = $userGroupRepository->getForType($studyArea, $groupType)
-        ?? (new UserGroup())->setStudyArea($studyArea)->setGroupType($groupType);
+        ?? new UserGroup()->setStudyArea($studyArea)->setGroupType($groupType);
 
     $newPermission = null;
     if ($userGroup->getUsers()->contains($user)) {
@@ -219,7 +229,7 @@ class PermissionsController extends AbstractController
     }
 
     $userGroup = $userGroupRepository->getForType($studyArea, $groupType)
-        ?? (new UserGroup())->setStudyArea($studyArea)->setGroupType($groupType);
+        ?? new UserGroup()->setStudyArea($studyArea)->setGroupType($groupType);
 
     $email = mb_strtolower(trim(urldecode($email)));
 

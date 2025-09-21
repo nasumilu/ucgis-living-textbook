@@ -15,6 +15,23 @@ use Pandoc\PandocException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+use function count;
+use function explode;
+use function in_array;
+use function libxml_clear_errors;
+use function libxml_use_internal_errors;
+use function md5;
+use function pathinfo;
+use function preg_match_all;
+use function preg_replace;
+use function sprintf;
+use function str_replace;
+use function strtolower;
+use function urldecode;
+
+use const DIRECTORY_SEPARATOR;
+use const PATHINFO_EXTENSION;
+
 abstract class LtbSection extends Section
 {
   protected readonly Pandoc $pandoc; // Set in constructor
@@ -49,7 +66,7 @@ abstract class LtbSection extends Section
   {
     // See https://tex.stackexchange.com/a/282/110054
     $this->addElement(new CustomCommand('\\FloatBarrier'));
-    $this->addElement((new SubSection($title))->addElement(new CustomCommand($this->convertHtmlToLatex($html))));
+    $this->addElement(new SubSection($title)->addElement(new CustomCommand($this->convertHtmlToLatex($html))));
   }
 
   /**

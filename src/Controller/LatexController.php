@@ -24,6 +24,13 @@ use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Cache\ItemInterface;
 
+use function filemtime;
+use function md5;
+use function sprintf;
+use function str_replace;
+use function time;
+use function urlencode;
+
 #[Route('/latex')]
 class LatexController extends AbstractController
 {
@@ -50,7 +57,7 @@ class LatexController extends AbstractController
     // Verify image still exists in cache
     if ($cache->hasItem($cacheKey)) {
       $imageLocation = $cache->getItem($cacheKey)->get();
-      if (!(new Filesystem())->exists($imageLocation)) {
+      if (!new Filesystem()->exists($imageLocation)) {
         $cache->delete($cacheKey);
         $imageLocation = null;
       }
@@ -73,7 +80,7 @@ class LatexController extends AbstractController
         }
 
         // Create latex object
-        $document = (new Standalone(md5($content)))
+        $document = new Standalone(md5($content))
           ->addPackages(['mathtools', 'amssymb', 'esint'])
           ->addElement(new CustomCommand('\\begin{displaymath}'))
           ->addElement(new CustomCommand($content))

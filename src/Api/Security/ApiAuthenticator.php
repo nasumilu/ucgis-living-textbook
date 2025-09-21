@@ -8,6 +8,7 @@ use App\Repository\UserApiTokenRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Override;
+use SensitiveParameter;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,6 +22,9 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CustomCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
+
+use function count;
+use function explode;
 
 class ApiAuthenticator extends AbstractAuthenticator
 {
@@ -57,9 +61,10 @@ class ApiAuthenticator extends AbstractAuthenticator
         fn ($userIdentifier): ?UserApiToken => $this->userApiTokenRepository->findOneBy(['tokenId' => $userIdentifier])
       ),
       new CustomCredentials(
-        fn (string $password, UserApiToken $apiToken): bool => (!$apiToken->getValidUntil() || $apiToken->getValidUntil() > new DateTimeImmutable())
-        && $this->passwordHasher->isPasswordValid($apiToken, $password),
-        $tokenData[1]
+        fn (#[SensitiveParameter] string $password, UserApiToken $apiToken): bool => (
+          !$apiToken->getValidUntil() || $apiToken->getValidUntil() > new DateTimeImmutable()
+        ) && $this->passwordHasher->isPasswordValid($apiToken, $password),
+        $tokenData[1],
       ),
       [
         new PasswordUpgradeBadge($tokenData[1], $this->userApiTokenRepository),

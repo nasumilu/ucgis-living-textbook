@@ -15,6 +15,8 @@ use Bobv\LatexBundle\Latex\Section\SubSection;
 use Pandoc\PandocException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
+use function sprintf;
+
 class LearningPathSection extends LtbSection
 {
   /**
@@ -34,12 +36,12 @@ class LearningPathSection extends LtbSection
     )));
 
     // Add learning path data
-    if ($learningPath->getIntroduction() != '') {
+    if ($learningPath->getIntroduction()) {
       $this->addElement(new CustomCommand('\\\\' . $this->convertHtmlToLatex($learningPath->getIntroduction())));
     }
 
     // Add question
-    if ($learningPath->getQuestion() != '') {
+    if ($learningPath->getQuestion()) {
       $this->addSection($translator->trans('learning-path.question'), $learningPath->getQuestion());
     }
 
@@ -47,7 +49,7 @@ class LearningPathSection extends LtbSection
     $concepts = $learningPath->getElementsOrdered()->map(fn (LearningPathElement $learningPathElement) => $learningPathElement->getConcept());
 
     // Add concept list
-    $this->addElement((new SubSection($translator->trans('menu.concept')))
+    $this->addElement(new SubSection($translator->trans('menu.concept'))
       ->addElement(new Listing($concepts->map(fn (Concept $concept) => $concept->getName())->toArray())));
 
     // Add each concept from the learning path

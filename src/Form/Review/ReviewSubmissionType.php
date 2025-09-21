@@ -24,6 +24,11 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use function array_merge;
+use function in_array;
+use function sprintf;
+use function strtolower;
+
 class ReviewSubmissionType extends AbstractType
 {
   public function __construct(private readonly ReviewService $reviewService)
@@ -45,7 +50,7 @@ class ReviewSubmissionType extends AbstractType
           $formOptions['incoming'] = $field !== 'relations';
         } elseif (in_array($field, ['priorKnowledge', 'learningOutcomes', 'externalResources', 'contributors'])) {
           $formType = ReviewSimpleListDiffType::class;
-        } elseif (in_array($field, ['introduction', 'theoryExplanation', 'howTo', 'examples', 'selfAssessment', 'additionalResources'])) {
+        } elseif (in_array($field, ['introduction', 'definition', 'theoryExplanation', 'howTo', 'examples', 'selfAssessment', 'additionalResources'])) {
           $formOptions['has_data_object'] = true;
           $formOptions['ckeditor']        = true;
         }

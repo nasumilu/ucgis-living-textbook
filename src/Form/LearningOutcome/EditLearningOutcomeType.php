@@ -15,6 +15,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use function in_array;
+
 class EditLearningOutcomeType extends AbstractType
 {
   #[Override]
@@ -48,6 +50,7 @@ class EditLearningOutcomeType extends AbstractType
       ])
       ->add('text', CkEditorType::class, [
         'label'      => 'learning-outcome.text',
+        'required'   => false,
         'empty_data' => '',
         'studyArea'  => $options['studyArea'],
         'disabled'   => in_array('text', $disabledFields),
