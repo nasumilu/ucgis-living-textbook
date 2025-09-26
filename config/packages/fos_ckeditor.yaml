@@ -26,7 +26,7 @@ fos_ck_editor:
       filebrowserWindowWidth: "40%"
       filebrowserWindowHeight: "40%"
       format_tags: "p;h1;h2;citation;reference"
-      extraPlugins: "image2,wordcount,latexeditor"
+      extraPlugins: "image2,wordcount,latexeditor,sourcedialog"
       extraAllowedContent: "span(latex-figure,latex-figure-inline);figure(latex-figure);figcaption(latex-caption);img(latex-image);a[data-concept-id](concept-link);ltb-abbr[data-abbr-id];symbol"
       removePlugins: "image,dialogadvtab"
       removeButtons: "Underline"
@@ -38,7 +38,7 @@ fos_ck_editor:
       filebrowserBrowseRoute: null
     ltb_concept_config:
       <<: *ckeditor_default
-      extraPlugins: "image2,wordcount,latexeditor,abbreviationselector,conceptselector,ltbbuttons"
+      extraPlugins: "image2,wordcount,latexeditor,abbreviationselector,conceptselector,ltbbuttons,sourcedialog"
     ltb_help:
       <<: *ckeditor_default
       extraPlugins: "image2,wordcount,ltbbuttons"
@@ -48,9 +48,9 @@ fos_ck_editor:
     configs:
       ltb_toolbar: [ "@text_tools", "@ltb_tools", "/", "@font_tools", "@edit_tools" ]
     items:
-      edit_tools: [ "Cut", "Copy", "Paste", "PasteText", "PasteFromWord", "-", "RemoveFormat" ]
-      text_tools: [ "Highlight", "Symbol", "Subscript", "Superscript", "-", "NumberedList", "BulletedList", "-", "Table" ]
-      ltb_tools:  [ "Link", "Image", "LatexEditor", "ConceptSelector", "AbbreviationSelector" ]
+      edit_tools: [ "Cut", "Copy", "Paste", "PasteText", "PasteFromWord", "-", "RemoveFormat", "-", "Sourcedialog", "Maximize" ]
+      text_tools: [ "Bold", "Italic", "Subscript", "Superscript", "-", "Symbol", "-", "NumberedList", "BulletedList", "-", "Table" ]
+      ltb_tools:  [ "Link", "Anchor", "Image", "LatexEditor", "ConceptSelector", "AbbreviationSelector"]
       font_tools: [ "Format", "TextColor" ]
   plugins:
     abbreviationselector:
