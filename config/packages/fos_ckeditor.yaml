@@ -48,8 +48,8 @@ fos_ck_editor:
     configs:
       ltb_toolbar: [ "@text_tools", "@ltb_tools", "/", "@font_tools", "@edit_tools" ]
     items:
-      edit_tools: [ "Cut", "Copy", "Paste", "PasteText", "PasteFromWord", "-", "RemoveFormat", "Sourcedialog" ]
-      text_tools: [ "Highlight", "Symbol", "Subscript", "Superscript", "-", "NumberedList", "BulletedList", "-", "Table" ]
+      edit_tools: [ "Cut", "Copy", "Paste", "PasteText", "PasteFromWord", "-", "RemoveFormat", ",", "Sourcedialog", "Maximize"]
+      text_tools: [ "Bold", "Italic", "Subscript", "Superscript", "-",  "Symbol", "NumberedList", "BulletedList", "-", "Table" ]
       ltb_tools:  [ "Link", "Anchor", "Image", "LatexEditor", "ConceptSelector", "AbbreviationSelector" ]
       font_tools: [ "Format", "TextColor" ]
   plugins:
