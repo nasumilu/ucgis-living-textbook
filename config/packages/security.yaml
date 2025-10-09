@@ -6,7 +6,9 @@ security:
   # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
   providers:
     default_provider:
-      id: App\Security\UserProvider
+      entity:
+        class: App\Entity\User
+        property: username
 
   access_decision_manager:
     strategy: unanimous
@@ -22,11 +24,6 @@ security:
         - App\Api\Security\ApiAuthenticator
     main:
       pattern: ^/
-      entry_point: oidc
-      oidc:
-        login_path: app_default_landing
-        success_handler: App\Security\Http\Authentication\AuthenticationSuccessHandler
-        user_identifier_property: email
       form_login:
         login_path: app_default_landing
         success_handler: App\Security\Http\Authentication\AuthenticationSuccessHandler
