@@ -917,52 +917,6 @@
     error-stack-parser "^2.1.4"
     string-width "^4.2.3"
 
-"@sentry-internal/browser-utils@10.17.0":
-  version "10.17.0"
-  resolved "https://registry.yarnpkg.com/@sentry-internal/browser-utils/-/browser-utils-10.17.0.tgz#1593d19f8785b3ccc6d4da9381871fbd34b44f85"
-  integrity sha512-jXC7dtItZYNGP+K9Lo+3MWaWaGVI6uDIPGB9BAZkZntc/1lGfhMPm7Fo2qb1N1bUP0vOTJ2TmSUA8GNxyxgekQ==
-  dependencies:
-    "@sentry/core" "10.17.0"
-
-"@sentry-internal/feedback@10.17.0":
-  version "10.17.0"
-  resolved "https://registry.yarnpkg.com/@sentry-internal/feedback/-/feedback-10.17.0.tgz#0464ee29d00550731645b774c7f47eaae6463ef5"
-  integrity sha512-KIIF/dDQqYENbx4vn6B0evy/qx1QtEZsSZRvXNX6tUm14CCyrZeDymBMyEzu8RQ5PeZXibbPEkz7xOXiG3q+eQ==
-  dependencies:
-    "@sentry/core" "10.17.0"
-
-"@sentry-internal/replay-canvas@10.17.0":
-  version "10.17.0"
-  resolved "https://registry.yarnpkg.com/@sentry-internal/replay-canvas/-/replay-canvas-10.17.0.tgz#92eb9978d5d6b5e88d5105dd6ead67798b23f1b7"
-  integrity sha512-GXKZIraXrboP03+XS+KwkkKVJO+cSlM0HrfjePSfFqiNbbnjRhOLekoLuDvvH/ZEXPUoUJD1We5IPBg+sZZQfQ==
-  dependencies:
-    "@sentry-internal/replay" "10.17.0"
-    "@sentry/core" "10.17.0"
-
-"@sentry-internal/replay@10.17.0":
-  version "10.17.0"
-  resolved "https://registry.yarnpkg.com/@sentry-internal/replay/-/replay-10.17.0.tgz#6732170946ba5f26b387fc640aef17af442a8704"
-  integrity sha512-9kirOPp3wbf+TMyHmA8iStKAysklZPcrPlB0v2zh0qRj1zNFY0xAD2WSgxuCvD9rEo5qKhmAKcaT7Ujin64uSw==
-  dependencies:
-    "@sentry-internal/browser-utils" "10.17.0"
-    "@sentry/core" "10.17.0"
-
-"@sentry/browser@10.17.0":
-  version "10.17.0"
-  resolved "https://registry.yarnpkg.com/@sentry/browser/-/browser-10.17.0.tgz#e7593d55efb1fb3349d94df1ddf1973411d4a93c"
-  integrity sha512-X4OiGECzkp6tIyAKXB/9beBC2oX1xKOEkDo4v/phIKGPzrmQ4o55j2a6/V20jSfSN7w+kfZ56ILE71SzC9w1aQ==
-  dependencies:
-    "@sentry-internal/browser-utils" "10.17.0"
-    "@sentry-internal/feedback" "10.17.0"
-    "@sentry-internal/replay" "10.17.0"
-    "@sentry-internal/replay-canvas" "10.17.0"
-    "@sentry/core" "10.17.0"
-
-"@sentry/core@10.17.0":
-  version "10.17.0"
-  resolved "https://registry.yarnpkg.com/@sentry/core/-/core-10.17.0.tgz#ea0851532bd6e407e9332e0200d90b34b556c3f5"
-  integrity sha512-UVIvxSzS0n5QbIDPyFf0WX9I77Of1bcr6a0sCEKfjhJGmGQ8mFWoWgR2gF4wcPw60XUrzbryCr79eOsIHLQ5cw==
-
 "@sinclair/typebox@^0.27.8":
   version "0.27.8"
   resolved "https://registry.yarnpkg.com/@sinclair/typebox/-/typebox-0.27.8.tgz#6667fac16c436b5434a387a34dedb013198f6e6e"
@@ -4997,7 +4951,6 @@ svgo@^3.2.0:
 
 symfony-collection@ninsuo/symfony-collection:
   version "2.1.30"
-  uid "61e92c33a86676a812c8dfbcaab45dfdfb0c12ff"
   resolved "https://codeload.github.com/ninsuo/symfony-collection/tar.gz/61e92c33a86676a812c8dfbcaab45dfdfb0c12ff"
   dependencies:
     jquery ">=1.7"

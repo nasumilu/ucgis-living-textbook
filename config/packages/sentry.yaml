@@ -1,9 +1,0 @@
-sentry:
-  dsn: '%env(SENTRY_DSN)%'
-  options:
-    release: '%sentry_release%'
-    send_default_pii: true
-    ignore_exceptions:
-      - Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-      - Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
-      - Symfony\Component\Security\Core\Exception\AccessDeniedException
