@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\ConceptPrint\Base\ConceptPrint;
+use App\ConceptPrint\S3Resource;
 use App\ConceptPrint\Section\ConceptSection;
 use App\ConceptPrint\Section\LearningPathSection;
 use App\Entity\Concept;
@@ -39,8 +40,7 @@ class PrintController extends AbstractController
   #[IsGranted(StudyAreaVoter::PRINTER, subject: 'requestStudyArea')]
   public function printSingleConcept(
     RequestStudyArea $requestStudyArea, Concept $concept, LatexGeneratorInterface $generator,
-    TranslatorInterface $translator, LtbRouter $router, NamingService $namingService): Response
-  {
+    TranslatorInterface $translator, LtbRouter $router, NamingService $namingService, S3Resource $downloader)  {
     // Check if correct study area
     if ($concept->getStudyArea()->getId() != $requestStudyArea->getStudyArea()->getId()) {
       throw $this->createNotFoundException();
@@ -54,7 +54,7 @@ class PrintController extends AbstractController
       ->setBaseUrl($this->generateUrl('base_url', [], UrlGeneratorInterface::ABSOLUTE_URL))
       ->setHeader($concept->getStudyArea(), $translator)
       ->addIntroduction($concept->getStudyArea(), $translator)
-      ->addElement(new ConceptSection($concept, $router, $translator, $namingService, $projectDir));
+      ->addElement(new ConceptSection($concept, $router, $translator, $namingService, $projectDir, $downloader));
 
     // Return PDF
     try {

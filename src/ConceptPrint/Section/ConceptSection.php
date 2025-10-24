@@ -2,6 +2,7 @@
 
 namespace App\ConceptPrint\Section;
 
+use App\ConceptPrint\S3Resource;
 use App\Entity\Concept;
 use App\Naming\NamingService;
 use App\Router\LtbRouter;
@@ -22,9 +23,9 @@ class ConceptSection extends LtbSection
    * @throws PandocException
    */
   public function __construct(
-    Concept $concept, LtbRouter $router, TranslatorInterface $translator, NamingService $namingService, string $projectDir)
+    Concept $concept, LtbRouter $router, TranslatorInterface $translator, NamingService $namingService, string $projectDir, S3Resource $downloader)
   {
-    parent::__construct($concept->getName(), $router, $projectDir);
+    parent::__construct($concept->getName(), $router, $projectDir, $downloader);
 
     // Use sloppy to improve text breaks
     $this->addElement(new CustomCommand('\\sloppy'));

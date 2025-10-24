@@ -1,0 +1,12 @@
+framework:
+  http_client:
+    scoped_clients:
+      ## A Scoped HTTP Client used to download LTB images from S3 when
+      ## printing.
+      ltbS3.client:
+        scope: 'https://bok-figures\.s3\.amazonaws\.com'
+        base_uri: 'https://bok-figures.s3.amazonaws.com'
+        headers:
+          User-Agent: 'UCGIS BoK Concept Printer'
+          ## Only png and jpg images are allowed;
+          Accept: 'image/png, image/jpeg'

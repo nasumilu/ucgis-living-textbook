@@ -2,6 +2,7 @@
 
 namespace App\ConceptPrint\Section;
 
+use App\ConceptPrint\S3Resource;
 use App\Router\LtbRouter;
 use Bobv\LatexBundle\Exception\LatexException;
 use Bobv\LatexBundle\Helper\Parser;
@@ -34,16 +35,17 @@ use const PATHINFO_EXTENSION;
 
 abstract class LtbSection extends Section
 {
-  protected readonly Pandoc $pandoc; // Set in constructor
+  protected readonly Pandoc     $pandoc; // Set in constructor
   protected readonly Filesystem $fileSystem; // Set in constructor
-  protected readonly Parser $parser; // Set in constructor
-  protected readonly string $baseUrl; // Set in constructor
+  protected readonly Parser     $parser; // Set in constructor
+  protected readonly string     $baseUrl; // Set in constructor
 
   /** @throws LatexException */
   public function __construct(
     string $name,
     protected readonly LtbRouter $router,
-    protected readonly string $projectDir)
+    protected readonly string $projectDir,
+    protected readonly S3Resource $downloader)
   {
     $this->pandoc     = new Pandoc($_ENV['PANDOC_PATH']);
     $this->fileSystem = new Filesystem();
@@ -70,9 +72,9 @@ abstract class LtbSection extends Section
   }
 
   /**
+   * @return string
    * @throws PandocException
    *
-   * @return string
    */
   protected function convertHtmlToLatex(string $html)
   {
@@ -175,11 +177,13 @@ abstract class LtbSection extends Section
           if (!$imgElement->hasAttribute('src')) {
             continue;
           }
+          $image = $imgElement->getAttribute('src');
+          // if an S3 image download otherwise assumes it its already local in the uploads folder
+          $filename = $this->downloader->download($image);;
 
-          // Retrieve relevant information
-          $image             = $imgElement->getAttribute('src');
           $normalImages[$id] = [
-            'replace' => preg_replace('/(\/uploads\/studyarea\/)/ui', sprintf('%s$1', $this->projectDir), $image),
+            'replace' => $filename,
+//            'replace' => preg_replace('/(\/uploads\/studyarea\/)/ui', sprintf('%s$1', $this->projectDir), $image),
             'caption' => $caption,
           ];
         }
