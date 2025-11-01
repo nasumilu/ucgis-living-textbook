@@ -998,6 +998,12 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Controller/ReviewController.php',
 ];
 $ignoreErrors[] = [
+	'message' => '#^Possibly invalid array key type float\\|int\\|string\\.$#',
+	'identifier' => 'offsetAccess.invalidOffset',
+	'count' => 1,
+	'path' => __DIR__ . '/src/Controller/ReviewController.php',
+];
+$ignoreErrors[] = [
 	'message' => '#^Cannot call method getId\\(\\) on App\\\\Entity\\\\Concept\\|null\\.$#',
 	'identifier' => 'method.nonObject',
 	'count' => 1,
@@ -4520,30 +4526,6 @@ $ignoreErrors[] = [
 	'path' => __DIR__ . '/src/Form/User/UpdatePasswordType.php',
 ];
 $ignoreErrors[] = [
-	'message' => '#^Method App\\\\Naming\\\\Model\\\\ResolvedConceptNames\\:\\:resolvePlurals\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Naming/Model/ResolvedConceptNames.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method App\\\\Naming\\\\Model\\\\ResolvedLearningOutcomeNames\\:\\:resolvePlurals\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Naming/Model/ResolvedLearningOutcomeNames.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method App\\\\Naming\\\\Model\\\\ResolvedNames\\:\\:resolvePlurals\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Naming/Model/ResolvedNames.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Method App\\\\Naming\\\\Model\\\\ResolvedNamesInterface\\:\\:resolvePlurals\\(\\) has no return type specified\\.$#',
-	'identifier' => 'missingType.return',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Naming/Model/ResolvedNamesInterface.php',
-];
-$ignoreErrors[] = [
 	'message' => '#^Parameter \\#1 \\$studyArea of method App\\\\Naming\\\\NamingService\\:\\:getCached\\(\\) expects App\\\\Entity\\\\StudyArea, App\\\\Entity\\\\StudyArea\\|null given\\.$#',
 	'identifier' => 'argument.type',
 	'count' => 1,
@@ -5046,12 +5028,6 @@ $ignoreErrors[] = [
 	'identifier' => 'booleanNot.alwaysFalse',
 	'count' => 1,
 	'path' => __DIR__ . '/src/Serializer/Handler/LearningPathVisualisationResultHandler.php',
-];
-$ignoreErrors[] = [
-	'message' => '#^Cannot assign offset \'sFirst\'\\|\'sLast\'\\|\'sNext\'\\|\'sPrevious\'\\|\'sSortAscending\'\\|\'sSortDescending\' to array\\<string, string\\>\\|string\\|null\\.$#',
-	'identifier' => 'offsetAssign.dimType',
-	'count' => 1,
-	'path' => __DIR__ . '/src/Twig/DataTableExtension.php',
 ];
 $ignoreErrors[] = [
 	'message' => '#^Method App\\\\Twig\\\\DataTableExtension\\:\\:dataTable\\(\\) has parameter \\$options with no value type specified in iterable type array\\.$#',

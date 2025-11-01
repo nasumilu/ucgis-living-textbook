@@ -1,7 +1,4 @@
 {
-    "behat/transliterator": {
-        "version": "v1.2.0"
-    },
     "bobv/latex-bundle": {
         "version": "v1.3.1"
     },
@@ -140,9 +137,6 @@
     "gedmo/doctrine-extensions": {
         "version": "v2.4.32"
     },
-    "guzzlehttp/psr7": {
-        "version": "1.6.1"
-    },
     "helios-ag/fm-elfinder-bundle": {
         "version": "12.1",
         "recipe": {
@@ -155,9 +149,6 @@
             "config/packages/fm_elfinder.yaml",
             "config/routes/fm_elfinder.yaml"
         ]
-    },
-    "jean85/pretty-package-versions": {
-        "version": "1.2"
     },
     "jms/metadata": {
         "version": "1.6.0"
@@ -321,9 +312,6 @@
     "psr/simple-cache": {
         "version": "1.0.0"
     },
-    "ralouphie/getallheaders": {
-        "version": "3.0.3"
-    },
     "rollerworks/password-strength-validator": {
         "version": "v1.3.0"
     },
@@ -374,21 +362,6 @@
     },
     "sebastian/version": {
         "version": "3.0.2"
-    },
-    "sentry/sentry": {
-        "version": "2.3.0"
-    },
-    "sentry/sentry-symfony": {
-        "version": "5.0",
-        "recipe": {
-            "repo": "github.com/symfony/recipes-contrib",
-            "branch": "main",
-            "version": "5.0",
-            "ref": "76afa07d23e76f678942f00af5a6a417ba0816d0"
-        },
-        "files": [
-            "config/packages/sentry.yaml"
-        ]
     },
     "stof/doctrine-extensions-bundle": {
         "version": "1.7",
@@ -606,18 +579,6 @@
     },
     "symfony/property-info": {
         "version": "v4.4.31"
-    },
-    "symfony/psr-http-message-bridge": {
-        "version": "2.1",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "master",
-            "version": "2.1",
-            "ref": "df8ec1e90aec60d301ec59a22093fc3febedb795"
-        },
-        "files": [
-            "config/packages/psr_http_message_bridge.yaml"
-        ]
     },
     "symfony/routing": {
         "version": "6.4",
