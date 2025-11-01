@@ -44,17 +44,16 @@ class ConceptPrint extends LatexBase
       'licenseimage' => false,
 
       'head' => '', // Header
-
-      'lfoot' => $dateTime->format('Y-m-d G:i'), // Bottom left footer
       'rfoot' => 'Page\ \thepage\ of\ \pageref{LastPage}', // Bottom right footer
+      'footerimage' => '',
 
       'topmargin'    => '0.5in', // Some document margins
-      'leftmargin'   => '2.4in', // Some document margins
+      'leftmargin'   => '0.8in', // Some document margins
       'rightmargin'  => '0.8in', // Some document margins
       'bottommargin' => '0.5in', // Some document margins
 
       'headsep'  => '0.3in',
-      'footskip' => '0.2in',
+      'footskip' => '0.5in',
 
       'linespread' => '1.1', // Line spacing
 
@@ -79,7 +78,7 @@ class ConceptPrint extends LatexBase
   public function useLicenseImage(string $projectDir)
   {
     $this->setParam('licenseimage', sprintf('%s/assets/img/footer/license.png', $projectDir));
-
+    $this->setParam('footerimage', sprintf('%s/assets/img/footer/ucgis_graphic.png', $projectDir));
     return $this;
   }
 

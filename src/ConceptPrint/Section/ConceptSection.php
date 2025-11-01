@@ -2,6 +2,7 @@
 
 namespace App\ConceptPrint\Section;
 
+use App\ConceptPrint\ImageResolver;
 use App\Entity\Concept;
 use App\Naming\NamingService;
 use App\Router\LtbRouter;
@@ -22,9 +23,9 @@ class ConceptSection extends LtbSection
    * @throws PandocException
    */
   public function __construct(
-    Concept $concept, LtbRouter $router, TranslatorInterface $translator, NamingService $namingService, string $projectDir)
+    Concept $concept, LtbRouter $router, TranslatorInterface $translator, NamingService $namingService, string $projectDir, ImageResolver $downloader)
   {
-    parent::__construct($concept->getName(), $router, $projectDir);
+    parent::__construct($concept->getName(), $router, $projectDir, $downloader);
 
     // Use sloppy to improve text breaks
     $this->addElement(new CustomCommand('\\sloppy'));
@@ -38,7 +39,7 @@ class ConceptSection extends LtbSection
     $fieldNames = $namingService->get()->concept();
     if ($concept->getDefinition()) {
       $this->addElement(new CustomCommand('\\\\'));
-      $this->addSection($fieldNames->definition(), $concept->getDefinition()->getText());
+      $this->addSection($fieldNames->definition(true), $concept->getDefinition()->getText());
     }    
     if ($concept->getIntroduction()->hasData()) {
       $this->addSection($fieldNames->introduction(true), $concept->getIntroduction()->getText());
