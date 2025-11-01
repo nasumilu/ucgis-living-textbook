@@ -23,6 +23,7 @@
   \usepackage{booktabs}
   \usepackage{longtable}
 
+
   % Math packages
   \usepackage{mathtools}
   \usepackage{amssymb}
@@ -50,12 +51,23 @@
 
   % Set up the header and footer
   \pagestyle{fancy}
-  \lhead{ {{- head|raw -}} } % Header
-  \chead{}
-  \rhead{}
-  \lfoot{ {{- lfoot|raw -}} } % Bottom left footer
-  \cfoot{}
-  \rfoot{ {{- rfoot|raw -}} } % Bottom right footer
+  \fancyhead[L]{}
+  \fancyhead[C]{}
+  \fancyfoot[L]{ \includegraphics[width=30px,keepaspectratio,valign=c]{ {{- footerimage|raw -}} } \hspace{0.5em} \textbf{UCGIS GIS\&T Body of Knowledge} | \emph{www.ucgis.org} }
+  \fancyhead[C]{}
+  \fancyfoot[R]{ {{- rfoot|raw -}} } % Bottom right footer
+
+  {# First page header #}
+  \fancypagestyle{plain}{
+    \fancyhf{} % Clear header and footer fields
+    \fancyhead[L]{}
+    \fancyhead[C]{}
+    \fancyhead[R]{}
+    \fancyfoot[L]{ \includegraphics[width=30px,keepaspectratio,valign=c]{ {{- footerimage|raw -}} } \hspace{0.5em} \textbf{UCGIS GIS\&T Body of Knowledge} | \emph{www.ucgis.org} }
+    \fancyfoot[R]{ {{- rfoot|raw -}} } % Bottom right footer
+    \renewcommand{\headrulewidth}{0pt} % Remove the header rule
+  }
+
 
   \renewcommand\headrulewidth{ {{- headrulewidth -}} } % Size of the header rule
   \renewcommand\footrulewidth{ {{- footrulewidth -}} } % Size of the footer rule
@@ -73,8 +85,10 @@
   \oldincludegraphics[#1,max width=\linewidth]{{ '{#2}}'|raw }} {# Print with twig due to conflicts #}
 
   % Custom commands for pandoc conversion
+  \usepackage{parskip}
   \providecommand{\tightlist}{ %
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+  \setlength{\itemsep}{0pt}
+  \setlength{\parskip}{1em}}
 
   \setlength{\abovecaptionskip}{0.05in}
 
@@ -88,15 +102,22 @@
 
   {{ include('@BobvLatex/extra_commands.twig.twig') }}
 
+  \renewcommand{\arraystretch}{1.5} % Increase cell height
   \begin{document}
+
+  \thispagestyle{plain}
+
+  {{ include('@BobvLatex/elements.twig.twig') }}
+
   {% if licenseimage %}
+    \bigskip
+    \bigskip
+    \bigskip
     \includegraphics[width=2.1cm,valign=c]{ {{- licenseimage|raw -}} }
     \begin{tabular}{l}
     {{ 'print.copyright'|trans }}
     \end{tabular}
   {% endif %}
-
-  {{ include('@BobvLatex/elements.twig.twig') }}
 
   \end{document}
 {% endblock bobv_latex_article %}
