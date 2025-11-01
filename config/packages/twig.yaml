@@ -17,8 +17,6 @@ twig:
   globals:
     allowed_ckeditor_tags: '%ckeditor_tags%'
     naming: '@App\Naming\NamingService'
-    sentry_dsn: '%env(SENTRY_JS_DSN)%'
-    sentry_release: '%sentry_release%'
 
 when@test:
   twig:
