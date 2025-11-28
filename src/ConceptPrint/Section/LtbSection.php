@@ -232,14 +232,14 @@ abstract class LtbSection extends Section
 
     // Replace local urls with full-path versions
     $latex = preg_replace('/\\\\href\{\/([^}]+)\}/ui', sprintf('\\\\href{%s$1}', $this->baseUrl), (string)$latex);
-
+    $latex = $this->parser->parseText($latex, removeGreek: true);
     return $latex;
   }
 
   private function replacePlaceholder(string $latex, array $replaceInfo, $replacement)
   {
     foreach ($replaceInfo as $id => $toReplace) {
-      $new   = sprintf($replacement, $toReplace['replace'], $this->parser->parseText($toReplace['caption']));
+      $new   = sprintf($replacement, $toReplace['replace'], $this->parser->parseText($toReplace['caption'], removeGreek: true));
       $latex = str_replace(sprintf('{placeholder-%s}', $id), $new, $latex);
     }
 
