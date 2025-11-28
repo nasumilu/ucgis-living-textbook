@@ -51,6 +51,8 @@
 
   % Set up the header and footer
   \pagestyle{fancy}
+  \fancyhf{}
+  \fancyhead[R]{ {{- head -}} }
   \fancyhead[L]{}
   \fancyhead[C]{}
   \fancyfoot[L]{ \includegraphics[width=30px,keepaspectratio,valign=c]{ {{- footerimage|raw -}} } \hspace{0.5em} \textbf{UCGIS GIS\&T Body of Knowledge} | \emph{www.ucgis.org} }
