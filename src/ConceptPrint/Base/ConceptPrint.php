@@ -101,14 +101,15 @@ class ConceptPrint extends LatexBase
    *
    * @return ConceptPrint
    */
-  public function setHeader(StudyArea $studyArea, TranslatorInterface $translator)
+  public function setHeader(StudyArea|string $studyArea, TranslatorInterface $translator)
   {
     if ($this->baseUrl == null) {
       throw new InvalidArgumentException('Missing base url, make sure to set it before calling this method!');
     }
+    $header = is_string($studyArea) ? $studyArea : $studyArea->getPrintHeader();
 
     $baseHeader = $translator->trans('print.header', [
-      '%header%' => $studyArea->getPrintHeader() ? $this->parser->parseText($studyArea->getPrintHeader()) : '',
+      '%header%' => $header ? $this->parser->parseText($header) : '',
       '%url%'    => $this->parser->parseText($this->baseUrl),
     ]);
 

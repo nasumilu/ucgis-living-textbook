@@ -51,8 +51,8 @@ class PrintController extends AbstractController
     // Create LaTeX document
     $document = new ConceptPrint($this->filename($concept->getName()))
       ->useLicenseImage($projectDir)
-      ->setBaseUrl($this->generateUrl('base_url', [], UrlGeneratorInterface::ABSOLUTE_URL))
-      ->setHeader($concept->getStudyArea(), $translator)
+      ->setBaseUrl($this->generateUrl('app_concept_show', ['_studyArea' => $concept->getStudyArea()->getId(), 'concept' => $concept->getId()], UrlGeneratorInterface::ABSOLUTE_URL))
+      ->setHeader($concept->getName(), $translator)
       ->addIntroduction($concept->getStudyArea(), $translator)
       ->addElement(new ConceptSection($concept, $router, $translator, $namingService, $projectDir, $downloader));
 

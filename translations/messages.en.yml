@@ -597,7 +597,7 @@ permissions:
     analysis: 'This role allows the user to view the analytics dashboard.'
   viewer-count: '{0} No viewers|{1} One viewer|]1,Inf[ %count% viewers'
   users: 'Users'
-
+#    \href{http://www.example.com}{Click here to visit Example.com}
 print:
   copyright: "This print is made available under the \\href{https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode}{Creative Commons}\\\\
                   \\href{https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode}{Attribution-NonCommercial-NoDerivatives 4.0 International} license."
@@ -611,7 +611,7 @@ print:
     tex: "Tex"
     tex-not-found: "LaTeX tex file not found"
     title: "Print failed"
-  header: "%header% \\url{%url%}"
+  header: "\\href{%url%}{%header%}"
   image-not-found:
     external: |
       You've referenced an externally hosted image (%image%), which cannot be used for printing.
