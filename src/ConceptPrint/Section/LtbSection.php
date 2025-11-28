@@ -232,7 +232,7 @@ abstract class LtbSection extends Section
 
     // Replace local urls with full-path versions
     $latex = preg_replace('/\\\\href\{\/([^}]+)\}/ui', sprintf('\\\\href{%s$1}', $this->baseUrl), (string)$latex);
-    $latex = $this->parser->parseText($latex, removeGreek: true);
+    $latex = $this->parser->parseText($latex, checkTable: false, removeGreek: true);
     return $latex;
   }
 
