@@ -69,7 +69,7 @@ class PrintController extends AbstractController
   #[IsGranted(StudyAreaVoter::PRINTER, subject: 'requestStudyArea')]
   public function printLearningPath(
     RequestStudyArea $requestStudyArea, LearningPath $learningPath, LatexGeneratorInterface $generator,
-    TranslatorInterface $translator, LtbRouter $router, NamingService $namingService): Response
+    TranslatorInterface $translator, LtbRouter $router, NamingService $namingService, ImageResolver $downloader): Response
   {
     // Check if correct study area
     if ($learningPath->getStudyArea()->getId() != $requestStudyArea->getStudyArea()->getId()) {
@@ -84,7 +84,7 @@ class PrintController extends AbstractController
       ->setBaseUrl($this->generateUrl('base_url', [], UrlGeneratorInterface::ABSOLUTE_URL))
       ->setHeader($learningPath->getStudyArea(), $translator)
       ->addIntroduction($learningPath->getStudyArea(), $translator)
-      ->addElement(new LearningPathSection($learningPath, $router, $translator, $namingService, $projectDir));
+      ->addElement(new LearningPathSection($learningPath, $router, $translator, $namingService, $projectDir, $downloader));
 
     // Return PDF
     try {
