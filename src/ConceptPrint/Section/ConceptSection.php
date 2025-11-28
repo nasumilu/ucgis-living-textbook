@@ -54,6 +54,14 @@ class ConceptSection extends LtbSection
       $this->addSection($fieldNames->examples(true), $concept->getExamples()->getText());
     }
 
+    // External resources
+    $reference = $concept->getExternalResources();
+    if ($reference->count() > 0) {
+
+      $html = $reference->reduce(fn ($prev, $resource) => $prev . '<p><a href="' . $resource->getUrl() . '">' . $resource->getTitle() . '</a></p>');
+      $this->addSection($translator->trans("concept.external-resources"), $html);
+    }
+
     // Undo sloppy
     $this->addElement(new CustomCommand('\\fussy'));
   }
