@@ -8,7 +8,6 @@ use App\Naming\NamingService;
 use App\Router\LtbRouter;
 use Bobv\LatexBundle\Exception\LatexException;
 use Bobv\LatexBundle\Latex\Element\CustomCommand;
-use Bobv\LatexBundle\Latex\Element\Text;
 use Pandoc\PandocException;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
@@ -27,18 +26,9 @@ class ConceptSection extends LtbSection
   {
     parent::__construct($concept->getName(), $router, $projectDir, $downloader);
 
-    // Use sloppy to improve text breaks
-    $this->addElement(new CustomCommand('\\sloppy'));
-
-    $this->addElement(new Text(sprintf('\href{%s}{%s}',
-      $this->router->generateBrowserUrl('app_concept_show', ['concept' => $concept->getId()]),
-      $translator->trans('concept.online-source')
-    )));
-
     // Add concept data
     $fieldNames = $namingService->get()->concept();
     if ($concept->getDefinition()) {
-      $this->addElement(new CustomCommand('\\\\'));
       $this->addSection($fieldNames->definition(true), $concept->getDefinition()->getText());
     }    
     if ($concept->getIntroduction()->hasData()) {
