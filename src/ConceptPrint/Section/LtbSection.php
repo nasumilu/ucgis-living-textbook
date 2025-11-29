@@ -142,7 +142,7 @@ abstract class LtbSection extends Section
         /** @var DOMElement $imgElement */
         $imgElement = $img->item(0);
         if (!$isInlineLatex) {
-          $captionElement = $caption->item(0)->childNodes->item(0);
+          $captionElement = $caption->item(0);
         }
 
         // Retrieve information
@@ -207,13 +207,12 @@ abstract class LtbSection extends Section
 
     // Restore errors
     libxml_clear_errors();
-
     $latex = $this->pandoc->convert($html, 'html', 'latex');
-
+    $latex = $this->parser->parseText($latex, checkTable: false, removeGreek: true);
     // Replace latex image placeholders with action LaTeX code
     $latex = $this->replacePlaceholder($latex, $inlineLatexImages, '$%s%s$');
     $latex = $this->replacePlaceholder($latex, $latexImages, '\\begin{figure}[!htb]\\begin{displaymath}{%s}\\end{displaymath}\\caption*{\textit{%s}}\\end{figure}');
-    $latex = $this->replacePlaceholder($latex, $normalImages, '\\begin{figure}[!htb]\\includegraphics[width=\linewidth]{%s}\\caption*{\textit{%s}}\\end{figure}');
+    $latex = $this->replacePlaceholder($latex, $normalImages, '\\begin{figure}[!htb]\\centering\\includegraphics[width=\dimexpr0.75\linewidth\relax]{%s}\\caption*{\textit{%s}}\\end{figure}');
 
     // Replace unsupported graphics with an unavailable image
     $matches = [];
@@ -232,17 +231,18 @@ abstract class LtbSection extends Section
 
     // Replace local urls with full-path versions
     $latex = preg_replace('/\\\\href\{\/([^}]+)\}/ui', sprintf('\\\\href{%s$1}', $this->baseUrl), (string)$latex);
-    $latex = $this->parser->parseText($latex, checkTable: false, removeGreek: true);
+
     return $latex;
   }
 
   private function replacePlaceholder(string $latex, array $replaceInfo, $replacement)
   {
     foreach ($replaceInfo as $id => $toReplace) {
-      $new   = sprintf($replacement, $toReplace['replace'], $this->parser->parseText($toReplace['caption'], removeGreek: true));
+      // caption may contain html, so convert it to latex
+      $caption = $this->pandoc->convert($toReplace['caption'], 'html', 'latex');
+      $new   = sprintf($replacement, $toReplace['replace'], $this->parser->parseText($caption, checkTable: false, removeGreek: true));
       $latex = str_replace(sprintf('{placeholder-%s}', $id), $new, $latex);
     }
-
     return $latex;
   }
 }
