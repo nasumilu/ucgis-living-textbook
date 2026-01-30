@@ -3,6 +3,7 @@
 
 body {
   background-color: $background-color;
+  counter-reset: table;
 }
 
 // Hide the default dropdown caret icon

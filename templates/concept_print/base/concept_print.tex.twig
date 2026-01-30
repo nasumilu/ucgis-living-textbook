@@ -9,6 +9,7 @@
   left={{- leftmargin }},
   right={{- rightmargin }},
   bottom={{- bottommargin }}]{geometry}
+
   \usepackage[utf8]{inputenc} % utf8 support, required for DeclareUnicodeCharacter etc
   \usepackage{fancyhdr} % Required for custom headers
   \usepackage{lastpage} % Required to determine the last page for the footer
@@ -20,9 +21,9 @@
   \usepackage[export]{adjustbox} % Required for license image alignment
 
   % Table support
+  \usepackage{multirow}
   \usepackage{booktabs}
   \usepackage{longtable}
-
 
   % Math packages
   \usepackage{mathtools}
@@ -55,7 +56,11 @@
   \fancyhead[R]{ {{- head -}} }
   \fancyhead[L]{}
   \fancyhead[C]{}
-  \fancyfoot[L]{ \includegraphics[width=30px,keepaspectratio,valign=c]{ {{- footerimage|raw -}} } \hspace{0.5em} \textbf{UCGIS GIS\&T Body of Knowledge} | \emph{www.ucgis.org} }
+  \fancyfoot[L]{
+    \includegraphics[width=30px,keepaspectratio,valign=c]{ {{- footerimage|raw -}} }
+    \hspace{0.5em}
+    \textbf{UCGIS GIS\&T Body of Knowledge} | \emph{www.ucgis.org}
+  }
   \fancyhead[C]{}
   \fancyfoot[R]{ {{- rfoot|raw -}} } % Bottom right footer
 

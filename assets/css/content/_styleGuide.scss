@@ -119,23 +119,36 @@
   table {
     min-width: 25%;
     margin-bottom: 1rem;
-    font-size: 0.75rem;
+    font-size: 1rem;
     line-height: 1rem;
 
     border-collapse: collapse;
     border: 1px solid $body-color !important;
 
     th, td {
-      padding: 0.1rem 0.25rem;
+      padding: 0.25rem 0.25rem;
       border: 1px solid $body-color !important;
     }
 
+    th {
+      font-weight: bolder;
+      background-color: #ccc;
+      text-align: center;
+    }
+
     caption {
+      counter-increment: table;
       line-height: 0.8rem;
       margin-top: 0.5rem;
       padding: 0;
       caption-side: bottom;
     }
+
+    caption::before {
+      content: "Table " counter(table) ". ";
+      font-weight: bold;
+    }
+
   }
 
   figure, span {
