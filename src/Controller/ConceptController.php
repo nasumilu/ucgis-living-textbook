@@ -20,6 +20,7 @@ use App\Review\ReviewService;
 use App\Security\Voters\StudyAreaVoter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -232,12 +233,13 @@ class ConceptController extends AbstractController
   }
 
   /** Instantiate an instance from a selected base concept. */
-  #[Route('/instantiate/{concept<\d+>?null}', options: ['expose' => true])]
+  #[Route('/instantiate/{concept<(\d+|[a-zA-Z0-9-]+)>?null}', options: ['expose' => true])]
   #[IsGranted(StudyAreaVoter::EDIT, subject: 'requestStudyArea')]
   #[DenyOnFrozenStudyArea(route: 'app_concept_listinstances', subject: 'requestStudyArea')]
   public function instantiate(
     Request $request,
     RequestStudyArea $requestStudyArea,
+    #[MapEntity(expr: 'repository.findOneByIdOrSlug(concept)')]
     ?Concept $concept,
     RelationTypeRepository $relationRepository,
     TranslatorInterface $translator): Response
@@ -393,12 +395,13 @@ class ConceptController extends AbstractController
     ]);
   }
 
-  #[Route(path: '/remove/{concept<\d+>}')]
+  #[Route(path: '/remove/{concept<(\d+|[a-zA-Z0-9-]+)>}')]
   #[IsGranted(StudyAreaVoter::EDIT, subject: 'requestStudyArea')]
   #[DenyOnFrozenStudyArea(route: 'app_concept_show', routeParams: ['concept' => '{concept}'], subject: 'requestStudyArea')]
   public function remove(
     Request $request,
     RequestStudyArea $requestStudyArea,
+    #[MapEntity(expr: 'repository.findOneByIdOrSlug(concept)')]
     Concept $concept,
     LearningPathRepository $learningPathRepository,
     TranslatorInterface $trans): Response
@@ -440,9 +443,10 @@ class ConceptController extends AbstractController
     ]);
   }
 
-  #[Route('/{concept<\d+>}', options: ['expose' => true])]
+  #[Route('/{concept<(\d+|[a-zA-Z0-9-]+)>}', options: ['expose' => true])]
   #[IsGranted(StudyAreaVoter::SHOW, subject: 'requestStudyArea')]
   public function show(
+    #[MapEntity(expr: 'repository.findOneByIdOrSlug(concept)')]
     Concept $concept,
     RequestStudyArea $requestStudyArea,
     LearningPathRepository $learningPathRepository): Response

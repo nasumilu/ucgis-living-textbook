@@ -10,6 +10,8 @@ use Doctrine\Persistence\ManagerRegistry;
 use Drenso\Shared\Database\RepositoryTraits\FindIdsTrait;
 use InvalidArgumentException;
 
+use function ctype_digit;
+
 /**
  * @extends ServiceEntityRepository<Concept>
  */
@@ -57,6 +59,25 @@ class ConceptRepository extends ServiceEntityRepository
     }
 
     return $qb->getQuery()->getResult();
+  }
+
+  public function findOneByIdOrSlug(string $value): ?Concept
+  {
+    $qb = $this->createQueryBuilder('c')
+      ->where('c.deletedAt IS NULL');
+
+    if (ctype_digit($value)) {
+      $qb->andWhere('c.id = :id')
+        ->setParameter('id', (int) $value);
+    } else {
+      $qb->andWhere('LOWER(c.slug) = LOWER(:slug)')
+        ->setParameter('slug', $value);
+    }
+
+    /** @var Concept|null $concept */
+    $concept = $qb->getQuery()->getOneOrNullResult();
+
+    return $concept;
   }
 
   /**

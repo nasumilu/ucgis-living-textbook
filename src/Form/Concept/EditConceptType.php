@@ -69,6 +69,11 @@ class EditConceptType extends AbstractType
         'field'               => 'name',
         'pending_change_info' => $pendingChangeObjectInfo,
       ])
+      ->add('slug', TextType::class, [
+        'label'      => 'concept.slug',
+        'empty_data' => '',
+        'disabled'   => in_array('slug', $disabledFields),
+      ])
       ->add('tags', EntityType::class, [
         'label'         => 'concept.tags',
         'class'         => Tag::class,

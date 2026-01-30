@@ -61,6 +61,13 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
   #[JMSA\Type('string')]
   private string $name = '';
 
+  #[Assert\Length(max: 32)]
+  #[ORM\Column(name: 'slug', length: 32, nullable: false)]
+  #[JMSA\Expose]
+  #[JMSA\Groups(['review_change'])]
+  #[JMSA\Type('string')]
+  private string $slug = '';
+
   /** Whether this concept should be seen as an instance. */
   #[ORM\Column(name: 'instance')]
   #[JMSA\Expose]
@@ -424,6 +431,9 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
         case 'name':
           $this->setName($changeObj->getName());
           break;
+        case 'slug':
+          $this->setSlug($changeObj->getSlug());
+          break;
         case 'instance':
           $this->setInstance($changeObj->isInstance());
           break;
@@ -582,6 +592,11 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
     return $this->getName();
   }
 
+  public function getSlug(): string
+  {
+    return $this->slug;
+  }
+
   public function getName(): string
   {
     return $this->name;
@@ -602,6 +617,13 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
   public function setName(string $name): self
   {
     $this->name = $name;
+
+    return $this;
+  }
+
+  public function setSlug(string $slug): self
+  {
+    $this->slug = $slug;
 
     return $this;
   }

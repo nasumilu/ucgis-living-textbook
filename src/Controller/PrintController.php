@@ -17,6 +17,7 @@ use Bobv\LatexBundle\Exception\LatexException;
 use Bobv\LatexBundle\Generator\LatexGeneratorInterface;
 use Bobv\LatexBundle\Helper\Sanitize;
 use Exception;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -35,11 +36,16 @@ use function str_replace;
 class PrintController extends AbstractController
 {
   /** @throws Exception */
-  #[Route('/concept/{concept<\d+>}')]
+  #[Route('/concept/{concept<(\d+|[a-zA-Z0-9-]+)>}')]
   #[IsGranted(StudyAreaVoter::PRINTER, subject: 'requestStudyArea')]
   public function printSingleConcept(
-    RequestStudyArea $requestStudyArea, Concept $concept, LatexGeneratorInterface $generator,
-    TranslatorInterface $translator, LtbRouter $router, NamingService $namingService): Response
+    RequestStudyArea $requestStudyArea,
+    #[MapEntity(expr: 'repository.findOneByIdOrSlug(concept)')]
+    Concept $concept,
+    LatexGeneratorInterface $generator,
+    TranslatorInterface $translator,
+    LtbRouter $router,
+    NamingService $namingService): Response
   {
     // Check if correct study area
     if ($concept->getStudyArea()->getId() != $requestStudyArea->getStudyArea()->getId()) {
