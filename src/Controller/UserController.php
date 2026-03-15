@@ -34,7 +34,7 @@ use function bin2hex;
 use function random_bytes;
 use function sprintf;
 
-#[Route('/{_studyArea<\d+>}/users')]
+#[Route('/{_studyArea<\d+|(?i:%study_area_slug%)>}/users')]
 class UserController extends AbstractController
 {
   #[Route('/api-tokens')]

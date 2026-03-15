@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Route('/resource/{_studyArea<\d+>}')]
+#[Route('/resource/{_studyArea<\d+|(?i:%study_area_slug%)>}')]
 class ResourceController extends AbstractController
 {
   /** @throws Exception */

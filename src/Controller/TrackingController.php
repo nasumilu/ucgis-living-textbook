@@ -27,7 +27,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use function count;
 use function trim;
 
-#[Route('/{_studyArea<\d+>}/track')]
+#[Route('/{_studyArea<\d+|(?i:%study_area_slug%)>}/track')]
 class TrackingController extends AbstractController
 {
   /** @throws Exception */

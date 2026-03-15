@@ -1,6 +1,6 @@
 {% block search_form %}
   {% set id = random() %}
-  {% set search_path = search_path|default(path('search')) %}
+  {% set search_path = search_path|default(path('search', {'_studyArea': '%study_area_slug%'})) %}
 
   <script type="text/javascript">
     function doSearch_{{ id }}(e) {
@@ -20,7 +20,13 @@
         {% block search_form_input_group_prepend %}{% endblock %}
       <input type="text" id="search_{{ id }}" required="required" value="{{ search|default('') }}"
              placeholder="{{ 'search.placeholder'|trans }}" class="form-control">
-        {% block searc_form_input_group_append %} {% endblock %}
+        {% block search_form_input_group_append %}
+          <div class="input-group-append">
+            <button class="btn ucgis-primary-btn" type="submit">
+              <i class="fa fa-search"></i>
+            </button>
+          </div>
+        {% endblock %}
       </div>
       {% if error|default(false) %}
         <div class="invalid-feedback">

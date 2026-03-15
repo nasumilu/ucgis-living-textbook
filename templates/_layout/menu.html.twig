@@ -42,7 +42,7 @@
     <span class="navbar-toggler-icon"></span>
   </button>
 
-  <a class="navbar-logo-brand" href="{{ path('app_default_landing') }}">
+  <a class="navbar-logo-brand" href="javascript:void(0)" onclick="window.top.location.href = '/'; return false;">
     <div class="navbar-logo"></div>
     <div class="navbar-brand">UCGIS GIS&T BoK</div>
   </a>
@@ -76,8 +76,8 @@
             {% set any_content = true %}
             <a class="dropdown-item"
                href="{{ path('app_concept_list') }}">{{ 'menu.concept'|trans }}</a>
-            <a class="dropdown-item"
-               href="{{ path('app_concept_listinstances') }}">{{ 'menu.instances'|trans }}</a>
+{#            <a class="dropdown-item"#}
+{#               href="{{ path('app_concept_listinstances') }}">{{ 'menu.instances'|trans }}</a>#}
           {% endif %}
           {% if is_granted('MENU_LEARNING_PATHS', _twigStudyArea) %}
             {% set any_content = true %}

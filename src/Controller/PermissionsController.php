@@ -35,7 +35,7 @@ use function mb_strtolower;
 use function trim;
 use function urldecode;
 
-#[Route('/{_studyArea<\d+>}/permissions')]
+#[Route('/{_studyArea<\d+|(?i:%study_area_slug%)>}/permissions')]
 class PermissionsController extends AbstractController
 {
   #[Route('/admins')]

@@ -23,7 +23,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use function count;
 use function sprintf;
 
-#[Route('/{_studyArea<\d+>}/learningoutcome')]
+#[Route('/{_studyArea<\d+|(?i:%study_area_slug%)>}/learningoutcome')]
 class LearningOutcomeController extends AbstractController
 {
   #[Route('/add')]

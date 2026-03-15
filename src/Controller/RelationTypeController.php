@@ -20,7 +20,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[Route('/{_studyArea<\d+>}/relationtype')]
+#[Route('/{_studyArea<\d+|(?i:%study_area_slug%)>}/relationtype')]
 class RelationTypeController extends AbstractController
 {
   public function __construct(

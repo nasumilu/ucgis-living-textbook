@@ -23,7 +23,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 use function array_filter;
 use function is_numeric;
 
-#[Route('/{_studyArea<\d+>}/abbreviation')]
+#[Route('/{_studyArea<\d+|(?i:%study_area_slug%)>}/abbreviation')]
 class AbbreviationController extends AbstractController
 {
   #[Route('/add')]

@@ -33,7 +33,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[Route('/{_studyArea<\d+>}/studyarea')]
+#[Route('/{_studyArea<\d+|(?i:%study_area_slug%)>}/studyarea')]
 class StudyAreaController extends AbstractController
 {
   #[Route('/add')]

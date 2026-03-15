@@ -32,15 +32,16 @@ use function strcmp;
 use function strlen;
 use function usort;
 
-#[Route('/{_studyArea<\d+>}/search')]
+#[Route('/{_studyArea<\d+|(?i:%study_area_slug%)>}/search')]
 class SearchController extends AbstractController
 {
   #[Route('/{s<.*>?}', name: 'search')]
   #[IsGranted(StudyAreaVoter::SHOW, subject: 'requestStudyArea')]
   public function search(
-    ?string $s, RequestStudyArea $requestStudyArea, TranslatorInterface $translator,
-    AbbreviationRepository $abbreviationRepository, ConceptRepository $conceptRepository,
-    ExternalResourceRepository $externalResourceRepository, LearningOutcomeRepository $learningOutcomeRepository,
+    ?string $s,
+    RequestStudyArea $requestStudyArea,
+    TranslatorInterface $translator,
+    ConceptRepository $conceptRepository,
     AnnotationRepository $annotationRepository): Response
   {
     $result = [];
@@ -65,13 +66,7 @@ class SearchController extends AbstractController
     $result['search'] = $search;
 
     // We just retrieve all data, to filter them locally on the content.
-    $result['conceptData']          = $this->searchData($conceptRepository->findForStudyAreaOrderedByName($studyArea, true, true), $search);
-//    $result['instanceData']         = $this->searchData($conceptRepository->findForStudyAreaOrderedByName($studyArea, true, false, true), $search);
-//    $result['abbreviationData']     = $this->searchData($abbreviationRepository->findForStudyArea($studyArea), $search);
-//    $result['externalResourceData'] = $this->searchData($externalResourceRepository->findForStudyArea($studyArea), $search);
-//    $result['learningOutcomeData']  = $this->searchData($learningOutcomeRepository->findForStudyArea($studyArea), $search);
-//    $result['ownAnnotationsData'] = [];
-//    $result['allAnnotationsData'] = [];
+    $result['conceptData'] = $this->searchData($conceptRepository->findForStudyAreaOrderedByName($studyArea, true, true), $search);
 
     // Retrieve annotation data, which is easier to do here
     $user = $this->getUser();
