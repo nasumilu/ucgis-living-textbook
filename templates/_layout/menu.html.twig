@@ -42,13 +42,9 @@
     <span class="navbar-toggler-icon"></span>
   </button>
 
-  <a class="navbar-logo-brand" href="{{ path('app_default_dashboard') }}">
+  <a class="navbar-logo-brand" href="/">
     <div class="navbar-logo"></div>
-    <div class="navbar-brand"
-         {% if _twigStudyArea is not empty %}data-toggle="tooltip"
-         title="{{ 'study-area.current-area'|trans({'%item%': _twigStudyArea.name}) }}"{% endif %}>
-        UCGIS GIS&T BoK
-    </div>
+    <div class="navbar-brand">UCGIS GIS&T BoK</div>
   </a>
 
   <button class="navbar-toggler user d-flex d-md-none" type="button" data-toggle="collapse" data-target="#collapseRight"
@@ -63,7 +59,10 @@
   <div class="collapse navbar-collapse" id="collapseLeft">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item">
-        <a class="nav-link" href="{{ path('app_default_dashboard') }}">{{ 'app.dashboard'|trans }}</a>
+        <a class="nav-link"
+           {% if _twigStudyArea is not empty %}data-toggle="tooltip"
+           title="{{ 'study-area.current-area'|trans({'%item%': _twigStudyArea.name}) }}"{% endif %}
+           href="{{ path('app_default_dashboard') }}">{{ 'app.dashboard'|trans }}</a>
       </li>
 
       <li class="nav-item dropdown" id="show-content-menu">
