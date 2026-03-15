@@ -67,7 +67,7 @@ use function set_time_limit;
 use function sprintf;
 use function strlen;
 
-#[Route('/{_studyArea<\d+>}/data')]
+#[Route('/{_studyArea<\d+|(?i:%study_area_slug%)>}/data')]
 class DataController extends AbstractController
 {
   /** Export for concept browser and search. Search part currently isn't used, but it kept for now. */

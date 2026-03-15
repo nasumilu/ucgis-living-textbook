@@ -25,7 +25,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 use function array_key_exists;
 
-#[Route('/{_studyArea<\d+>}/analytics')]
+#[Route('/{_studyArea<\d+|(?i:%study_area_slug%)>}/analytics')]
 class AnalyticsController extends AbstractController
 {
   /** The analytics dashboard. */

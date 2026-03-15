@@ -25,7 +25,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 use function assert;
 use function count;
 
-#[Route('/{_studyArea<\d+>}/annotation')]
+#[Route('/{_studyArea<\d+|(?i:%study_area_slug%)>}/annotation')]
 class AnnotationController extends AbstractController
 {
   #[Route(path: '/{concept}/all', requirements: ['concept' => '\d+'], options: ['expose' => 'true'])]

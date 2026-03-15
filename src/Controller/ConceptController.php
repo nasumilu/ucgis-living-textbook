@@ -30,7 +30,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[Route('/{_studyArea<\d+>}/concept')]
+#[Route('/{_studyArea<\d+|(?i:%study_area_slug%)>}/concept')]
 class ConceptController extends AbstractController
 {
   public function __construct(

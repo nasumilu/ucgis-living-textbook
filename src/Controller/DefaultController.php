@@ -29,6 +29,7 @@ use Doctrine\ORM\NonUniqueResultException;
 use Psr\Cache\InvalidArgumentException;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
@@ -76,12 +77,16 @@ class DefaultController extends AbstractController
   /** @var LearningPath[] */
   private ?array $learningPaths = null;
 
-  #[Route('/page/{_studyArea<\d+>}/{pageUrl<.+>}', name: '_home', options: ['expose' => true, 'no_login_wrap' => true], defaults: ['_studyArea' => null, 'pageUrl' => ''])]
-  #[Route('/page/{pageUrl<.+>}', name: '_home_simple', options: ['no_login_wrap' => true], defaults: ['_studyArea' => null, 'pageUrl' => ''])]
+  #[Route('/page/{_studyArea<\d+|(?i:%study_area_slug%)>}/{pageUrl<.+>}', name: '_home', options: ['expose' => true, 'no_login_wrap' => true], defaults: ['_studyArea' => null, 'pageUrl' => ''])]
+  #[Route('/page/{pageUrl<.+>}', name: '_home_simple', options: ['no_login_wrap' => true], defaults: ['_studyArea' => '%study_area_slug%', 'pageUrl' => ''])]
   #[IsGranted(AuthenticatedVoter::PUBLIC_ACCESS)]
   public function index(
-    Request $request, RequestStudyArea $requestStudyArea, string $pageUrl, RouterInterface $router,
-    UserBrowserStateRepository $userBrowserStateRepository, ?Profiler $profiler): Response
+    Request $request, RequestStudyArea $requestStudyArea,
+    string $pageUrl,
+    RouterInterface $router,
+    UserBrowserStateRepository $userBrowserStateRepository,
+    #[Autowire('%study_area_slug%')] string $studyAreaSlug,
+    ?Profiler $profiler): Response
   {
     // Disable profiler on the home page
     $profiler?->disable();
@@ -104,12 +109,14 @@ class DefaultController extends AbstractController
     $user = $this->getUser();
     assert($user === null || $user instanceof User);
 
+    $studyAreaId = $user ? $studyArea->getId() : $studyAreaSlug;
+
     return $this->render('double_column.html.twig', [
       'studyArea'    => $studyArea,
       'browserState' => $user ? $userBrowserStateRepository->findForUser($user, $studyArea) : null,
       'pageUrl'      => $pageUrl != ''
-          ? '/' . $studyArea->getId() . '/' . $pageUrl
-          : $router->generate('app_default_dashboard', ['_studyArea' => $studyArea->getId()]),
+          ? '/' . $studyAreaId. '/' . $pageUrl
+          : $router->generate('app_default_dashboard', ['_studyArea' => $studyAreaId]),
       'openMap' => $request->query->has('open'),
     ]);
   }
@@ -175,8 +182,8 @@ class DefaultController extends AbstractController
    * @throws InvalidArgumentException
    * @throws NonUniqueResultException
    */
-  #[Route('/{_studyArea<\d+>}/dashboard')]
-  #[Route('/{_studyArea<\d+>}/dashboard', name: 'app_studyarea_list')]
+  #[Route('/{_studyArea<\d+|(?i:%study_area_slug%)>}/dashboard')]
+  #[Route('/{_studyArea<\d+|(?i:%study_area_slug%)>}/dashboard', name: 'app_studyarea_list')]
   #[IsGranted(StudyAreaVoter::SHOW, subject: 'requestStudyArea')]
   public function dashboard(
     RequestStudyArea $requestStudyArea, FormFactoryInterface $formFactory, StudyAreaRepository $studyAreaRepository,

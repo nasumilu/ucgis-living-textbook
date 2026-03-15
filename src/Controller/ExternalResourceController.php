@@ -18,7 +18,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[Route('/{_studyArea<\d+>}/externalresource')]
+#[Route('/{_studyArea<\d+|(?i:%study_area_slug%)>}/externalresource')]
 class ExternalResourceController extends AbstractController
 {
   #[Route('/add')]

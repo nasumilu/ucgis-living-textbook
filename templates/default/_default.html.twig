@@ -2,12 +2,13 @@
   {% if not app.user %}
 
     <div class="col-12 col-md-4 mb-3 d-flex">
-      <button type="button" {{ singleStudyArea ?: 'disabled' }}
-              data-toggle="tooltip"
-              title="{{ singleStudyArea.name ?? 'No pulbic, open-access study area available.' }}"
-              onclick="location.href='{{ path('_home', {'_studyArea' : singleStudyArea.id ?? -1}) }}'"
-              class="btn btn-lg ucgis-green-outline-btn w-100 flex-fill">Advanced Search:<br>Open Dashboard
-      </button>
+      <a href="{{ path('_home', {'_studyArea': study_area_slug}) }}"
+         {{ singleStudyArea ?: 'disabled' }}
+         data-toggle="tooltip"
+         title="{{ singleStudyArea.name ?? 'No pulbic, open-access study area available.' }}"
+        class="btn btn-lg ucgis-green-outline-btn w-100 flex-fill">
+        Advanced Search:<br>Open Dashboard
+      </a>
     </div>
     <div class="col-12 col-md-4 mb-3 d-flex">
       <a href="https://www.ucgis.org/site/gis-t-body-of-knowledge"

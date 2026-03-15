@@ -34,7 +34,7 @@ use function assert;
 use function count;
 use function is_numeric;
 
-#[Route('/{_studyArea<\d+>}/review')]
+#[Route('/{_studyArea<\d+|(?i:%study_area_slug%)>}/review')]
 class ReviewController extends AbstractController
 {
   /** Edit the pending review. It is only possible to edit the notes and requested reviewer. */
