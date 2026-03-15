@@ -32,7 +32,7 @@ use function preg_match;
 use function sprintf;
 use function str_replace;
 
-#[Route('/{_studyArea<\d+>}/print')]
+#[Route('/{_studyArea<\d+|(?i:%study_area_slug%)>}/print')]
 class PrintController extends AbstractController
 {
   /** @throws Exception */

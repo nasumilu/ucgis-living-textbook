@@ -18,7 +18,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
-#[Route('/{_studyArea<\d+>}/contributor')]
+#[Route('/{_studyArea<\d+|(?i:%study_area_slug%)>}/contributor')]
 class ContributorController extends AbstractController
 {
   #[Route('/add')]

@@ -12,6 +12,7 @@ use Override;
 use ReflectionException;
 use ReflectionMethod;
 use ReflectionNamedType;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
@@ -39,14 +40,15 @@ class RequestStudyAreaSubscriber implements EventSubscriberInterface
 
   private ?StudyArea $studyArea = null;
 
-  private ?int $studyAreaId = null;
+  private int|string|null $studyAreaId = null;
 
   public function __construct(
     private readonly RouterInterface $router,
     private readonly StudyAreaRepository $studyAreaRepository,
     private readonly TokenStorageInterface $tokenStorage,
     private readonly Environment $twig,
-    private readonly NamingService $namingService)
+    private readonly NamingService $namingService,
+    #[Autowire('%study_area_slug%')] private readonly string $studyAreaSlug)
   {
   }
 
@@ -73,45 +75,24 @@ class RequestStudyAreaSubscriber implements EventSubscriberInterface
     $request = $event->getRequest();
     $session = $request->getSession();
 
+    $token = $this->tokenStorage->getToken();
+    $user  = $token?->getUser();
+    $user  = is_object($user) ? $user : null;
+    assert($user === null || $user instanceof User);
+
     // Retrieve study area id from route
-    $studyAreaId = $request->attributes->get(self::STUDY_AREA_KEY, null);
+    $studyAreaId = null === $user ? $this->studyAreaSlug : $request->attributes->get(self::STUDY_AREA_KEY, 'current');
+    if (b($this->studyAreaSlug)->folded()->equalsTo(b($studyAreaId)->folded())) {
+      $this->studyArea = $this->studyAreaRepository->findLatestPublicOpenAccess();
+      $this->studyAreaId = $studyAreaId;
+      $this->router->getContext()->setParameter(self::STUDY_AREA_KEY, $this->studyAreaId);
+      $session->set(self::STUDY_AREA_KEY, $studyAreaId);
+      return;
+    }
 
     // Check whether it actually exists, throw not found otherwise
     if ($studyAreaId && !$this->studyAreaRepository->find($studyAreaId)) {
       throw new NotFoundHttpException('Study area not found');
-    }
-
-    // Check the study area
-    if (!$studyAreaId) {
-      // Set to NULL to force empty study area
-      $studyAreaId = null;
-
-      // Try to retrieve it from the session
-      if ($session && $session->has(self::STUDY_AREA_KEY)) {
-        $studyAreaId = $session->get(self::STUDY_AREA_KEY);
-
-        // Check whether it actually still exists, remove from session otherwise
-        if (!$studyAreaId || !$this->studyAreaRepository->find($studyAreaId)) {
-          $session->remove(self::STUDY_AREA_KEY);
-          $studyAreaId = null;
-        }
-      }
-
-      // Invalid or no result from session
-      if ($studyAreaId === null) {
-        // Resolve the user
-        $token = $this->tokenStorage->getToken();
-        $user  = $token?->getUser();
-        $user  = is_object($user) ? $user : null;
-        assert($user === null || $user instanceof User);
-
-        // Try to find a visible study area
-        if (null !== ($studyArea = $this->studyAreaRepository->findLatestPublicOpenAccess($user))) {
-          assert($studyArea instanceof StudyArea);
-          $studyAreaId     = $studyArea->getId();
-          $this->studyArea = $studyArea;
-        }
-      }
     }
 
     // Save in memory for usage and in session as backup
@@ -186,7 +167,6 @@ class RequestStudyAreaSubscriber implements EventSubscriberInterface
   /** Inject the StudyArea in the twig variables for the view */
   public function injectStudyAreaInView(): void
   {
-    $this->testCache();
     $this->twig->addGlobal(self::TWIG_STUDY_AREA_KEY, $this->studyArea);
   }
 

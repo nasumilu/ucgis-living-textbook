@@ -18,7 +18,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 /** Scoped per study area to prevent reload issues. */
-#[Route('/{_studyArea<\d+>}/help')]
+#[Route('/{_studyArea<\d+|(?i:%study_area_slug%)>}/help')]
 class HelpController extends AbstractController
 {
   /**

@@ -23,7 +23,7 @@ use function sprintf;
 #[Route('/uploads')]
 class UploadsController extends AbstractController
 {
-  #[Route('/studyarea/{_studyArea<\d+>}/{path<.+>}', options: ['no_login_wrap' => true])]
+  #[Route('/studyarea/{_studyArea<\d+|(?i:%study_area_slug%)>}/{path<.+>}', options: ['no_login_wrap' => true])]
   #[IsGranted(AuthenticatedVoter::PUBLIC_ACCESS)]
   public function load(Request $request, RequestStudyArea $requestStudyArea, string $path): Response
   {

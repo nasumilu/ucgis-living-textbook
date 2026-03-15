@@ -17,6 +17,8 @@ parameters:
 
   bobv.latex.pdflatex.location: "/usr/bin/pdflatex"
 
+  study_area_slug: current
+
 services:
   # default configuration for services in *this* file
   _defaults:

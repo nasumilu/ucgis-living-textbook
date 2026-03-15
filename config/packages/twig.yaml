@@ -17,6 +17,7 @@ twig:
   globals:
     allowed_ckeditor_tags: '%ckeditor_tags%'
     naming: '@App\Naming\NamingService'
+    study_area_slug: '%study_area_slug%'
 
 when@test:
   twig:

@@ -18,7 +18,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 use function assert;
 
-#[Route('/{_studyArea<\d+>}/browser/state')]
+#[Route('/{_studyArea<\d+|(?i:%study_area_slug%)>}/browser/state')]
 class BrowserStateController extends AbstractController
 {
   /** Retrieve the current filter state. */
