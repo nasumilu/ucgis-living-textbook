@@ -160,7 +160,7 @@ COPY --from=ltb_prod_php_build /usr/src/app/vendor/friendsofsymfony ./vendor/fri
 COPY --from=ltb_prod_php_build /usr/src/app/vendor/studio-42 ./vendor/studio-42
 
 # Install assets dependencies
-RUN npm ci
+RUN npm install
 
 # Build the assets
 RUN npm run build
