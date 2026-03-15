@@ -22,7 +22,6 @@ use function array_filter;
 use function array_key_exists;
 use function array_merge;
 use function assert;
-use function curl_close;
 use function curl_exec;
 use function curl_getinfo;
 use function curl_init;
@@ -102,7 +101,7 @@ class UrlChecker
     $studyAreas = $this->studyAreaRepository->findAll();
     $badUrls    = [];
     foreach ($studyAreas as $studyArea) {
-      $badUrls[$studyArea->getId()] = $this->checkStudyArea($studyArea, $force, $fromCache);
+      $badUrls[$studyArea->getNonNullId()] = $this->checkStudyArea($studyArea, $force, $fromCache);
     }
 
     return $badUrls;
@@ -217,7 +216,7 @@ class UrlChecker
 
     $router = $this->router;
     // Exclude latex URLs
-    $urls = array_filter($urls, function (Url $entry) use ($router) {
+    $urls = array_filter($urls, static function (Url $entry) use ($router) {
       if (!$entry->isInternal()) {
         return true;
       }
@@ -254,7 +253,6 @@ class UrlChecker
     curl_exec($ch);
     // Get headers
     $headers = curl_getinfo($ch);
-    curl_close($ch);
 
     // Verify HTTP code
     return $headers['http_code'] === 200;
@@ -295,18 +293,19 @@ class UrlChecker
         return false;
       }
     }
+
     // Recheck
     if ($this->_checkUrl($url)) {
       // Good items expire after 7 days
       $this->cacheUrl($cacheableUrl, $this->goodUrlsCache, 7 * 24 * 60 * 60);
 
       return true;
-    } else {
-      // Bad items expire after 14 days, although they should be deleted if they're no longer valid
-      $this->cacheUrl($cacheableUrl, $newCache, 14 * 24 * 60 * 60);
-
-      return false;
     }
+
+    // Bad items expire after 14 days, although they should be deleted if they're no longer valid
+    $this->cacheUrl($cacheableUrl, $newCache, 14 * 24 * 60 * 60);
+
+    return false;
   }
 
   private function checkInternalUrl(Url $url, StudyArea $studyArea): ?bool

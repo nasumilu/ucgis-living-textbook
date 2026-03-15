@@ -29,12 +29,12 @@ class ConceptRelationValidator extends ConstraintValidator
   public function validate(mixed $value, Constraint $constraint): void
   {
     // Check constraint
-    if (!($constraint instanceof ConceptRelation)) {
+    if (!$constraint instanceof ConceptRelation) {
       throw new UnexpectedTypeException($constraint, ConceptRelation::class);
     }
 
     // Check value
-    if (!($value instanceof Concept)) {
+    if (!$value instanceof Concept) {
       throw new UnexpectedTypeException($value, Concept::class);
     }
 
@@ -58,8 +58,9 @@ class ConceptRelationValidator extends ConstraintValidator
         continue;
       }
 
-      $sourceId = $source->getId();
-      $targetId = $target->getId();
+      // Fallback id to 0 to be able to validate correctly for a newly created source or target
+      $sourceId = $source->getId() ?? 0;
+      $targetId = $target->getId() ?? 0;
 
       // Update map to contain a key for every concept
       if (!array_key_exists($sourceId, $map)) {

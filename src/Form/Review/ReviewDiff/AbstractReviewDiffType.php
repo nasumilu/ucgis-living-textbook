@@ -43,22 +43,23 @@ class AbstractReviewDiffType extends AbstractType
     }
 
     $builder->addModelTransformer(new CallbackTransformer(
-      function () use ($options) {
+      static function () use ($options) {
         $pendingChange = $options['pending_change'];
         assert($pendingChange instanceof PendingChange);
 
         $existingComments = $pendingChange->getReviewComments() ?? [];
         $data             = null;
 
-        if (array_key_exists($options['field'], $existingComments)) {
-          $data = $existingComments[$options['field']];
+        $field = $options['field'];
+        if ($field && array_key_exists($field, $existingComments)) {
+          $data = $existingComments[$field];
         }
 
         return [
           'comments' => $data,
         ];
       },
-      function (array $formData) use ($options) {
+      static function (array $formData) use ($options) {
         $pendingChange = $options['pending_change'];
         $field         = $options['field'];
         assert($pendingChange instanceof PendingChange);

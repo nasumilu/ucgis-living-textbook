@@ -79,7 +79,7 @@ class SearchController extends AbstractController
       assert($user instanceof User);
       $userId         = $user->getId();
       $allAnnotations = $annotationRepository->getForUserAndStudyArea($user, $studyArea);
-      $ownAnnotations = array_filter($allAnnotations, fn (Annotation $annotation) => $annotation->getUserId() == $userId);
+      $ownAnnotations = array_filter($allAnnotations, static fn (Annotation $annotation) => $annotation->getUserId() == $userId);
 
       $result['ownAnnotationsData'] = $this->groupAnnotationsByConcept($this->searchData($ownAnnotations, $search));
       $result['allAnnotationsData'] = $this->groupAnnotationsByConcept($this->searchData($allAnnotations, $search));
@@ -91,7 +91,7 @@ class SearchController extends AbstractController
   /** @param SearchableInterface[] $data */
   private function searchData(array $data, string $search): array
   {
-    $data = array_map(fn (SearchableInterface $element) => $element->searchIn($search), $data);
+    $data = array_map(static fn (SearchableInterface $element) => $element->searchIn($search), $data);
 
     $data = array_filter($data, $this->filterSortData(...));
 
@@ -105,7 +105,7 @@ class SearchController extends AbstractController
   {
     $result = [];
 
-    array_map(function ($item) use (&$result) {
+    array_map(static function ($item) use (&$result) {
       $annotation = $item['_data'];
       assert($annotation instanceof Annotation);
       $concept = $annotation->getConcept();
@@ -131,7 +131,7 @@ class SearchController extends AbstractController
 
   public static function sortSearchData($a, $b): int
   {
-    $reduceFunction = fn ($carry, $item) => max($item['prio'], $carry);
+    $reduceFunction = static fn ($carry, $item) => max($item['prio'], $carry);
 
     $ap = array_reduce($a['results'], $reduceFunction, 0);
     $bp = array_reduce($b['results'], $reduceFunction, 0);
