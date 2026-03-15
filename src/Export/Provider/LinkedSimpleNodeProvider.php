@@ -15,6 +15,7 @@ use App\Repository\LearningOutcomeRepository;
 use App\Repository\RelationTypeRepository;
 use App\Repository\TagRepository;
 use App\Router\LtbRouter;
+use Drenso\Shared\Exception\NullGuard\IdRequiredException;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Override;
@@ -188,15 +189,15 @@ EOT,
     // Detach the data from the ORM
     $idMap = [];
     foreach ($concepts as $key => $concept) {
-      $idMap[$concept->getId()] = $key;
+      $idMap[$concept->getNonNullId()] = $key;
     }
 
     // Create link data
     $mappedLinks = [];
     foreach ($links as &$link) {
       $mappedLinks[] = [
-        'target'       => $idMap[$link->getTargetId()],
-        'source'       => $idMap[$link->getSourceId()],
+        'target'       => $idMap[$link->getTargetId() ?? throw new IdRequiredException()],
+        'source'       => $idMap[$link->getSourceId() ?? throw new IdRequiredException()],
         'relationName' => $link->getRelationName(),
       ];
     }
@@ -205,7 +206,7 @@ EOT,
     $mappedContributors = [];
     foreach ($contributors as $contributor) {
       $mappedContributors[] = [
-        'nodes'       => $contributor->getConcepts()->map(fn (Concept $concept) => $idMap[$concept->getId()]),
+        'nodes'       => $contributor->getConcepts()->map(static fn (Concept $concept) => $idMap[$concept->getNonNullId()]),
         'name'        => $contributor->getName(),
         'description' => $contributor->getDescription(),
         'url'         => $contributor->getUrl(),
@@ -217,7 +218,7 @@ EOT,
     $mappedExternalResources = [];
     foreach ($externalResources as $externalResource) {
       $mappedExternalResources[] = [
-        'nodes'       => $externalResource->getConcepts()->map(fn (Concept $concept) => $idMap[$concept->getId()]),
+        'nodes'       => $externalResource->getConcepts()->map(static fn (Concept $concept) => $idMap[$concept->getNonNullId()]),
         'title'       => $externalResource->getTitle(),
         'description' => $externalResource->getDescription(),
         'url'         => $externalResource->getUrl(),
@@ -228,7 +229,7 @@ EOT,
     $mappedLearningOutcomes = [];
     foreach ($learningOutcomes as $learningOutcome) {
       $mappedLearningOutcomes[] = [
-        'nodes'   => $learningOutcome->getConcepts()->map(fn (Concept $concept) => $idMap[$concept->getId()]),
+        'nodes'   => $learningOutcome->getConcepts()->map(static fn (Concept $concept) => $idMap[$concept->getNonNullId()]),
         'number'  => $learningOutcome->getNumber(),
         'name'    => $learningOutcome->getName(),
         'content' => $learningOutcome->getText(),
@@ -239,7 +240,7 @@ EOT,
     $mappedTags = [];
     foreach ($tags as $tag) {
       $mappedTags[] = [
-        'nodes'       => $tag->getConcepts()->map(fn (Concept $concept) => $idMap[$concept->getId()]),
+        'nodes'       => $tag->getConcepts()->map(static fn (Concept $concept) => $idMap[$concept->getNonNullId()]),
         'color'       => $tag->getColor(),
         'name'        => $tag->getName(),
         'description' => $tag->getDescription(),
@@ -251,8 +252,8 @@ EOT,
     foreach ($concepts as $concept) {
       if (!$concept->getPriorKnowledge()->isEmpty()) {
         $mappedPriorKnowledge[] = [
-          'node'               => $idMap[$concept->getId()],
-          'isPriorKnowledgeOf' => $concept->getPriorKnowledge()->map(fn (Concept $priorKnowledge) => $idMap[$priorKnowledge->getId()]),
+          'node'               => $idMap[$concept->getNonNullId()],
+          'isPriorKnowledgeOf' => $concept->getPriorKnowledge()->map(static fn (Concept $priorKnowledge) => $idMap[$priorKnowledge->getNonNullId()]),
         ];
       }
     }
@@ -267,7 +268,7 @@ EOT,
     $serializationContext->setSerializeNull(true);
     $json = $this->serializer->serialize(
       [
-        'id'           => $studyArea->getId(),
+        'id'           => $studyArea->getNonNullId(),
         'name'         => $studyArea->getName(),
         'description'  => $studyArea->getDescription(),
         'date_created' => $studyArea->getCreatedAt(),

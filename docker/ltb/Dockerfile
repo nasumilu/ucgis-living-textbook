@@ -1,5 +1,5 @@
-FROM php:8.4.14-fpm-bookworm as ltb_base
-MAINTAINER Drienerlo Engineering Solutions <hallo@drenso.nl>
+FROM php:8.5.3-fpm-trixie AS ltb_base
+LABEL org.opencontainers.image.authors="Drienerlo Engineering Solutions <hallo@drenso.nl>"
 
 # Update all dependencies, and install required ones
 RUN export DEBIAN_FRONTEND=noninteractive \
@@ -9,7 +9,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get install -y \
     # PHP dependencies
     ## ZIP
-      unzip zlib1g-dev libpcre3-dev libzip-dev \
+      unzip zlib1g-dev libzip-dev \
     ## GD
       libpng-dev \
     ## Intl
@@ -66,7 +66,6 @@ RUN printf "memory_limit = 1024M\n" >> `php -i | grep php.ini | awk '{print $6'}
 
 # Install PHP extensions
 RUN docker-php-ext-install zip
-RUN docker-php-ext-install opcache
 RUN docker-php-ext-install pdo_mysql
 RUN docker-php-ext-install gd
 RUN docker-php-ext-install intl
@@ -101,7 +100,7 @@ COPY ./docker/ltb/install-composer.sh .
 RUN sh install-composer.sh && rm install-composer.sh
 
 # Configure Imagick
-RUN sed -ri 's/rights="(none)" pattern="PDF"/rights="read" pattern="PDF"/gi' /etc/ImageMagick-6/policy.xml
+RUN sed -ri 's/rights="(none)" pattern="PDF"/rights="read" pattern="PDF"/gi' /etc/ImageMagick-7/policy.xml
 
 # Install wait-for script
 RUN curl -s https://raw.githubusercontent.com/eficode/wait-for/master/wait-for -o /opt/wait-for \
@@ -120,7 +119,7 @@ RUN mv docker/ltb/docker-entry.sh /opt/docker-entry.sh \
     && rm -rf docker
 
 ######################## Development image ########################
-FROM ltb_base as ltb_dev
+FROM ltb_base AS ltb_dev
 
 # Install debug extension
 RUN pecl install xdebug && docker-php-ext-enable xdebug
@@ -129,14 +128,14 @@ RUN pecl install xdebug && docker-php-ext-enable xdebug
 ENTRYPOINT ["/opt/docker-entry.sh"]
 
 ######################## Production php builder ########################
-FROM ltb_base as ltb_prod_php_build
+FROM ltb_base AS ltb_prod_php_build
 
 # Install application
 COPY . .
 
 # Install php vendors and prepare python environment
-ENV COMPOSER_NO_DEV 1
-ENV COMPOSER_ALLOW_SUPERUSER 1
+ENV COMPOSER_NO_DEV=1
+ENV COMPOSER_ALLOW_SUPERUSER=1
 RUN cp .secrets.json.dist .secrets.json \
     && composer install --no-scripts \
     && composer dump-autoload --classmap-authoritative \
@@ -148,7 +147,7 @@ RUN cp .secrets.json.dist .secrets.json \
     && rm .secrets.json
 
 ######################## Production assets builder ########################
-FROM node:20.19.6-slim as ltb_prod_assets_build
+FROM node:24.14.0-slim AS ltb_prod_assets_build
 
 # Set the work dir
 WORKDIR /usr/src/app
@@ -160,13 +159,13 @@ COPY --from=ltb_prod_php_build /usr/src/app/vendor/friendsofsymfony ./vendor/fri
 COPY --from=ltb_prod_php_build /usr/src/app/vendor/studio-42 ./vendor/studio-42
 
 # Install assets dependencies
-RUN yarn install
+RUN npm ci
 
 # Build the assets
-RUN yarn build
+RUN npm run build
 
 ######################## Production image ########################
-FROM ltb_prod_php_build as ltb_prod
+FROM ltb_prod_php_build AS ltb_prod
 
 # Install assets
 COPY --from=ltb_prod_assets_build /usr/src/app/public/build ./public/build

@@ -11,9 +11,7 @@ use Doctrine\Persistence\ManagerRegistry;
 
 use function array_walk;
 
-/**
- * @extends ServiceEntityRepository<LearningOutcome>
- */
+/** @extends ServiceEntityRepository<LearningOutcome> */
 class LearningOutcomeRepository extends ServiceEntityRepository
 {
   public function __construct(ManagerRegistry $registry)
@@ -78,7 +76,7 @@ class LearningOutcomeRepository extends ServiceEntityRepository
       ->getQuery()->getResult();
 
     $return = [];
-    array_walk($result, function ($item) use (&$return) {
+    array_walk($result, static function ($item) use (&$return) {
       if (!isset($return[$item['id']])) {
         $return[$item['id']] = [];
       }

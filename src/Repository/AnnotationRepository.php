@@ -13,9 +13,7 @@ use Doctrine\Persistence\ManagerRegistry;
 
 use function array_walk;
 
-/**
- * @extends ServiceEntityRepository<Annotation>
- */
+/** @extends ServiceEntityRepository<Annotation> */
 class AnnotationRepository extends ServiceEntityRepository
 {
   public function __construct(ManagerRegistry $registry)
@@ -81,7 +79,7 @@ class AnnotationRepository extends ServiceEntityRepository
 
     // Map result to id => count array
     $result = [];
-    array_walk($counts, function ($value) use (&$result) {
+    array_walk($counts, static function ($value) use (&$result) {
       $result[$value[1]] = $value[2];
     });
 
