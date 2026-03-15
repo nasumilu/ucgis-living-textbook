@@ -3,7 +3,7 @@
 {% block javascripts %}
   <!--suppress JSUnusedLocalSymbols -->
   <script type="text/javascript">
-    var _studyArea = {{ app.user ? studyArea.id : study_area_slug }};
+    var _studyArea = {{ studyArea.id }};
     var _conceptMapWidth = {{ studyArea.mapWidth }};
     var _conceptMapHeight = {{ studyArea.mapHeight }};
     var _isDotronStudyArea = {{ studyArea.dotron ? 'true' : 'false' }};
