@@ -44,7 +44,7 @@
                 <tr>
                   {% if result.property == 'theory-explanation' %}
                     <td>
-                      <a href="{{ path('app_concept_show', {concept: concept._id}) }}">{{ concept._title }}</a>
+                      <a href="{{ path('app_concept_show', {concept: concept._slug}) }}">{{ concept._title }}</a>
                     </td>
                   <td>{{ result.data|striptags|u.truncate(500, '...', false)|raw }}</td>
                 </tr>
@@ -103,7 +103,7 @@
               {% if render_concept %}
                 {% set render_concept = false %}
                 <td rowspan="{{ annotations_data_per_concept.count }}">
-                  <a href="{{ path('app_concept_show', {concept: annotation._data.concept.id}) }}">{{ annotation._data.concept.name }}</a>
+                  <a href="{{ path('app_concept_show', {concept: annotation._data.concept.slug}) }}">{{ annotation._data.concept.name }}</a>
                 </td>
               {% endif %}
 
