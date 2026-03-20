@@ -179,6 +179,7 @@ concept:
   introduction: 'Introduction'
   list-title: 'Topic list'
   name: 'Name'
+  slug: 'Slug'
   new: 'New topic/instance'
   no-relations-possible-concept: "There are no other topics or instances available."
   no-relations-possible-linktype: "There are no link types defined."

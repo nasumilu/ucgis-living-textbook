@@ -42,6 +42,15 @@ class StudyAreaRepository extends ServiceEntityRepository
     return $this->getVisibleQueryBuilder($user)->getQuery()->getResult();
   }
 
+  public function findByIdOrSlug(string|int $idOrSlug, ?User $user = null): ?StudyArea
+  {
+    if (is_numeric($idOrSlug)) {
+      return $this->find($idOrSlug);
+    }
+
+    return $this->findLatestPublicOpenAccess($user);
+  }
+
   public function findLatestPublicOpenAccess(?User $user = null): ?StudyArea
   {
     return $this->getVisibleQueryBuilder($user)

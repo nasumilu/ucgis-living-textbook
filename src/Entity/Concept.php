@@ -65,6 +65,14 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
   #[JMSA\Type('string')]
   private string $name = '';
 
+  #[Assert\NotBlank]
+  #[Assert\Length(max: 32)]
+  #[ORM\Column(name: 'slug', length: 32, nullable: false)]
+  #[JMSA\Expose]
+  #[JMSA\Groups(['Default'])]
+  #[JMSA\Type('string')]
+  private string $slug = '';
+
   /** Whether this concept should be seen as an instance. */
   #[ORM\Column(name: 'instance')]
   #[JMSA\Expose]
@@ -310,8 +318,8 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
       $val = strcasecmp($a->getRelationName(), $b->getRelationName());
 
       return $val === 0
-          ? strcasecmp((string)$a->$conceptRetriever()->getName(), (string)$b->$conceptRetriever()->getName())
-          : $val;
+        ? strcasecmp((string)$a->$conceptRetriever()->getName(), (string)$b->$conceptRetriever()->getName())
+        : $val;
     });
 
     // Set sort order
@@ -343,12 +351,12 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
   public function hasTextData()
   {
     return $this->getDefinition()->hasData()
-        || $this->getIntroduction()->hasData()
-        || $this->getExamples()->hasData()
-        || $this->getHowTo()->hasData()
-        || $this->selfAssessment->hasData()
-        || $this->additionalResources->hasData()
-        || $this->theoryExplanation->hasData();
+      || $this->getIntroduction()->hasData()
+      || $this->getExamples()->hasData()
+      || $this->getHowTo()->hasData()
+      || $this->selfAssessment->hasData()
+      || $this->additionalResources->hasData()
+      || $this->theoryExplanation->hasData();
   }
 
   /** @return array Array with DateTime and username */
@@ -425,6 +433,7 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
 
     return [
       '_id'     => $this->getId(),
+      '_slug'   => $this->getSlug(),
       '_title'  => $this->getName(),
       'results' => $results,
     ];
@@ -453,6 +462,9 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
       switch ($changedField) {
         case 'name':
           $this->setName($changeObj->getName());
+          break;
+        case 'slug':
+          $this->setSlug($changeObj->getSlug());
           break;
         case 'instance':
           $this->setInstance($changeObj->isInstance());
@@ -620,6 +632,11 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
     return $this->name;
   }
 
+  public function getSlug(): string
+  {
+    return $this->slug;
+  }
+
   public function isInstance(): bool
   {
     return $this->instance;
@@ -635,6 +652,13 @@ class Concept implements SearchableInterface, ReviewableInterface, IdInterface
   public function setName(string $name): self
   {
     $this->name = $name;
+
+    return $this;
+  }
+
+  public function setSlug(string $slug): self
+  {
+    $this->slug = $slug;
 
     return $this;
   }

@@ -9,19 +9,66 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Drenso\Shared\Database\RepositoryTraits\FindIdsTrait;
 use InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /** @extends ServiceEntityRepository<Concept> */
 class ConceptRepository extends ServiceEntityRepository
 {
   use FindIdsTrait;
 
-  public function __construct(ManagerRegistry $registry)
+  public function __construct(
+    ManagerRegistry $registry,
+    #[Autowire('%study_area_slug%')] private readonly string $studyAreaSlug)
   {
     parent::__construct($registry, Concept::class);
   }
 
+  public function findOneByIdOrSlug(string|int|StudyArea $studyArea, string $conceptId): ?Concept
+  {
+
+    $qb = $this->createQueryBuilder('c')
+      ->where('c.deletedAt IS NULL');
+
+    if ($studyArea == $this->studyAreaSlug) {
+      $latestPublicStudyAreaSubQuery = $this->getEntityManager()->createQueryBuilder()
+        ->select('sa2')
+        ->from(StudyArea::class, 'sa2')
+        ->where('sa2.accessType = :publicAccessType')
+        ->andWhere('sa2.openAccess = true')
+        ->andWhere('sa2.deletedAt IS NULL')
+        ->orderBy('sa2.createdAt', 'DESC')
+        ->setMaxResults(1);
+
+
+      $qb->andWhere('c.studyArea = (' . $latestPublicStudyAreaSubQuery->getDQL() . ')')
+        ->setParameter('publicAccessType', 'public');
+
+
+    } else {
+      $qb->andWhere('c.studyArea = :studyArea')
+         ->setParameter('studyArea', is_numeric($studyArea) ? (int)$studyArea : $studyArea);
+    }
+
+
+
+    if (ctype_digit($conceptId)) {
+      $qb->andWhere('c.id = :id')
+        ->setParameter('id', (int)$conceptId);
+    } else {
+      $qb->andWhere('LOWER(c.slug) = LOWER(:slug)')
+        ->setParameter('slug', $conceptId);
+    }
+
+    /** @var Concept|null $concept */
+    $concept = $qb->getQuery()->getOneOrNullResult();
+
+    return $concept;
+  }
+
   public function findForStudyAreaOrderByNameQb(
-    StudyArea $studyArea, bool $conceptsOnly = false, bool $instancesOnly = false): QueryBuilder
+    StudyArea $studyArea,
+    bool $conceptsOnly = false,
+    bool $instancesOnly = false): QueryBuilder
   {
     if ($conceptsOnly && $instancesOnly) {
       throw new InvalidArgumentException('You cannot select both only options at the same time!');
@@ -44,7 +91,10 @@ class ConceptRepository extends ServiceEntityRepository
 
   /** @return Concept[] */
   public function findForStudyAreaOrderedByName(
-    StudyArea $studyArea, bool $preLoadData = false, bool $conceptsOnly = false, bool $instancesOnly = false)
+    StudyArea $studyArea,
+    bool $preLoadData = false,
+    bool $conceptsOnly = false,
+    bool $instancesOnly = false)
   {
     $qb = $this->findForStudyAreaOrderByNameQb($studyArea, $conceptsOnly, $instancesOnly);
 
@@ -62,7 +112,9 @@ class ConceptRepository extends ServiceEntityRepository
    * @noinspection PhpUnhandledExceptionInspection
    */
   public function getCountForStudyArea(
-    StudyArea $studyArea, bool $conceptsOnly = false, bool $instancesOnly = false): int
+    StudyArea $studyArea,
+    bool $conceptsOnly = false,
+    bool $instancesOnly = false): int
   {
     if ($conceptsOnly && $instancesOnly) {
       throw new InvalidArgumentException('You cannot select both only options at the same time!');

@@ -6,6 +6,7 @@ use App\Attribute\DenyOnFrozenStudyArea;
 use App\Entity\Concept;
 use App\Entity\ConceptRelation;
 use App\Entity\PendingChange;
+use App\Entity\StudyArea;
 use App\Entity\User;
 use App\EntityHandler\ConceptEntityHandler;
 use App\Form\Concept\EditConceptType;
@@ -20,6 +21,7 @@ use App\Review\ReviewService;
 use App\Security\Voters\StudyAreaVoter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -460,10 +462,10 @@ class ConceptController extends AbstractController
     ]);
   }
 
-  #[Route('/{concept<\d+>}', options: ['expose' => true])]
+  #[Route('/{concept<\d+|(?i:(\w*)(-\w+)*)>}', options: ['expose' => true])]
   #[IsGranted(StudyAreaVoter::SHOW, subject: 'requestStudyArea')]
   public function show(
-    Concept $concept,
+    #[MapEntity(expr: 'repository.findOneByIdOrSlug(_studyArea, concept)')] Concept $concept,
     RequestStudyArea $requestStudyArea,
     LearningPathRepository $learningPathRepository): Response
   {

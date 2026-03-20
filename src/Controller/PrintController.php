@@ -18,6 +18,7 @@ use Bobv\LatexBundle\Exception\LatexException;
 use Bobv\LatexBundle\Generator\LatexGeneratorInterface;
 use Bobv\LatexBundle\Helper\Sanitize;
 use Exception;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -36,11 +37,17 @@ use function str_replace;
 class PrintController extends AbstractController
 {
   /** @throws Exception */
-  #[Route('/concept/{concept<\d+>}')]
+  #[Route('/concept/{concept<\d+|(?i:(\w*)(-\w+)*)>}')]
   #[IsGranted(StudyAreaVoter::PRINTER, subject: 'requestStudyArea')]
   public function printSingleConcept(
-      RequestStudyArea    $requestStudyArea, Concept $concept, LatexGeneratorInterface $generator,
-      TranslatorInterface $translator, LtbRouter $router, NamingService $namingService, ImageResolver $downloader)  {
+    RequestStudyArea $requestStudyArea,
+    #[MapEntity(expr: 'repository.findOneByIdOrSlug(_studyArea, concept)')] Concept $concept,
+    LatexGeneratorInterface $generator,
+    TranslatorInterface $translator,
+    LtbRouter $router,
+    NamingService $namingService,
+    ImageResolver $downloader)
+  {
     // Check if correct study area
     if ($concept->getStudyArea()->getId() != $requestStudyArea->getStudyArea()->getId()) {
       throw $this->createNotFoundException();
@@ -68,8 +75,13 @@ class PrintController extends AbstractController
   #[Route('/learningpath/{learningPath<\d+>}')]
   #[IsGranted(StudyAreaVoter::PRINTER, subject: 'requestStudyArea')]
   public function printLearningPath(
-    RequestStudyArea $requestStudyArea, LearningPath $learningPath, LatexGeneratorInterface $generator,
-    TranslatorInterface $translator, LtbRouter $router, NamingService $namingService, ImageResolver $downloader): Response
+    RequestStudyArea $requestStudyArea,
+    LearningPath $learningPath,
+    LatexGeneratorInterface $generator,
+    TranslatorInterface $translator,
+    LtbRouter $router,
+    NamingService $namingService,
+    ImageResolver $downloader): Response
   {
     // Check if correct study area
     if ($learningPath->getStudyArea()->getId() != $requestStudyArea->getStudyArea()->getId()) {
@@ -104,7 +116,9 @@ class PrintController extends AbstractController
    *
    * @throws Exception
    */
-  private function parsePrintException(Exception $e, ?Concept $concept = null, ?LearningPath $learningPath = null): Response
+  private function parsePrintException(Exception $e,
+    ?Concept $concept = null,
+    ?LearningPath $learningPath = null): Response
   {
     // Retrieve study area from one of the given objects
     $studyArea = $concept?->getStudyArea();
