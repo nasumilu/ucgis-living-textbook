@@ -7,6 +7,7 @@ import ConceptBrowserRenderer from './ConceptBrowserRenderer';
 export interface JsonType {
     numberOfLinks: number;
     id: number;
+    slug: string;
     name: string;
     instance: boolean;
     isEmpty: boolean;
@@ -24,6 +25,7 @@ export interface JsonType {
 
 export interface NodeType {
     id: number;
+    slug: string;
     index: number;
     x: number;
     y: number;
@@ -658,10 +660,10 @@ export default class ConceptBrowser {
         this.mouseMoveDisabled = !!node;
 
         if (!this.clickSend && node !== undefined) {
-            if (typeof node.id !== 'undefined' && node.id !== '') {
+            if (typeof node.slug !== 'undefined' && node.slug !== '') {
                 this.clickSend = true;
                 // @ts-ignore
-                window.eDispatch.conceptSelected(node.id);
+                window.eDispatch.conceptSelected(node.slug);
                 setTimeout(() => {
                     this.clickSend = false;
                 }, 250);
@@ -1135,6 +1137,7 @@ export default class ConceptBrowser {
             // Node mapping
             this.cbGraph.nodes.push({
                 id: concept.id,
+                slug: concept.slug,
                 label: concept.name,
                 instance: concept.instance,
                 empty: concept.isEmpty,

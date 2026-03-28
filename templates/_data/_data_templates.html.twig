@@ -137,7 +137,7 @@
 
 {% macro link_to_relation(concept, create_link) %}
   {% if create_link %}
-    <a href="{{ path('app_concept_show', {concept: concept.id}) }}">{{ concept.name }}</a>
+    <a href="{{ path('app_concept_show', {concept: concept.slug}) }}">{{ concept.name }}</a>
   {% else %}
     {{ concept.name }}
   {% endif %}
@@ -174,7 +174,7 @@
 {% endmacro %}
 
 {% macro render_prior_knowledge(prior_knowledge) %}
-  <a href="{{ path('app_concept_show', {concept: prior_knowledge.id}) }}">{{ prior_knowledge.name }}</a>
+  <a href="{{ path('app_concept_show', {concept: prior_knowledge.slug}) }}">{{ prior_knowledge.name }}</a>
 {% endmacro %}
 
 {% macro data_learning_outcomes(data) %}
@@ -222,7 +222,7 @@
     <ul>
       {% for concept in data %}
         <li>
-          <a href="{{ path('app_concept_show', {concept: concept.id}) }}"><b>{{ concept.name }}</b></a>
+          <a href="{{ path('app_concept_show', {concept: concept.slug}) }}"><b>{{ concept.name }}</b></a>
           {# Show definition is available, otherwise introduction if available #}
           {% if concept.definition.text|length > 0 %}
             <div class="ltb-text-container">
@@ -258,7 +258,7 @@
     <ul class="tagged-concepts">
       {% for concept in data %}
         <li class="tagged-concept">
-          <h5><a href="{{ path('app_concept_show', { concept: concept.id}) }}">{{ concept.name }}</a></h5>          
+          <h5><a href="{{ path('app_concept_show', { concept: concept.slug}) }}">{{ concept.name }}</a></h5>
           {% if concept.imagePath %}
             <div class="concept-image">
               <img src="{{ concept.imagePath }}" alt="" title="{{ concept.name }}">
