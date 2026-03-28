@@ -10,6 +10,7 @@ use App\Entity\Concept;
 use App\Entity\LearningPath;
 use App\Entity\StudyArea;
 use App\Naming\NamingService;
+use App\Repository\ConceptRepository;
 use App\Request\Wrapper\RequestStudyArea;
 use App\Router\LtbRouter;
 use App\Security\Voters\StudyAreaVoter;
@@ -36,13 +37,30 @@ use function str_replace;
 class PrintController extends AbstractController
 {
   /** @throws Exception */
-  #[Route('/concept/{concept<\d+>}')]
+  #[Route('/concept/{concept<\d+|(?i:(\w*)(-\w+)*)>}')]
   #[IsGranted(StudyAreaVoter::PRINTER, subject: 'requestStudyArea')]
   public function printSingleConcept(
-      RequestStudyArea    $requestStudyArea, Concept $concept, LatexGeneratorInterface $generator,
-      TranslatorInterface $translator, LtbRouter $router, NamingService $namingService, ImageResolver $downloader)  {
-    // Check if correct study area
-    if ($concept->getStudyArea()->getId() != $requestStudyArea->getStudyArea()->getId()) {
+    RequestStudyArea $requestStudyArea,
+    string| int $concept,
+    ConceptRepository $conceptRepository,
+    LatexGeneratorInterface $generator,
+    TranslatorInterface $translator,
+    LtbRouter $router,
+    NamingService $namingService,
+    ImageResolver $downloader)
+  {
+
+    $user = $this->getUser();
+    if (null === $user && is_numeric($concept)) {
+      $concept = $conceptRepository->findEvenDeleted((int)$concept);
+      return $this->redirectToRoute(
+        'app_print_printsingleconcept',
+        ['concept' => $concept->getSlug()],
+        301
+      );
+    }
+
+    if (null === ($concept = $conceptRepository->findOneBySlugOrId($requestStudyArea->getStudyArea(), $concept))) {
       throw $this->createNotFoundException();
     }
 
@@ -51,7 +69,7 @@ class PrintController extends AbstractController
     // Create LaTeX document
     $document = new ConceptPrint($this->filename($concept->getName()))
       ->useLicenseImage($projectDir)
-      ->setBaseUrl($this->generateUrl('app_concept_show', ['_studyArea' => $concept->getStudyArea()->getId(), 'concept' => $concept->getId()], UrlGeneratorInterface::ABSOLUTE_URL))
+      ->setBaseUrl($this->generateUrl('app_concept_show', ['_studyArea' => 'current', 'concept' => $concept->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL))
       ->setHeader($concept->getName(), $translator)
       ->addIntroduction($concept->getStudyArea(), $translator)
       ->addElement(new ConceptSection($concept, $router, $translator, $namingService, $projectDir, $downloader));
@@ -68,8 +86,13 @@ class PrintController extends AbstractController
   #[Route('/learningpath/{learningPath<\d+>}')]
   #[IsGranted(StudyAreaVoter::PRINTER, subject: 'requestStudyArea')]
   public function printLearningPath(
-    RequestStudyArea $requestStudyArea, LearningPath $learningPath, LatexGeneratorInterface $generator,
-    TranslatorInterface $translator, LtbRouter $router, NamingService $namingService, ImageResolver $downloader): Response
+    RequestStudyArea $requestStudyArea,
+    LearningPath $learningPath,
+    LatexGeneratorInterface $generator,
+    TranslatorInterface $translator,
+    LtbRouter $router,
+    NamingService $namingService,
+    ImageResolver $downloader): Response
   {
     // Check if correct study area
     if ($learningPath->getStudyArea()->getId() != $requestStudyArea->getStudyArea()->getId()) {
@@ -104,7 +127,9 @@ class PrintController extends AbstractController
    *
    * @throws Exception
    */
-  private function parsePrintException(Exception $e, ?Concept $concept = null, ?LearningPath $learningPath = null): Response
+  private function parsePrintException(Exception $e,
+    ?Concept $concept = null,
+    ?LearningPath $learningPath = null): Response
   {
     // Retrieve study area from one of the given objects
     $studyArea = $concept?->getStudyArea();

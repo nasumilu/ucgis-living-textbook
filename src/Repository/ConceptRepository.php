@@ -5,23 +5,57 @@ namespace App\Repository;
 use App\Entity\Concept;
 use App\Entity\StudyArea;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Filter\SQLFilter;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Drenso\Shared\Database\RepositoryTraits\FindIdsTrait;
 use InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /** @extends ServiceEntityRepository<Concept> */
 class ConceptRepository extends ServiceEntityRepository
 {
   use FindIdsTrait;
 
-  public function __construct(ManagerRegistry $registry)
+  public function __construct(
+    ManagerRegistry $registry,
+    #[Autowire('%study_area_slug%')] private readonly string $studyAreaSlug)
   {
     parent::__construct($registry, Concept::class);
   }
 
+  public function findEvenDeleted(int $conceptId): ?Concept
+  {
+    $filters = $this->getEntityManager()->getFilters();
+    $filters->disable('softdeleteable');
+    $concept = $this->find($conceptId);
+    $filters->enable('softdeleteable');
+
+    return $concept;
+  }
+
+  public function findOneBySlugOrId(StudyArea $studyArea, string|int $conceptId): ?Concept
+  {
+    $qb = $this->createQueryBuilder('c')
+      ->where('c.studyArea = :studyArea')
+      ->setParameter('studyArea', $studyArea);
+
+    if (is_numeric($conceptId)) {
+      $qb->andWhere('c.id = :id')
+        ->setParameter('id', $conceptId);
+    } else {
+      $qb->andWhere('c.slug = UPPER(:slug)')
+        ->setParameter('slug', $conceptId);
+    }
+
+    return $qb->getQuery()
+      ->getOneOrNullResult();
+  }
+
   public function findForStudyAreaOrderByNameQb(
-    StudyArea $studyArea, bool $conceptsOnly = false, bool $instancesOnly = false): QueryBuilder
+    StudyArea $studyArea,
+    bool $conceptsOnly = false,
+    bool $instancesOnly = false): QueryBuilder
   {
     if ($conceptsOnly && $instancesOnly) {
       throw new InvalidArgumentException('You cannot select both only options at the same time!');
@@ -44,7 +78,10 @@ class ConceptRepository extends ServiceEntityRepository
 
   /** @return Concept[] */
   public function findForStudyAreaOrderedByName(
-    StudyArea $studyArea, bool $preLoadData = false, bool $conceptsOnly = false, bool $instancesOnly = false)
+    StudyArea $studyArea,
+    bool $preLoadData = false,
+    bool $conceptsOnly = false,
+    bool $instancesOnly = false)
   {
     $qb = $this->findForStudyAreaOrderByNameQb($studyArea, $conceptsOnly, $instancesOnly);
 
@@ -62,7 +99,9 @@ class ConceptRepository extends ServiceEntityRepository
    * @noinspection PhpUnhandledExceptionInspection
    */
   public function getCountForStudyArea(
-    StudyArea $studyArea, bool $conceptsOnly = false, bool $instancesOnly = false): int
+    StudyArea $studyArea,
+    bool $conceptsOnly = false,
+    bool $instancesOnly = false): int
   {
     if ($conceptsOnly && $instancesOnly) {
       throw new InvalidArgumentException('You cannot select both only options at the same time!');

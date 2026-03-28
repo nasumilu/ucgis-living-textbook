@@ -16,7 +16,7 @@
   {% endif %}
   {{ buttons.browser_button(concept.id) }}
   {% if is_granted('STUDYAREA_PRINT', concept.studyArea) %}
-    {{ buttons.print_button(path('app_print_printsingleconcept', {concept: concept.id})) }}
+    {{ buttons.print_button(path('app_print_printsingleconcept', {concept: concept.slug})) }}
   {% endif %}
   {% if is_granted('STUDYAREA_EDIT', concept.studyArea) %}
     {{ buttons.add_button(path('app_concept_add'), concept.studyArea.isFrozen ? 'study-area.frozen'|trans : '') }}
