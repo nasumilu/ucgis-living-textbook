@@ -53,7 +53,6 @@ class DenyOnFrozenStudyAreaSubscriber implements EventSubscriberInterface
     }
 
     $configuration = $attributes[0];
-    assert($configuration instanceof DenyOnFrozenStudyArea);
 
     // Retrieve subject
     $arguments = $event->getNamedArguments();
@@ -101,7 +100,7 @@ class DenyOnFrozenStudyAreaSubscriber implements EventSubscriberInterface
 
       // Redirect to new url
       $redirectRoute = $this->router->generate($configuration->route, $routeParams);
-      $event->setController(static fn () => new RedirectResponse($redirectRoute));
+      $event->setController(static fn (): RedirectResponse => new RedirectResponse($redirectRoute));
     }
   }
 }

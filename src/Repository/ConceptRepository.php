@@ -91,10 +91,7 @@ class ConceptRepository extends ServiceEntityRepository
 
   /** @return Concept[] */
   public function findForStudyAreaOrderedByName(
-    StudyArea $studyArea,
-    bool $preLoadData = false,
-    bool $conceptsOnly = false,
-    bool $instancesOnly = false)
+    StudyArea $studyArea, bool $preLoadData = false, bool $conceptsOnly = false, bool $instancesOnly = false): mixed
   {
     $qb = $this->findForStudyAreaOrderByNameQb($studyArea, $conceptsOnly, $instancesOnly);
 
@@ -136,7 +133,7 @@ class ConceptRepository extends ServiceEntityRepository
   }
 
   /** Eagerly load the concept relations, while applying the soft deletable filter. */
-  private function loadRelations(QueryBuilder &$qb, string $alias)
+  private function loadRelations(QueryBuilder &$qb, string $alias): void
   {
     $qb
       ->leftJoin($alias . '.outgoingRelations', 'r')
@@ -146,7 +143,7 @@ class ConceptRepository extends ServiceEntityRepository
   }
 
   /** Eagerly load the text data. */
-  private function preLoadData(QueryBuilder &$qb, string $alias)
+  private function preLoadData(QueryBuilder &$qb, string $alias): void
   {
     $qb
       ->join($alias . '.examples', 'de')

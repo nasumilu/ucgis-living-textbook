@@ -3,25 +3,17 @@
 namespace App\Twig;
 
 use App\Router\LtbRouter;
-use Override;
-use Twig\Extension\AbstractExtension;
-use Twig\TwigFunction;
+use Twig\Attribute\AsTwigFunction;
 
-class LtbRouterExtension extends AbstractExtension
+class LtbRouterExtension
 {
   public function __construct(private readonly LtbRouter $router)
   {
   }
 
-  #[Override]
-  public function getFunctions(): array
-  {
-    return [
-      new TwigFunction('browserPath', $this->browserPath(...)),
-    ];
-  }
-
-  public function browserPath($name, $parameters = []): string
+  /** @phpstan-ignore missingType.iterableValue */
+  #[AsTwigFunction(name: 'browserPath')]
+  public function browserPath(string $name, array $parameters = []): string
   {
     return $this->router->generateBrowserUrl($name, $parameters);
   }

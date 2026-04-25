@@ -12,8 +12,8 @@ use function count;
 
 class ReviewNotificationService
 {
-  private MailerInterface $mailer;
-  private TranslatorInterface $translator;
+  private readonly MailerInterface $mailer;
+  private readonly TranslatorInterface $translator;
 
   public function __construct(MailerInterface $mailer, TranslatorInterface $translator)
   {
@@ -26,7 +26,7 @@ class ReviewNotificationService
    *
    * @throws TransportExceptionInterface
    */
-  public function reviewRequested(Review $review)
+  public function reviewRequested(Review $review): void
   {
     $changeCount = 0;
     foreach ($review->getPendingChanges() as $pendingChange) {
@@ -55,7 +55,7 @@ class ReviewNotificationService
    *
    * @throws TransportExceptionInterface
    */
-  public function submissionDenied(Review $review)
+  public function submissionDenied(Review $review): void
   {
     $this->mailer->send(
       new TemplatedEmail()
@@ -78,7 +78,7 @@ class ReviewNotificationService
    *
    * @throws TransportExceptionInterface
    */
-  public function submissionApproved(Review $review)
+  public function submissionApproved(Review $review): void
   {
     $this->mailer->send(
       new TemplatedEmail()
@@ -109,7 +109,7 @@ class ReviewNotificationService
   }
 
   /** @throws TransportExceptionInterface */
-  public function submissionPublished(Review $review)
+  public function submissionPublished(Review $review): void
   {
     $this->mailer->send(
       new TemplatedEmail()

@@ -29,16 +29,16 @@ use function sprintf;
 #[Autoconfigure(lazy: true)]
 class LinkedSimpleNodeProvider implements ProviderInterface
 {
-  private ConceptRepository          $conceptRepository;
-  private ConceptRelationRepository  $conceptRelationRepository;
-  private ContributorRepository      $contributorRepository;
-  private ExternalResourceRepository $externalResourceRepository;
-  private LearningOutcomeRepository  $learningOutcomeRepository;
-  private NamingService              $namingService;
-  private RelationTypeRepository     $relationTypeRepository;
-  private TagRepository              $tagRepository;
-  private LtbRouter                  $router;
-  private SerializerInterface        $serializer;
+  private readonly ConceptRepository $conceptRepository;
+  private readonly ConceptRelationRepository $conceptRelationRepository;
+  private readonly ContributorRepository $contributorRepository;
+  private readonly ExternalResourceRepository $externalResourceRepository;
+  private readonly LearningOutcomeRepository $learningOutcomeRepository;
+  private readonly NamingService $namingService;
+  private readonly RelationTypeRepository $relationTypeRepository;
+  private readonly TagRepository $tagRepository;
+  private readonly LtbRouter $router;
+  private readonly SerializerInterface $serializer;
 
   public function __construct(
     ConceptRepository $conceptRepository,
@@ -206,7 +206,7 @@ EOT,
     $mappedContributors = [];
     foreach ($contributors as $contributor) {
       $mappedContributors[] = [
-        'nodes'       => $contributor->getConcepts()->map(static fn (Concept $concept) => $idMap[$concept->getNonNullId()]),
+        'nodes'       => $contributor->getConcepts()->map(static fn (Concept $concept): mixed => $idMap[$concept->getNonNullId()]),
         'name'        => $contributor->getName(),
         'description' => $contributor->getDescription(),
         'url'         => $contributor->getUrl(),
@@ -218,7 +218,7 @@ EOT,
     $mappedExternalResources = [];
     foreach ($externalResources as $externalResource) {
       $mappedExternalResources[] = [
-        'nodes'       => $externalResource->getConcepts()->map(static fn (Concept $concept) => $idMap[$concept->getNonNullId()]),
+        'nodes'       => $externalResource->getConcepts()->map(static fn (Concept $concept): mixed => $idMap[$concept->getNonNullId()]),
         'title'       => $externalResource->getTitle(),
         'description' => $externalResource->getDescription(),
         'url'         => $externalResource->getUrl(),
@@ -229,7 +229,7 @@ EOT,
     $mappedLearningOutcomes = [];
     foreach ($learningOutcomes as $learningOutcome) {
       $mappedLearningOutcomes[] = [
-        'nodes'   => $learningOutcome->getConcepts()->map(static fn (Concept $concept) => $idMap[$concept->getNonNullId()]),
+        'nodes'   => $learningOutcome->getConcepts()->map(static fn (Concept $concept): mixed => $idMap[$concept->getNonNullId()]),
         'number'  => $learningOutcome->getNumber(),
         'name'    => $learningOutcome->getName(),
         'content' => $learningOutcome->getText(),
@@ -240,7 +240,7 @@ EOT,
     $mappedTags = [];
     foreach ($tags as $tag) {
       $mappedTags[] = [
-        'nodes'       => $tag->getConcepts()->map(static fn (Concept $concept) => $idMap[$concept->getNonNullId()]),
+        'nodes'       => $tag->getConcepts()->map(static fn (Concept $concept): mixed => $idMap[$concept->getNonNullId()]),
         'color'       => $tag->getColor(),
         'name'        => $tag->getName(),
         'description' => $tag->getDescription(),
@@ -253,7 +253,7 @@ EOT,
       if (!$concept->getPriorKnowledge()->isEmpty()) {
         $mappedPriorKnowledge[] = [
           'node'               => $idMap[$concept->getNonNullId()],
-          'isPriorKnowledgeOf' => $concept->getPriorKnowledge()->map(static fn (Concept $priorKnowledge) => $idMap[$priorKnowledge->getNonNullId()]),
+          'isPriorKnowledgeOf' => $concept->getPriorKnowledge()->map(static fn (Concept $priorKnowledge): mixed => $idMap[$priorKnowledge->getNonNullId()]),
         ];
       }
     }
@@ -273,7 +273,7 @@ EOT,
         'description'  => $studyArea->getDescription(),
         'date_created' => $studyArea->getCreatedAt(),
         'last_updated' => $studyArea->getLastUpdated(),
-        'nodes'        => array_map(fn (Concept $concept) => [
+        'nodes'        => array_map(fn (Concept $concept): array => [
           'instance'            => $concept->isInstance(),
           'label'               => $concept->getName(),
           'link'                => $this->router->generateBrowserUrl('app_concept_show', ['concept' => $concept->getId()]),

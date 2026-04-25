@@ -20,7 +20,6 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 #[UniqueEntity(['email'], errorPath: 'email')]
 #[ORM\Entity(repositoryClass: UserProtoRepository::class)]
-#[ORM\Table]
 #[ORM\Index(columns: ['email'])]
 class UserProto implements UserInterface, PasswordAuthenticatedUserInterface, IdInterface
 {
@@ -57,7 +56,7 @@ class UserProto implements UserInterface, PasswordAuthenticatedUserInterface, Id
   #[Override]
   public function getUserIdentifier(): string
   {
-    return $this->email;
+    return empty($this->email) ? '-' : $this->email;
   }
 
   #[Override]

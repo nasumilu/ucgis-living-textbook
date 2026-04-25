@@ -39,33 +39,33 @@ use const CURLOPT_URL;
 
 class UrlChecker
 {
-  private FilesystemAdapter $bad0UrlCache;
+  private readonly FilesystemAdapter $bad0UrlCache;
 
-  private FilesystemAdapter $bad1UrlCache;
+  private readonly FilesystemAdapter $bad1UrlCache;
 
-  private FilesystemAdapter $bad2UrlCache;
+  private readonly FilesystemAdapter $bad2UrlCache;
 
-  private FilesystemAdapter $bad4UrlCache;
+  private readonly FilesystemAdapter $bad4UrlCache;
 
-  private FilesystemAdapter $bad7UrlCache;
+  private readonly FilesystemAdapter $bad7UrlCache;
 
-  private FilesystemAdapter $goodUrlsCache;
+  private readonly FilesystemAdapter $goodUrlsCache;
 
-  private FilesystemAdapter $studyAreaCache;
+  private readonly FilesystemAdapter $studyAreaCache;
 
-  private ContributorRepository $contributorRepository;
+  private readonly ContributorRepository $contributorRepository;
 
-  private ExternalResourceRepository $externalResourceRepository;
+  private readonly ExternalResourceRepository $externalResourceRepository;
 
-  private LearningOutcomeRepository $learningOutcomeRepository;
+  private readonly LearningOutcomeRepository $learningOutcomeRepository;
 
-  private LearningPathRepository $learningPathRepository;
+  private readonly LearningPathRepository $learningPathRepository;
 
-  private StudyAreaRepository $studyAreaRepository;
+  private readonly StudyAreaRepository $studyAreaRepository;
 
-  private UrlScanner $urlScanner;
+  private readonly UrlScanner $urlScanner;
 
-  private RouterInterface $router;
+  private readonly RouterInterface $router;
 
   /** UrlChecker constructor. */
   public function __construct(
@@ -195,7 +195,7 @@ class UrlChecker
    *
    * @return Url[]|array Returns a flat array of URLs without origin
    */
-  private function scanStudyArea(StudyArea $studyArea)
+  private function scanStudyArea(StudyArea $studyArea): array
   {
     $urls = $this->urlScanner->scanStudyArea($studyArea);
     foreach ($studyArea->getConcepts() as $concept) {
@@ -216,7 +216,7 @@ class UrlChecker
 
     $router = $this->router;
     // Exclude latex URLs
-    $urls = array_filter($urls, static function (Url $entry) use ($router) {
+    $urls = array_filter($urls, static function (Url $entry) use ($router): bool {
       if (!$entry->isInternal()) {
         return true;
       }
@@ -263,7 +263,7 @@ class UrlChecker
    *
    * @throws InvalidArgumentException
    */
-  private function cacheUrl(CacheableUrl $cacheableUrl, AdapterInterface $cache, $expiry): void
+  private function cacheUrl(CacheableUrl $cacheableUrl, AdapterInterface $cache, int $expiry): void
   {
     $cache->save(
       $cache->getItem($cacheableUrl->getCachekey())

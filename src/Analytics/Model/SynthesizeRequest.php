@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class SynthesizeRequest
 {
-  private StudyArea $studyArea;
+  private readonly StudyArea $studyArea;
 
   /**
    * Number of users to skip.
@@ -123,7 +123,7 @@ class SynthesizeRequest
   }
 
   #[Assert\Callback]
-  public function validate(ExecutionContextInterface $context)
+  public function validate(ExecutionContextInterface $context): void
   {
     if ($this->testMoment >= new DateTimeImmutable()) {
       $context->buildViolation('analytics.before-now')
