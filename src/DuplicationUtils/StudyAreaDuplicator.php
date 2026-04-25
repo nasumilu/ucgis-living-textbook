@@ -45,35 +45,35 @@ use function str_replace;
 
 class StudyAreaDuplicator
 {
-  private TagRepository $tagRepository;
-  private UrlContext $urlContext;
+  private readonly TagRepository $tagRepository;
+  private readonly UrlContext $urlContext;
 
-  private string $uploadsPath;
+  private readonly string $uploadsPath;
 
-  private EntityManagerInterface $em;
+  private readonly EntityManagerInterface $em;
 
-  private UrlScanner $urlScanner;
+  private readonly UrlScanner $urlScanner;
 
-  private LtbRouter $router;
+  private readonly LtbRouter $router;
 
-  private AbbreviationRepository $abbreviationRepo;
+  private readonly AbbreviationRepository $abbreviationRepo;
 
-  private ConceptRelationRepository $conceptRelationRepo;
+  private readonly ConceptRelationRepository $conceptRelationRepo;
 
-  private ContributorRepository $contributorRepo;
+  private readonly ContributorRepository $contributorRepo;
 
-  private ExternalResourceRepository $externalResourceRepo;
+  private readonly ExternalResourceRepository $externalResourceRepo;
 
-  private LearningOutcomeRepository $learningOutcomeRepo;
+  private readonly LearningOutcomeRepository $learningOutcomeRepo;
 
-  private LearningPathRepository $learningPathRepo;
+  private readonly LearningPathRepository $learningPathRepo;
 
-  private StudyArea $studyAreaToDuplicate;
+  private readonly StudyArea $studyAreaToDuplicate;
 
-  private StudyArea $newStudyArea;
+  private readonly StudyArea $newStudyArea;
 
   /** @var Concept[] */
-  private array $concepts;
+  private readonly array $concepts;
 
   /** @var LearningPath[] Array of duplicated learning paths ([original id] = new learning path) */
   private array $newLearningPaths = [];
@@ -132,7 +132,7 @@ class StudyAreaDuplicator
    *
    * @throws Exception
    */
-  public function duplicate()
+  public function duplicate(): void
   {
     $this->em->getConnection()->beginTransaction();
     try {
@@ -487,12 +487,8 @@ class StudyAreaDuplicator
     $fileSystem->remove($directory);
   }
 
-  /**
-   * Retrieve the study area uploads path.
-   *
-   * @return string
-   */
-  private function getStudyAreaDirectory(StudyArea $studyArea)
+  /** Retrieve the study area uploads path. */
+  private function getStudyAreaDirectory(StudyArea $studyArea): string
   {
     // Check for null
     if ($studyArea->getId() === null) {

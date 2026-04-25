@@ -27,7 +27,6 @@ use function substr;
 use function usort;
 
 #[ORM\Entity(repositoryClass: PendingChangeRepository::class)]
-#[ORM\Table]
 class PendingChange implements IdInterface
 {
   use Blameable;
@@ -40,7 +39,7 @@ class PendingChange implements IdInterface
   final public const string CHANGE_TYPE_ADD    = '10_add';
   final public const string CHANGE_TYPE_EDIT   = '20_edit';
   final public const string CHANGE_TYPE_REMOVE = '30_remove';
-  final public const array CHANGE_TYPES        = [
+  final public const array  CHANGE_TYPES       = [
     self::CHANGE_TYPE_ADD,
     self::CHANGE_TYPE_EDIT,
     self::CHANGE_TYPE_REMOVE,
@@ -66,23 +65,19 @@ class PendingChange implements IdInterface
   #[ORM\Column(nullable: true)]
   private ?int $objectId = null;
 
-  /**
-   * JSON encoded object.
-   *
-   * @var string|null
-   */
+  /** JSON encoded object. */
   #[Assert\NotBlank(allowNull: false)]
   #[ORM\Column(type: Types::TEXT)]
-  private $payload;
+  private ?string $payload = null;
 
   /**
    * Changed fields in the object.
    *
-   * @var array|null
+   * @var string[]|null
    */
   #[Assert\NotNull]
   #[ORM\Column(type: Types::JSON)]
-  private $changedFields;
+  private ?array $changedFields = null;
 
   /** The owner of the pending change (aka, the user who created it). */
   #[Assert\NotNull]
@@ -129,7 +124,7 @@ class PendingChange implements IdInterface
   {
     // Validate whether the pending change to be merged is of the same type
     if ($this->getObjectType() !== $merge->getObjectType()
-        || $this->getObjectId() !== $merge->getObjectId()) {
+      || $this->getObjectId() !== $merge->getObjectId()) {
       throw new IncompatibleChangeMergeException($this, $merge);
     }
 
@@ -156,80 +151,65 @@ class PendingChange implements IdInterface
   }
 
   /** Order the changes fields */
-  public function orderChangedFields()
+  public function orderChangedFields(): void
   {
-    switch ($this->objectType) {
-      case Abbreviation::class:
-        $sortOrder = [
-          'abbreviation' => 200,
-          'meaning'      => 150,
-        ];
-        break;
-      case Concept::class:
-        $sortOrder = [
-          'name'                => 200,
-          'instance'            => 190,
-          'definition'          => 180,
-          'introduction'        => 170,
-          'theoryExplanation'   => 160,
-          'examples'            => 150,
-          'howTo'               => 145,
-          'synonyms'            => 140,
-          'externalResources'   => 130,
-          'learningOutcomes'    => 120,
-          'priorKnowledge'      => 110,
-          'selfAssessment'      => 90,
-          'relations'           => 80,
-          'incomingRelations'   => 70,
-          'additionalResources' => 85,
-          'contributors'        => 60,
-        ];
-        break;
-      case Contributor::class:
-        $sortOrder = [
-          'name'        => 200,
-          'description' => 150,
-          'url'         => 100,
-        ];
-        break;
-      case ExternalResource::class:
-        $sortOrder = [
-          'title'       => 200,
-          'description' => 150,
-          'url'         => 100,
-        ];
-        break;
-      case LearningOutcome::class:
-        $sortOrder = [
-          'number' => 200,
-          'name'   => 150,
-          'text'   => 100,
-        ];
-        break;
-      case LearningPath::class:
-        $sortOrder = [
-          'name'         => 200,
-          'introduction' => 150,
-          'question'     => 100,
-          'elements'     => 50,
-        ];
-        break;
-      case RelationType::class:
-        $sortOrder = [
-          'name'        => 200,
-          'description' => 150,
-        ];
-        break;
-      default:
-        $sortOrder = [];
-    }
+    $sortOrder = match ($this->objectType) {
+      Abbreviation::class => [
+        'abbreviation' => 200,
+        'meaning'      => 150,
+      ],
+      Concept::class => [
+        'name'              => 200,
+        'instance'          => 190,
+        'definition'        => 180,
+        'introduction'      => 170,
+        'theoryExplanation' => 160,
+        'examples'          => 150,
+        'howTo'             => 145,
+        'synonyms'          => 140,
+        'externalResources' => 130,
+        'learningOutcomes'  => 120,
+        'priorKnowledge'    => 110,
+        'selfAssessment'    => 90,
+        'relations'         => 80,
+        'incomingRelations' => 70,
+        'additionalResources' => 85,
+        'contributors'      => 60,
+      ],
+      Contributor::class => [
+        'name'        => 200,
+        'description' => 150,
+        'url'         => 100,
+      ],
+      ExternalResource::class => [
+        'title'       => 200,
+        'description' => 150,
+        'url'         => 100,
+      ],
+      LearningOutcome::class => [
+        'number' => 200,
+        'name'   => 150,
+        'text'   => 100,
+      ],
+      LearningPath::class => [
+        'name'         => 200,
+        'introduction' => 150,
+        'question'     => 100,
+        'elements'     => 50,
+      ],
+      RelationType::class => [
+        'name'        => 200,
+        'description' => 150,
+      ],
+      default => [],
+    };
 
-    usort($this->changedFields, static function (string $a, string $b) use ($sortOrder) {
+    $this->changedFields ??= [];
+    usort($this->changedFields, static function (string $a, string $b) use ($sortOrder): int {
       if (!array_key_exists($a, $sortOrder) || !array_key_exists($b, $sortOrder)) {
         return 0;
       }
 
-      /* @phpstan-ignore offsetAccess.notFound, offsetAccess.notFound */
       return $sortOrder[$b] <=> $sortOrder[$a];
     });
   }
@@ -299,7 +279,7 @@ class PendingChange implements IdInterface
 
   /** Validates the object id field, which must be empty for new objects, but filled for existing objects. */
   #[Assert\Callback]
-  public function validateObjectId(ExecutionContextInterface $context, $payload)
+  public function validateObjectId(ExecutionContextInterface $context, $payload): void
   {
     $violation = null;
     if ($this->changeType == self::CHANGE_TYPE_ADD) {
@@ -327,8 +307,8 @@ class PendingChange implements IdInterface
   {
     $this->cachedObject = null;
     $this->payload      = $object
-        ? ReviewService::getDataSnapshot($object)
-        : null;
+      ? ReviewService::getDataSnapshot($object)
+      : null;
 
     return $this;
   }

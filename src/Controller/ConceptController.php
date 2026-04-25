@@ -23,6 +23,7 @@ use App\Security\Voters\StudyAreaVoter;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
+use Doctrine\ORM\QueryBuilder;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -71,7 +72,7 @@ class ConceptController extends AbstractController
       if ($imageFile) {
         $imageName = uniqid().'.'.$imageFile->guessExtension();
         $imageFile->move(
-          sprintf('%s/public/uploads/studyarea/%s', $this->getParameter('kernel.project_dir'), $studyArea->getId()), 
+          sprintf('%s/public/uploads/studyarea/%s', $this->getParameter('kernel.project_dir'), $studyArea->getId()),
           $imageName
         );
         $concept->setImagePath(sprintf('/uploads/studyarea/%s/%s', $studyArea->getId(), $imageName));
@@ -147,7 +148,7 @@ class ConceptController extends AbstractController
       if ($imageFile) {
         $imageName = uniqid().'.'.$imageFile->guessExtension();
         $imageFile->move(
-          sprintf('%s/public/uploads/studyarea/%s', $this->getParameter('kernel.project_dir'), $studyArea->getId()), 
+          sprintf('%s/public/uploads/studyarea/%s', $this->getParameter('kernel.project_dir'), $studyArea->getId()),
           $imageName
         );
         $concept->setImagePath(sprintf('/uploads/studyarea/%s/%s', $studyArea->getId(), $imageName));
@@ -288,7 +289,7 @@ class ConceptController extends AbstractController
         'choice_label'  => 'name',
         'class'         => Concept::class,
         'select2'       => true,
-        'query_builder' => static fn (ConceptRepository $conceptRepository) => $conceptRepository->findForStudyAreaOrderByNameQb($studyArea, true),
+        'query_builder' => static fn (ConceptRepository $conceptRepository): QueryBuilder => $conceptRepository->findForStudyAreaOrderByNameQb($studyArea, true),
         'constraints'   => [
           new NotNull(),
         ],
