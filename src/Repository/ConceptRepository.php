@@ -10,6 +10,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use Drenso\Shared\Database\RepositoryTraits\FindIdsTrait;
 use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /** @extends ServiceEntityRepository<Concept> */
 class ConceptRepository extends ServiceEntityRepository
@@ -18,13 +19,28 @@ class ConceptRepository extends ServiceEntityRepository
 
   public function __construct(
     ManagerRegistry $registry,
+    private readonly TokenStorageInterface $tokenStorage,
     #[Autowire('%study_area_slug%')] private readonly string $studyAreaSlug)
   {
     parent::__construct($registry, Concept::class);
   }
 
-  public function findOneByIdOrSlug(string|int|StudyArea $studyArea, string $conceptId): ?Concept
+  public function findOneByIdOrSlug(
+    string|int|StudyArea $studyArea,
+    string $conceptId): ?Concept
   {
+    $token = $this->tokenStorage->getToken();
+    $user  = $token?->getUser();
+    $user  = $user instanceof User ? $user : null;
+
+    if ($user === null && ctype_digit($conceptId)) {
+      /** @var Concept|null $legacyConcept */
+      $legacyConcept = $this->find((int) $conceptId);
+
+      if ($legacyConcept !== null) {
+        $conceptId = $legacyConcept->getSlug();
+      }
+    }
 
     $qb = $this->createQueryBuilder('c')
       ->where('c.deletedAt IS NULL');
@@ -39,21 +55,16 @@ class ConceptRepository extends ServiceEntityRepository
         ->orderBy('sa2.createdAt', 'DESC')
         ->setMaxResults(1);
 
-
       $qb->andWhere('c.studyArea = (' . $latestPublicStudyAreaSubQuery->getDQL() . ')')
-        ->setParameter('publicAccessType', 'public');
-
-
+        ->setParameter('publicAccessType', StudyArea::ACCESS_PUBLIC);
     } else {
       $qb->andWhere('c.studyArea = :studyArea')
-         ->setParameter('studyArea', is_numeric($studyArea) ? (int)$studyArea : $studyArea);
+        ->setParameter('studyArea', is_numeric($studyArea) ? (int) $studyArea : $studyArea);
     }
 
-
-
-    if (ctype_digit($conceptId)) {
+    if ($user !== null && ctype_digit($conceptId)) {
       $qb->andWhere('c.id = :id')
-        ->setParameter('id', (int)$conceptId);
+        ->setParameter('id', (int) $conceptId);
     } else {
       $qb->andWhere('LOWER(c.slug) = LOWER(:slug)')
         ->setParameter('slug', $conceptId);
