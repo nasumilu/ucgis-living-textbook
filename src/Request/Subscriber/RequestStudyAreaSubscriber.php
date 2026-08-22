@@ -81,7 +81,7 @@ class RequestStudyAreaSubscriber implements EventSubscriberInterface
     assert($user === null || $user instanceof User);
 
     // Retrieve study area id from route
-    $studyAreaId = null === $user ? $this->studyAreaSlug : $request->attributes->get(self::STUDY_AREA_KEY, 'current');
+    $studyAreaId = null === $user ? $this->studyAreaSlug : $request->attributes->get(self::STUDY_AREA_KEY, $this->studyAreaSlug);
     if (u($this->studyAreaSlug)->upper()->equalsTo(u($studyAreaId)->upper())) {
       $this->studyArea = $this->studyAreaRepository->findLatestPublicOpenAccess();
       $this->studyAreaId = $studyAreaId;

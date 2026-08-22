@@ -467,6 +467,7 @@ class ConceptController extends AbstractController
   #[IsGranted(StudyAreaVoter::SHOW, subject: 'requestStudyArea')]
   public function show(
     #[MapEntity(expr: 'repository.findOneByIdOrSlug(_studyArea, concept)')] Concept $concept,
+    Request $request,
     RequestStudyArea $requestStudyArea,
     RateLimitedConceptPrinter $generator,
     LearningPathRepository $learningPathRepository): Response
@@ -474,6 +475,14 @@ class ConceptController extends AbstractController
     // Check study area
     if ($concept->getStudyArea()->getId() != $requestStudyArea->getStudyArea()->getId()) {
       throw $this->createNotFoundException();
+    }
+
+    $requestedConcept = (string) $request->attributes->get('concept');
+    if ($this->getUser() === null && ctype_digit($requestedConcept)) {
+      return $this->redirectToRoute('app_concept_show', [
+        '_studyArea' => $request->attributes->get('_studyArea'),
+        'concept'   => $concept->getSlug(),
+      ], Response::HTTP_MOVED_PERMANENTLY);
     }
 
     return $this->render('concept/show.html.twig', [
