@@ -1,7 +1,4 @@
 {
-    "bobv/latex-bundle": {
-        "version": "v1.3.1"
-    },
     "caxy/php-htmldiff": {
         "version": "0.1.x-dev"
     },
@@ -180,9 +177,6 @@
     "markbaker/matrix": {
         "version": "1.1.4"
     },
-    "ml/iri": {
-        "version": "1.1.4"
-    },
     "monolog/monolog": {
         "version": "1.23.0"
     },
@@ -305,9 +299,6 @@
     },
     "rollerworks/password-strength-validator": {
         "version": "v1.3.0"
-    },
-    "ryakad/pandoc-php": {
-        "version": "v1.0.0"
     },
     "sebastian/cli-parser": {
         "version": "1.0.1"

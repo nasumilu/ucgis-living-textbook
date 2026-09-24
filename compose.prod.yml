@@ -21,6 +21,14 @@ services:
       - db
     networks:
       - ltb-network
+  latex-server:
+    build:
+      context: docker/latex-server
+      dockerfile: Containerfile
+    image: nasumilu.io/latext-server:latest
+    container_name: latex-server
+    networks:
+      - ltb-network
 
   nginx:
     image: nginx:1.29.6-alpine

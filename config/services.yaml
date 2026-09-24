@@ -15,8 +15,7 @@ parameters:
   router.request_context.host: '%env(HTTP_HOST)%'
   router.request_context.scheme: '%env(HTTP_SCHEMA)%'
 
-  bobv.latex.pdflatex.location: "/usr/bin/pdflatex"
-  bobv.latex.error_image: "%kernel.project_dir%/public/img/latex/error.jpg"
+  latex_service_base_url: 'http://latex-server:8080/'
   study_area_slug: current
 
 services:
