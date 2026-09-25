@@ -119,7 +119,7 @@ CKEDITOR.dialog.add('latexeditorDialog', function (editor) {
             id: 'preview',
             type: 'html',
             html: '<div>' +
-                '<img class="latex-image" onload="$(this).parent().find(\'.initial,.loader\').hide(); $(this).show();"></img>' +
+                '<img class="latex-image" onload="$(this).parent().find(\'.initial,.loader\').hide(); $(this).show();"/>' +
                 '<span class="initial">Enter a equation</span>' +
                 '<span class="loader">Loading...</span>' +
                 '</div>'
@@ -167,7 +167,7 @@ CKEDITOR.dialog.add('latexeditorDialog', function (editor) {
       var img = editor.document.createElement('img');
       img.setAttribute('contenteditable', false);
       img.setAttribute('class', 'latex-image');
-      img.setAttribute('src', Routing.generate('app_latex_renderlatex', {content: equation}, true));
+      img.setAttribute('src', Routing.generate('app_latex_renderlatex', {content: equation}));
       img.setAttribute('alt', encodeURIComponent(equation));
       latexFigure.append(img);
 

@@ -5,12 +5,14 @@ namespace App\ConceptPrint;
 use App\Entity\Concept;
 use Mpdf\Mpdf;
 use Mpdf\MpdfException;
+use RuntimeException;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
-use RuntimeException;
+
+use function implode;
 
 /**
  * This class generates PDF documents for Concept objects using the Mpdf library.
@@ -18,22 +20,14 @@ use RuntimeException;
  */
 readonly class MpdfConceptGenerator implements ConceptPdfGeneratorInterface
 {
-
   public function __construct(
     private Environment $twig,
     #[Autowire('%kernel.project_dir%')] private string $projectDir,
     #[Autowire('%kernel.cache_dir%')] private string $cacheDir,
-  )
-  {
+  ) {
   }
 
-  /**
-   * Create a PDF document for the given Concept object.
-   *
-   * @param Concept $concept
-   *
-   * @return string
-   */
+  /** Create a PDF document for the given Concept object. */
   public function create(Concept $concept): string
   {
     try {

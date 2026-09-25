@@ -18,10 +18,6 @@ RUN export DEBIAN_FRONTEND=noninteractive \
       libxslt-dev \
     ## Imagick
       imagemagick libmagickwand-dev libmagickcore-dev \
-    # Latex
-      texlive-base texlive-latex-base texlive-latex-extra texlive-fonts-recommended texlive-fonts-extra poppler-utils \
-    # Pandoc
-      pandoc \
     # Python build dependencies \
 # todo: Python sources
 #      build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libsqlite3-dev libreadline-dev libffi-dev curl libbz2-dev \
@@ -90,11 +86,11 @@ RUN pecl install imagick && docker-php-ext-enable imagick
 #    && rm -rf /tmp/*
 # <<< End of Imagick installation
 
-# Fix ulem package
-RUN mkdir /usr/share/texmf/tex/latex/ulem \
-    && (curl -s -f https://raw.githubusercontent.com/bobvandevijver/latex-bundle/v2.7.2/src/Resources/packages/ulem.sty \
-      > /usr/share/texmf/tex/latex/ulem/ulem.sty) \
-    && texhash
+## Fix ulem package
+#RUN mkdir /usr/share/texmf/tex/latex/ulem \
+#    && (curl -s -f https://raw.githubusercontent.com/bobvandevijver/latex-bundle/v2.7.2/src/Resources/packages/ulem.sty \
+#      > /usr/share/texmf/tex/latex/ulem/ulem.sty) \
+#    && texhash
 
 # Install composer globally
 COPY ./docker/ltb/install-composer.sh .
